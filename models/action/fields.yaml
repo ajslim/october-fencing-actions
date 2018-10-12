@@ -1,0 +1,30 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+id:
+    label: ID
+    disabled: true
+
+tabs:
+    fields:
+        gfycat_id:
+            label: 'Gfycat Id'
+            type: text
+            tab: Main
+        gfycat:
+            type: partial
+            path: field_gfycat
+            tab: Main
+        call_on_site:
+            label: 'Call on site'
+            type: relation
+            tab: Main
+        alternate_calls:
+            label: 'Alternate Calls'
+            type: relation
+            tab: Details
+        tags:
+            label: tags
+            type: relation
+            tab: Details

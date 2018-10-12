@@ -1,0 +1,15 @@
+# ===================================
+#  Relation Behavior Config
+# ===================================
+
+tags:
+    label: Tags
+    deferredBinding: true
+    view:
+        list: $/ajslim/fencingactions/models/tag/columns.yaml
+        form: $/ajslim/fencingactions/models/tag/fields.yaml
+        toolbarButtons: create|delete
+    manage:
+        list: $/ajslim/fencingactions/models/tag/columns.yaml
+        form: $/ajslim/fencingactions/models/tag/fields.yaml
+        recordsPerPage: 10

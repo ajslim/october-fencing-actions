@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Tag
+
+# Model Form Field configuration
+form: $/ajslim/fencingactions/models/tag/fields.yaml
+
+# Model Class name
+modelClass: Ajslim\FencingActions\Models\Tag
+
+# Default redirect location
+defaultRedirect: ajslim/fencingactions/tags
+
+# Create page
+create:
+    title: Create Tag
+    redirect: ajslim/fencingactions/tags/update/:id
+    redirectClose: ajslim/fencingactions/tags
+
+# Update page
+update:
+    title: Edit Tag
+    redirect: ajslim/fencingactions/tags
+    redirectClose: ajslim/fencingactions/tags
+
+# Preview page
+preview:
+    title: Preview Tag

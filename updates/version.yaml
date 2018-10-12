@@ -1,8 +1,10 @@
 1.0.1:
     - First version of FencingActions
+    - create_tournaments_table.php
+    - create_tags_table.php
+    - create_fencers_table.php
+    - create_calls_table.php
     - create_actions_table.php
     - create_action_tag_table.php
-    - create_tags_table.php
-    - create_calls_table.php
     - create_action_call_table.php
     - seed_all_tables.php

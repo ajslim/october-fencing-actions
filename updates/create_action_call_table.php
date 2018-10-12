@@ -18,6 +18,12 @@ class CreateActionCallTable extends Migration
                 $table->engine = 'InnoDB';
                 $table->integer('action_id')->unsigned();
                 $table->integer('call_id')->unsigned();
+                $table->foreign('action_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_actions');
+                $table->foreign('call_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_calls');;
                 $table->primary(['action_id', 'call_id']);
             }
         );

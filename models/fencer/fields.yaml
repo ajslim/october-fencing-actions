@@ -1,0 +1,27 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    id:
+        label: ID
+        disabled: true
+    fie_site_link:
+        type: partial
+        path: field_link
+    fie_number:
+        label: FIE Number
+        type: text
+    fie_site_number:
+        label: FIE Site Number
+        type: text
+    name:
+        label: Name
+        type: text
+    country_code:
+        label: Nationality
+        type: text
+    birth:
+        label: Birth Date
+        type: datepicker
+        mode: date

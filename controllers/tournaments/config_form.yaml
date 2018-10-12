@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Tournament
+
+# Model Form Field configuration
+form: $/ajslim/fencingactions/models/tournament/fields.yaml
+
+# Model Class name
+modelClass: Ajslim\Fencingactions\Models\Tournament
+
+# Default redirect location
+defaultRedirect: ajslim/fencingactions/tournaments
+
+# Create page
+create:
+    title: Create Tournament
+    redirect: ajslim/fencingactions/tournaments/update/:id
+    redirectClose: ajslim/fencingactions/tournaments
+
+# Update page
+update:
+    title: Edit Tournament
+    redirect: ajslim/fencingactions/tournaments
+    redirectClose: ajslim/fencingactions/tournaments
+
+# Preview page
+preview:
+    title: Preview Tournament

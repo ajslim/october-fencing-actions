@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Fencer
+
+# Model Form Field configuration
+form: $/ajslim/fencingactions/models/fencer/fields.yaml
+
+# Model Class name
+modelClass: Ajslim\Fencingactions\Models\Fencer
+
+# Default redirect location
+defaultRedirect: ajslim/fencingactions/fencers
+
+# Create page
+create:
+    title: Create Fencer
+    redirect: ajslim/fencingactions/fencers/update/:id
+    redirectClose: ajslim/fencingactions/fencers
+
+# Update page
+update:
+    title: Edit Fencer
+    redirect: ajslim/fencingactions/fencers
+    redirectClose: ajslim/fencingactions/fencers
+
+# Preview page
+preview:
+    title: Preview Fencer

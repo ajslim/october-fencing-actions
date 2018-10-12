@@ -9,6 +9,15 @@ columns:
     gfycat_id:
         label: 'Gfycat Id'
         type: text
+    call_on_site:
+        label: Call
+        relation: call_on_site
+        select: name
+    priority:
+        label: Priority
+        type: partial
+        path: list_priority
     tags:
         label: tags
         relation: tags
+        select: name

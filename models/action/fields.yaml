@@ -2,9 +2,16 @@
 #  Form Field Definitions
 # ===================================
 
-id:
-    label: ID
-    disabled: true
+fields:
+    id:
+        label: ID
+        disabled: true
+    tournament:
+        label: Tournament
+        type: dropdown
+        emptyOption: 'Unknown Tournament'
+        dependsOn: bout
+
 
 tabs:
     fields:
@@ -19,6 +26,24 @@ tabs:
         call_on_site:
             label: 'Call on site'
             type: relation
+            tab: Main
+        priority:
+            tab: Main
+            label: Priority for
+            type: dropdown
+            emptyOption: "Unknown / Other"
+            options:
+                1: Left
+                2: Right
+        left_fencer:
+            label: 'Left Fencer'
+            type: relation
+            emptyOption: "Unknown / Other"
+            tab: Main
+        right_fencer:
+            label: 'Right Fencer'
+            type: relation
+            emptyOption: "Unknown / Other"
             tab: Main
         alternate_calls:
             label: 'Alternate Calls'

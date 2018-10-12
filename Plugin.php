@@ -30,7 +30,8 @@ class Plugin extends PluginBase
      */
     public function register()
     {
-
+        $this->registerConsoleCommand('ajslim.UpdateFencersFromFie', 'Ajslim\FencingActions\Console\UpdateFencersFromFie');
+        $this->registerConsoleCommand('ajslim.getAjslimGfycats', 'Ajslim\FencingActions\Console\getAjslimGfycats');
     }
 
     /**
@@ -51,10 +52,6 @@ class Plugin extends PluginBase
     public function registerComponents()
     {
         return []; // Remove this line to activate
-
-        return [
-            'Ajslim\FencingActions\Components\MyComponent' => 'myComponent',
-        ];
     }
 
     /**
@@ -88,13 +85,19 @@ class Plugin extends PluginBase
                 'order'       => 500,
 
                 'sideMenu' => [
-                    'Actions' => [
+                    'tournaments' => [
+                        'label'       => 'Tournaments',
+                        'icon'        => 'icon-bolt',
+                        'url'         => Backend::url('ajslim/fencingactions/tournaments'),
+                        'permissions' => ['ajslim.fencingactions.*'],
+                    ],
+                    'actions' => [
                         'label'       => 'Actions',
                         'icon'        => 'icon-bolt',
                         'url'         => Backend::url('ajslim/fencingactions/actions'),
                         'permissions' => ['ajslim.fencingactions.*'],
                     ],
-                    'Tags' => [
+                    'tags' => [
                         'label'       => 'Tags',
                         'icon'        => 'icon-bolt',
                         'url'         => Backend::url('ajslim/fencingactions/tags'),

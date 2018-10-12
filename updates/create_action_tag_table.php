@@ -18,6 +18,12 @@ class CreateActionTagTable extends Migration
                 $table->engine = 'InnoDB';
                 $table->integer('action_id')->unsigned();
                 $table->integer('tag_id')->unsigned();
+                $table->foreign('action_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_actions');
+                $table->foreign('tag_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_tags');
                 $table->primary(['action_id', 'tag_id']);
             }
         );

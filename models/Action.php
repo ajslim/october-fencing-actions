@@ -22,7 +22,7 @@ class Action extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = [];
+    protected $fillable = ['gfycat_id', 'priority', 'tags'];
 
     /**
      * @var array Relations
@@ -34,7 +34,10 @@ class Action extends Model
             [
                 'Ajslim\Fencingactions\Models\Call',
                 'key' => 'call_on_site_id'
-            ]
+            ],
+        'tournament' => 'Ajslim\Fencingactions\Models\Tournament',
+        'left_fencer' => ['Ajslim\Fencingactions\Models\Fencer', 'left_fencer_id'],
+        'right_fencer' => ['Ajslim\Fencingactions\Models\Fencer', 'right_fencer_id'],
     ];
     public $belongsToMany = [
         'tags' => [
@@ -59,5 +62,14 @@ class Action extends Model
     public function getGfycatAttribute()
     {
         return $this->gfycat_id;
+    }
+
+    public function getTournamentOptions() {
+
+        if (isset($this->bout)) {
+            return [];
+        }
+        return Tournament::all()->lists('name', 'id');
+
     }
 }

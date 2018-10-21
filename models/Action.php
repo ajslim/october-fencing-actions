@@ -79,7 +79,7 @@ class Action extends Model
         if (isset($this->bout)) {
             return [];
         }
-        return Fencer::all()->lists('name', 'id');
+        return Fencer::all()->lists('last_name', 'id');
 
     }
 
@@ -88,7 +88,7 @@ class Action extends Model
         if (isset($this->bout)) {
             return [];
         }
-        return Fencer::all()->lists('name', 'id');
+        return Fencer::all()->lists('last_name', 'id');
 
     }
 }

@@ -9,8 +9,8 @@ fields:
     bout:
         label: Bout
         type: relation
-        emptyOption: 'Unknown Tournament'
-        dependsOn: bout
+        nameFrom: name
+        emptyOption: 'Unknown Bout'
     tournament:
         label: Tournament
         type: dropdown

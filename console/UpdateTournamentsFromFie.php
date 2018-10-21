@@ -67,8 +67,6 @@ class UpdateTournamentsFromFie extends Command
                 $tds = $row->getElementsByTagName('td');
 
                 if (sizeof($tds) > 0) {
-
-
                     $name = $tds->item(0)->nodeValue;
                     echo $name . " - ";
 
@@ -150,8 +148,6 @@ class UpdateTournamentsFromFie extends Command
             $currentPage = Http::get($currenUrl);
             @$dom->loadHTML($currentPage);
         } while ($currentPageNumber <= $totalPages);
-
-
     }
 
     /**

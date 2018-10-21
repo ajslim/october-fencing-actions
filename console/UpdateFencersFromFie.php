@@ -33,6 +33,26 @@ class UpdateFencersFromFie extends Command
         "result_models_Ranks_page=$pageNumber";
     }
 
+    private function getFirstAndLastName($fullName) {
+        $allNames = explode(" ", $fullName);
+        $lastName = "";
+        $firstName = "";
+
+        foreach($allNames as $name) {
+            // Fie site lists last names as all caps (with hypens) and first names as lower case
+            if (ctype_upper(str_replace("-", "", $name))) {
+                $lastName .= $name . " ";
+            } else {
+                $firstName .= $name . " ";
+            }
+        }
+
+        $lastName = trim($lastName);
+        $firstName = trim($firstName);
+
+        return [$firstName, $lastName];
+    }
+
     /**
      * Execute the console command.
      * @return void
@@ -60,25 +80,11 @@ class UpdateFencersFromFie extends Command
                 $tds = $row->getElementsByTagName('td');
 
                 if (sizeof($tds) > 0) {
-
-
                     $fullName = $tds->item(2)->nodeValue;
 
-                    $allNames = explode(" ", $fullName);
-                    $lastName = "";
-                    $firstName = "";
-
-                    foreach($allNames as $name) {
-                        // Fie site lists last names as all caps (with hypens) and first names as lower case
-                        if (ctype_upper(str_replace("-", "", $name))) {
-                            $lastName .= $name . " ";
-                        } else {
-                            $firstName .= $name . " ";
-                        }
-                    }
-
-                    $lastName = trim($lastName);
-                    $firstName = trim($firstName);
+                    $bothNames = $this->getFirstAndLastName($fullName);
+                    $firstName = $bothNames[0];
+                    $lastName = $bothNames[1];
 
                     echo $lastName . " " . $firstName . " - ";
 
@@ -110,8 +116,6 @@ class UpdateFencersFromFie extends Command
             $currentPage = Http::get($this->makeRankingsUrl('f', 'm', '2019', "$currentPageNumber"));
             @$dom->loadHTML($currentPage);
         } while ($currentPageNumber <= $totalPages);
-
-
     }
 
     /**

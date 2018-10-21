@@ -19,7 +19,7 @@ class CreateActionsTable extends Migration
                 $table->engine = 'InnoDB';
                 $table->increments('id');
                 $table->string('gfycat_id', 100);
-                $table->integer('priority');
+                $table->integer('priority')->nullable();
 
                 $table->integer('call_on_site_id')
                     ->nullable() // To allow deferred bindings

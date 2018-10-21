@@ -22,7 +22,7 @@ class Bout extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = ['left_fencer_id', 'right_fencer_id', 'tournament_id', 'score'];
+    protected $fillable = ['left_fencer_id', 'right_fencer_id', 'tournament_id', 'left_score', 'right_score'];
 
     /**
      * @var array Relations
@@ -44,9 +44,11 @@ class Bout extends Model
 
     public function getNameAttribute()
     {
-        return $this->tournament->name . ':' .
-            $this->left_fencer->last_name . " " . $this->left_fencer->first_name .
+        $bout = Bout::find($this->id);
+
+        return $bout->id . ":" . $bout->tournament->year . " - " . $bout->tournament->place  . ': ' .
+            $bout->left_fencer->last_name . " " . $bout->left_fencer->first_name .
             '-' .
-            $this->right_fencer->last_name . " " . $this->right_fencer->first_name;
+            $bout->right_fencer->last_name . " " . $bout->right_fencer->first_name;
     }
 }

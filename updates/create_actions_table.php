@@ -21,6 +21,24 @@ class CreateActionsTable extends Migration
                 $table->string('gfycat_id', 100);
                 $table->integer('priority');
 
+                $table->integer('call_on_site_id')
+                    ->nullable() // To allow deferred bindings
+                    ->unsigned();
+                $table->foreign('call_on_site_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_calls');
+
+
+                // Actions either have a bout
+                // Or a tournament and left and right fencers
+                $table->integer('bout_id')
+                    ->nullable() // To allow deferred bindings
+                    ->unsigned();
+                $table->foreign('bout_id')
+                    ->references('id')
+                    ->on('ajslim_fencingactions_bouts');
+
+
                 $table->integer('left_fencer_id')
                     ->nullable() // To allow deferred bindings
                     ->unsigned();
@@ -34,13 +52,6 @@ class CreateActionsTable extends Migration
                 $table->foreign('right_fencer_id')
                     ->references('id')
                     ->on('ajslim_fencingactions_fencers');
-
-                $table->integer('call_on_site_id')
-                    ->nullable() // To allow deferred bindings
-                    ->unsigned();
-                $table->foreign('call_on_site_id')
-                    ->references('id')
-                    ->on('ajslim_fencingactions_calls');
 
                 $table->integer('tournament_id')
                     ->nullable() // To allow deferred bindings

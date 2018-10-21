@@ -6,12 +6,26 @@ fields:
     id:
         label: ID
         disabled: true
+    bout:
+        label: Bout
+        type: relation
+        emptyOption: 'Unknown Tournament'
+        dependsOn: bout
     tournament:
         label: Tournament
         type: dropdown
         emptyOption: 'Unknown Tournament'
         dependsOn: bout
-
+    left_fencer:
+        label: 'Left Fencer'
+        type: dropdown
+        emptyOption: "Unknown / Other"
+        dependsOn: bout
+    right_fencer:
+        label: 'Right Fencer'
+        type: dropdown
+        emptyOption: "Unknown / Other"
+        dependsOn: bout
 
 tabs:
     fields:
@@ -35,16 +49,6 @@ tabs:
             options:
                 1: Left
                 2: Right
-        left_fencer:
-            label: 'Left Fencer'
-            type: relation
-            emptyOption: "Unknown / Other"
-            tab: Main
-        right_fencer:
-            label: 'Right Fencer'
-            type: relation
-            emptyOption: "Unknown / Other"
-            tab: Main
         alternate_calls:
             label: 'Alternate Calls'
             type: relation

@@ -35,6 +35,7 @@ class Action extends Model
                 'Ajslim\Fencingactions\Models\Call',
                 'key' => 'call_on_site_id'
             ],
+        'bout' => 'Ajslim\Fencingactions\Models\Bout',
         'tournament' => 'Ajslim\Fencingactions\Models\Tournament',
         'left_fencer' => ['Ajslim\Fencingactions\Models\Fencer', 'left_fencer_id'],
         'right_fencer' => ['Ajslim\Fencingactions\Models\Fencer', 'right_fencer_id'],
@@ -70,6 +71,24 @@ class Action extends Model
             return [];
         }
         return Tournament::all()->lists('name', 'id');
+
+    }
+
+    public function getLeftFencerOptions() {
+
+        if (isset($this->bout)) {
+            return [];
+        }
+        return Fencer::all()->lists('name', 'id');
+
+    }
+
+    public function getRightFencerOptions() {
+
+        if (isset($this->bout)) {
+            return [];
+        }
+        return Fencer::all()->lists('name', 'id');
 
     }
 }

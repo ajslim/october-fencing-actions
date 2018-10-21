@@ -1,7 +1,9 @@
 <?php namespace Ajslim\Fencingactions\Updates;
 
 use Ajslim\FencingActions\Models\Call;
+use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\FencingActions\Models\Tag;
+use Ajslim\Fencingactions\Models\Tournament;
 use October\Rain\Database\Updates\Seeder;
 
 class SeedAllTables extends Seeder
@@ -18,6 +20,5 @@ class SeedAllTables extends Seeder
         Tag::create(['name' => 'In preparation']);
         Tag::create(['name' => 'Attack no - Attack']);
         Tag::create(['name' => 'Separating Attacks']);
-
     }
 }

@@ -1,6 +1,7 @@
 <?php namespace Ajslim\FencingActions\Console;
 
 use Ajslim\FencingActions\Models\Action;
+use Ajslim\FencingActions\Models\Call;
 use Ajslim\FencingActions\Models\Fencer;
 use DateTime;
 use DOMDocument;
@@ -15,7 +16,7 @@ class GetAjslimGfycats extends Command
     /**
      * @var string The console command name.
      */
-    protected $name = 'fencingactions:getAjslimGfycats';
+    protected $name = 'fencingactions:getajslimgfycats';
 
     /**
      * @var string The console command description.
@@ -42,6 +43,7 @@ class GetAjslimGfycats extends Command
 
                     $tags = [];
                     $priority = 0;
+                    $call = null;
                     $gfyTags = $gfycat["tags"];
 
                     if(is_array($gfyTags)) {
@@ -63,6 +65,18 @@ class GetAjslimGfycats extends Command
                             if (strtolower($gfyTag) == "separating attacks") {
                                 $tags[] = "separating attacks"; // Separating attacks id
                             }
+
+                            if (strtolower($gfyTag) == "attack") {
+                                $call = "attack"; // Separating attacks id
+                            }
+
+                            if (strtolower($gfyTag) == "riposte" || strtolower($gfyTag) == "counter riposte") {
+                                $call = "riposte"; // Separating attacks id
+                            }
+
+                            if (strtolower($gfyTag) == "line") {
+                                $call = "line"; // Separating attacks id
+                            }
                         }
                     }
 
@@ -76,6 +90,10 @@ class GetAjslimGfycats extends Command
                             'priority' => $priority,
                         ]
                     );
+                    if ($call != "") {
+                        $action->call_on_site()->associate(Call::where('name', $call)->first()->id);
+                    }
+
                     $action->save();
                 }
             }

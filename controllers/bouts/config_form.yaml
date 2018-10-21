@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Bout
+
+# Model Form Field configuration
+form: $/ajslim/fencingactions/models/bout/fields.yaml
+
+# Model Class name
+modelClass: Ajslim\FencingActions\Models\Bout
+
+# Default redirect location
+defaultRedirect: ajslim/fencingactions/bouts
+
+# Create page
+create:
+    title: Create Bout
+    redirect: ajslim/fencingactions/bouts/update/:id
+    redirectClose: ajslim/fencingactions/bouts
+
+# Update page
+update:
+    title: Edit Bout
+    redirect: ajslim/fencingactions/bouts
+    redirectClose: ajslim/fencingactions/bouts
+
+# Preview page
+preview:
+    title: Preview Bout

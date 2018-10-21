@@ -1,0 +1,24 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    id:
+        label: ID
+        disabled: true
+    left_fencer:
+        label: 'Left Fencer'
+        type: relation
+        emptyOption: "Unknown / Other"
+        tab: Main
+    left_score:
+        label: 'Left Score'
+        type: number
+    right_fencer:
+        label: 'Right Fencer'
+        type: relation
+        emptyOption: "Unknown / Other"
+        tab: Main
+    right_score:
+        label: 'Right Score'
+        type: number

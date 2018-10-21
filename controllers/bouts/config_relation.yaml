@@ -1,0 +1,15 @@
+# ===================================
+#  Relation Behavior Config
+# ===================================
+
+actions:
+    label: Actions
+    deferredBinding: true
+    view:
+        list: $/ajslim/fencingactions/models/action/columns.yaml
+        form: $/ajslim/fencingactions/models/action/fields.yaml
+        toolbarButtons: create|delete
+    manage:
+        list: $/ajslim/fencingactions/models/action/columns.yaml
+        form: $/ajslim/fencingactions/models/action/fields.yaml
+        recordsPerPage: 10

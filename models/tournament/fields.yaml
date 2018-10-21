@@ -8,6 +8,30 @@ fields:
         disabled: true
     name:
         label: Name
+    place:
+        label: Place
+    start_date:
+        label: Start Date
+        type: datepicker
+        mode: date
+    end_date:
+        label: Start Date
+        type: datepicker
+        mode: date
+    fie_id:
+        label: FIE Id
+    weapon:
+        label: Weapon
+    gender:
+        label: Gender
+    type:
+        label: Type
+    event:
+        label: Event
+    bouts:
+        label: Bouts
+        type: partial
+        path: field_bouts
     actions:
         label: Actions
         type: partial

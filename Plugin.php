@@ -32,6 +32,7 @@ class Plugin extends PluginBase
     {
         $this->registerConsoleCommand('ajslim.UpdateFencersFromFie', 'Ajslim\FencingActions\Console\UpdateFencersFromFie');
         $this->registerConsoleCommand('ajslim.getAjslimGfycats', 'Ajslim\FencingActions\Console\getAjslimGfycats');
+        $this->registerConsoleCommand('ajslim.UpdateTournamentsFromFie', 'Ajslim\FencingActions\Console\UpdateTournamentsFromFie');
     }
 
     /**
@@ -91,10 +92,22 @@ class Plugin extends PluginBase
                         'url'         => Backend::url('ajslim/fencingactions/tournaments'),
                         'permissions' => ['ajslim.fencingactions.*'],
                     ],
+                    'bouts' => [
+                        'label'       => 'Bouts',
+                        'icon'        => 'icon-bolt',
+                        'url'         => Backend::url('ajslim/fencingactions/bouts'),
+                        'permissions' => ['ajslim.fencingactions.*'],
+                    ],
                     'actions' => [
                         'label'       => 'Actions',
                         'icon'        => 'icon-bolt',
                         'url'         => Backend::url('ajslim/fencingactions/actions'),
+                        'permissions' => ['ajslim.fencingactions.*'],
+                    ],
+                    'fencers' => [
+                        'label'       => 'Fencers',
+                        'icon'        => 'icon-bolt',
+                        'url'         => Backend::url('ajslim/fencingactions/fencers'),
                         'permissions' => ['ajslim.fencingactions.*'],
                     ],
                     'tags' => [

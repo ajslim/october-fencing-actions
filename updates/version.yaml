@@ -3,6 +3,7 @@
     - create_tournaments_table.php
     - create_tags_table.php
     - create_fencers_table.php
+    - create_bouts_table.php
     - create_calls_table.php
     - create_actions_table.php
     - create_action_tag_table.php

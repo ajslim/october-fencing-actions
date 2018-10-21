@@ -9,3 +9,21 @@ columns:
     name:
         label: Name
         searchable: true
+    place:
+        label: Place
+    start_date:
+        label: Start Date
+        type: date
+    end_date:
+        label: Start Date
+        type: date
+    fie_id:
+        label: FIE Id
+    weapon:
+        label: Weapon
+    gender:
+        label: Gender
+    type:
+        label: Type
+    event:
+        label: Event

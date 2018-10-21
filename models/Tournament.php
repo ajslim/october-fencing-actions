@@ -22,13 +22,27 @@ class Tournament extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'year',
+        'fie_id',
+        'name',
+        'place',
+        'weapon',
+        'country_code',
+        'start_date',
+        'end_date',
+        'category',
+        'gender',
+        'type',
+        'event',
+    ];
 
     /**
      * @var array Relations
      */
     public $hasOne = [];
     public $hasMany = [
+        'bouts' => 'Ajslim\Fencingactions\Models\Bout',
         'actions' => 'Ajslim\Fencingactions\Models\Action',
     ];
     public $belongsTo = [];

@@ -62,8 +62,25 @@ class UpdateFencersFromFie extends Command
                 if (sizeof($tds) > 0) {
 
 
-                    $name = $tds->item(2)->nodeValue;
-                    echo $name . " - ";
+                    $fullName = $tds->item(2)->nodeValue;
+
+                    $allNames = explode(" ", $fullName);
+                    $lastName = "";
+                    $firstName = "";
+
+                    foreach($allNames as $name) {
+                        // Fie site lists last names as all caps (with hypens) and first names as lower case
+                        if (ctype_upper(str_replace("-", "", $name))) {
+                            $lastName .= $name . " ";
+                        } else {
+                            $firstName .= $name . " ";
+                        }
+                    }
+
+                    $lastName = trim($lastName);
+                    $firstName = trim($firstName);
+
+                    echo $lastName . " " . $firstName . " - ";
 
                     $fieSiteLink = $tds->item(2)->getElementsByTagName('a')->item(0)->getAttribute('href');
                     $fieSiteNumber = substr(substr($fieSiteLink, strrpos($fieSiteLink, '-') + 1), 0, -1);
@@ -79,7 +96,8 @@ class UpdateFencersFromFie extends Command
                     $fencer = Fencer::updateOrCreate(
                         ['fie_site_number' => $fieSiteNumber],
                         [
-                            'name' => $name,
+                            'last_name' => $lastName,
+                            'first_name' => $firstName,
                             'country_code' => $countryCode,
                             'birth' => $birth,
                         ]

@@ -16,7 +16,8 @@ class CreateFencersTable extends Migration
                 ->nullable();
             $table->string('fie_site_number')
                 ->nullable();
-            $table->string('name', 100);
+            $table->string('first_name', 100);
+            $table->string('last_name', 100);
             $table->string('country_code', 3)
                 ->nullable();
             $table->date('birth')

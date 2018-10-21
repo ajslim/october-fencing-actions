@@ -44,6 +44,9 @@ class Bout extends Model
 
     public function getNameAttribute()
     {
-        return $this->tournament->name . ':' . $this->left_fencer->name . '-' . $this->right_fencer->name;
+        return $this->tournament->name . ':' .
+            $this->left_fencer->last_name . " " . $this->left_fencer->first_name .
+            '-' .
+            $this->right_fencer->last_name . " " . $this->right_fencer->first_name;
     }
 }

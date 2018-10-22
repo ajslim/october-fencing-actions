@@ -90,6 +90,9 @@ class UpdateFencersFromFie extends Command
                     $tds = $row->getElementsByTagName('td');
 
                     if (sizeof($tds) > 0) {
+                        $rank = intval($tds->item(0)->nodeValue);
+                        echo $rank . " - ";
+
                         $fullName = $tds->item(2)->nodeValue;
 
                         $bothNames = $this->getFirstAndLastName($fullName);
@@ -125,6 +128,10 @@ class UpdateFencersFromFie extends Command
                                 'gender' => $gender, // Determined by list at top of function
                             ]
                         );
+                        // Update the rank as we go
+                        if (!$fencer->highest_rank || $rank < $fencer->highest_rank) {
+                            $fencer->highest_rank = $rank;
+                        }
                         $fencer->save();
                     }
                 }

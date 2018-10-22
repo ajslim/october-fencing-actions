@@ -55,10 +55,21 @@ class UpdateBoutsFromFie extends Command
      */
     public function handle()
     {
-        $gender = $this->argument('gender');
-        $fencers = Fencer::where('gender', '=', $gender)->get();
 
-        foreach($fencers as $fencer) {
+        $lowestRank = $this->option('lowestRank');
+        $gender = $this->argument('gender');
+        if ($lowestRank) {
+            $fencers = Fencer::where([
+                ['gender', '=', $gender],
+                ['highest_rank', '<=', intval($lowestRank)]
+            ])->get();
+        } else {
+            $fencers = Fencer::where('gender', '=', $gender)->get();
+        }
+
+
+        $totalNumberOfFencers = count($fencers);
+        foreach($fencers as $fencerIndex=>$fencer) {
             $currenUrl = $this->makemakeHeadToHeadUrl($fencer->last_name, $fencer->first_name,
                 $fencer->fie_site_number);
             $fencerBoutsPage = Http::get($currenUrl);
@@ -83,7 +94,6 @@ class UpdateBoutsFromFie extends Command
             // bouts
             foreach ($historyEventNames as $index => $historyEvent) {
                 $eventFullName = trim($historyEvent->nodeValue);
-                echo $eventFullName . "\n";
 
                 $eventParts = explode(" ", $eventFullName);
                 if (sizeof($eventParts) > 8) {
@@ -122,26 +132,13 @@ class UpdateBoutsFromFie extends Command
                         ->where('type', '=', $eventType)
                         ->first();
 
-                    echo $tournament;
-                    echo "\n";
-                    echo "$eventName: $eventPlace: $eventWeapon:$eventCategory:$eventType \n";
-                    echo $eventDate->format('Y-m-d');
-                    echo "\n";
-                    echo "$leftFirstName, $leftLastName: $leftScore\n";
                     $leftFencer = Fencer::where("first_name", "=", $leftFirstName)
                         ->where("last_name", "=", $leftLastName)
                         ->first();
-                    echo "\n";
-                    echo $leftFencer;
-                    echo "\n";
 
-                    echo "$rightFirstName, $rightLastName: $rightScore\n";
                     $rightFencer = Fencer::where("first_name", "=", $rightFirstName)
                         ->where("last_name", "=", $rightLastName)
                         ->first();
-                    echo "\n";
-                    echo $rightFencer;
-                    echo "\n";
 
                     if ($tournament && $leftFencer && $rightFencer) {
                         // Check to see that the reversed bout was not saved
@@ -155,7 +152,7 @@ class UpdateBoutsFromFie extends Command
                             'right_score' => $leftScore,
                         ])->get();
 
-                        if (!reversed) {
+                        if (count($reversed) == 0) {
                             $bout = Bout::updateOrCreate(
                                 [
                                     'tournament_id' => $tournament->id,
@@ -166,10 +163,13 @@ class UpdateBoutsFromFie extends Command
                                 ]
                             );
                             $bout->save();
+
+                            echo "$fencerIndex/$totalNumberOfFencers - Adding Bout: $leftFirstName, $leftLastName: $leftScore - $rightFirstName, $rightLastName: $rightScore\r";
+                        } else {
+                            echo "$fencerIndex/$totalNumberOfFencers - Duplicate Bout: $leftFirstName, $leftLastName: $leftScore - $rightFirstName, $rightLastName: $rightScore\r";
                         }
                     }
                 }
-                echo "\n----------------------\n";
             }
         }
     }
@@ -191,6 +191,8 @@ class UpdateBoutsFromFie extends Command
      */
     protected function getOptions()
     {
-        return [];
+        return [
+            ['lowestRank', null, InputOption::VALUE_OPTIONAL, 'The lowest rank fencer to consider.', null],
+        ];
     }
 }

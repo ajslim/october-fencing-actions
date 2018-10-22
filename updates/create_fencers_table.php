@@ -23,6 +23,12 @@ class CreateFencersTable extends Migration
                 ->nullable();
             $table->date('birth')
                 ->nullable();
+
+            // This is useful for grabbing fencers who achieved a certain rank
+            // when importing bouts
+            $table->integer('highest_rank')
+                ->nullable();
+
             $table->timestamps();
         });
     }

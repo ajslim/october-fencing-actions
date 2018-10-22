@@ -10,13 +10,14 @@ columns:
         label: 'Thumnail'
         type: partial
         path: list_gfycat_poster
-    gfycat_id:
-        label: 'Gfycat Id'
-        type: text
     call_on_site:
         label: Call
         relation: call_on_site
         select: name
+    leftname:
+        label: Left Fencer
+    rightname:
+        label: Right Fencer
     priority:
         label: Priority
         type: partial

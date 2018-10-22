@@ -22,13 +22,15 @@ class Bout extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = ['left_fencer_id', 'right_fencer_id', 'tournament_id', 'left_score', 'right_score'];
+    protected $fillable = ['left_fencer_id', 'right_fencer_id', 'tournament_id', 'left_score', 'right_score', 'cache_name'];
 
     /**
      * @var array Relations
      */
     public $hasOne = [];
-    public $hasMany = [];
+    public $hasMany = [
+        'actions' => 'Ajslim\Fencingactions\Models\Action',
+    ];
     public $belongsTo = [
         'bout' => 'Ajslim\Fencingactions\Models\Bout',
         'tournament' => 'Ajslim\Fencingactions\Models\Tournament',

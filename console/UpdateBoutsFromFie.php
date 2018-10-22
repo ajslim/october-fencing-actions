@@ -55,7 +55,8 @@ class UpdateBoutsFromFie extends Command
      */
     public function handle()
     {
-        $fencers = Fencer::all();
+        $gender = $this->argument('gender');
+        $fencers = Fencer::where('gender', '=', $gender)->get();
 
         foreach($fencers as $fencer) {
             $currenUrl = $this->makemakeHeadToHeadUrl($fencer->last_name, $fencer->first_name,
@@ -143,16 +144,29 @@ class UpdateBoutsFromFie extends Command
                     echo "\n";
 
                     if ($tournament && $leftFencer && $rightFencer) {
-                        $bout = Bout::updateOrCreate(
-                            [
-                                'tournament_id' => $tournament->id,
-                                'left_fencer_id' => $leftFencer->id,
-                                'right_fencer_id' => $rightFencer->id,
-                                'left_score' => $leftScore,
-                                'right_score' => $rightScore
-                            ]
-                        );
-                        $bout->save();
+                        // Check to see that the reversed bout was not saved
+                        // since you can't tell which side a fencer is on
+                        // on the FIE site
+                        $reversed = Bout::where([
+                            'tournament_id' => $tournament->id,
+                            'left_fencer_id' => $rightFencer->id,
+                            'right_fencer_id' => $leftFencer->id,
+                            'left_score' => $rightScore,
+                            'right_score' => $leftScore,
+                        ])->get();
+
+                        if (!reversed) {
+                            $bout = Bout::updateOrCreate(
+                                [
+                                    'tournament_id' => $tournament->id,
+                                    'left_fencer_id' => $leftFencer->id,
+                                    'right_fencer_id' => $rightFencer->id,
+                                    'left_score' => $leftScore,
+                                    'right_score' => $rightScore,
+                                ]
+                            );
+                            $bout->save();
+                        }
                     }
                 }
                 echo "\n----------------------\n";
@@ -166,7 +180,9 @@ class UpdateBoutsFromFie extends Command
      */
     protected function getArguments()
     {
-        return [];
+        return [
+            ['gender', InputArgument::REQUIRED, 'The gender to get bouts from'],
+        ];
     }
 
     /**

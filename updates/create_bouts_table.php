@@ -12,7 +12,8 @@ class CreateBoutsTable extends Migration
         Schema::connection('business')->create('ajslim_fencingactions_bouts', function(Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->string('cache_name');
+            $table->string('cache_name')
+                ->nullable(); // A place to cache the bout name to speed up lookups
             $table->integer('left_score');
             $table->integer('right_score');
 

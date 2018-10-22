@@ -59,63 +59,81 @@ class UpdateFencersFromFie extends Command
      */
     public function handle()
     {
-        $currentPageNumber = 1;
-        $mensFoilRankingFirstPage = Http::get($this->makeRankingsUrl('f', 'm', '2019', "$currentPageNumber"));
+        $weapon = $this->argument('weapon');
+        $gender = $this->argument('gender');
 
-        $dom = new DOMDocument();
+        $currentYear = intval(date('Y'));
+        $startYear = $this->argument('startYear');
 
-        // The @ suppreses warnings from bad html
-        @$dom->loadHTML($mensFoilRankingFirstPage);
+        for($year = $startYear; $year <= $currentYear; $year += 1) {
+            $yearString = strval($year);
 
-        $finder = new DomXPath($dom);
-        $classname="last";
-        $lastPage = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+            echo "$yearString - $weapon - $gender \n";
+            $currentPageNumber = 1;
+            $rankingFirstPage = Http::get($this->makeRankingsUrl($weapon, $gender, $yearString, "$currentPageNumber"));
 
-        // Get the total pages
-        $totalPages = intval($lastPage->item(0)->textContent);
+            $dom = new DOMDocument();
 
-        do {
-            $trs = $dom->getElementsByTagName('tr');
-            foreach ($trs as $row) {
-                $tds = $row->getElementsByTagName('td');
+            // The @ suppreses warnings from bad html
+            @$dom->loadHTML($rankingFirstPage);
 
-                if (sizeof($tds) > 0) {
-                    $fullName = $tds->item(2)->nodeValue;
+            $finder = new DomXPath($dom);
+            $classname = "last";
+            $lastPage = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
 
-                    $bothNames = $this->getFirstAndLastName($fullName);
-                    $firstName = $bothNames[0];
-                    $lastName = $bothNames[1];
+            // Get the total pages
+            $totalPages = intval($lastPage->item(0)->textContent);
 
-                    echo $lastName . " " . $firstName . " - ";
+            do {
+                $trs = $dom->getElementsByTagName('tr');
+                foreach ($trs as $row) {
+                    $tds = $row->getElementsByTagName('td');
 
-                    $fieSiteLink = $tds->item(2)->getElementsByTagName('a')->item(0)->getAttribute('href');
-                    $fieSiteNumber = substr(substr($fieSiteLink, strrpos($fieSiteLink, '-') + 1), 0, -1);
-                    echo $fieSiteNumber . " - ";
+                    if (sizeof($tds) > 0) {
+                        $fullName = $tds->item(2)->nodeValue;
 
-                    $countryCode = $tds->item(3)->nodeValue;
-                    echo $countryCode . " - ";
+                        $bothNames = $this->getFirstAndLastName($fullName);
+                        $firstName = $bothNames[0];
+                        $lastName = $bothNames[1];
 
-                    $birth = DateTime::createFromFormat('d.m.y', $tds->item(4)->nodeValue);
-                    echo $birth->format('Y-m-d');
-                    echo "\n";
+                        echo $lastName . " " . $firstName . " - ";
 
-                    $fencer = Fencer::updateOrCreate(
-                        ['fie_site_number' => $fieSiteNumber],
-                        [
-                            'last_name' => $lastName,
-                            'first_name' => $firstName,
-                            'country_code' => $countryCode,
-                            'birth' => $birth,
-                        ]
-                    );
-                    $fencer->save();
+                        $fieSiteLink = $tds->item(2)->getElementsByTagName('a')->item(0)->getAttribute('href');
+                        $fieSiteNumber = substr(substr($fieSiteLink, strrpos($fieSiteLink, '-') + 1), 0, -1);
+                        echo $fieSiteNumber . " - ";
+
+                        $countryCode = $tds->item(3)->nodeValue;
+                        echo $countryCode . " - ";
+
+                        $birth = DateTime::createFromFormat('d.m.y', $tds->item(4)->nodeValue);
+
+                        if (!$birth) {
+                            // Fuck you SANGOWAWA BABATUNDE OLUFEMI, have a birthday like a normal person
+                            continue;
+                        }
+
+                        echo $birth->format('Y-m-d');
+                        echo "\n";
+
+                        $fencer = Fencer::updateOrCreate(
+                            ['fie_site_number' => $fieSiteNumber],
+                            [
+                                'last_name' => $lastName,
+                                'first_name' => $firstName,
+                                'country_code' => $countryCode,
+                                'birth' => $birth,
+                                'gender' => $gender, // Determined by list at top of function
+                            ]
+                        );
+                        $fencer->save();
+                    }
                 }
-            }
 
-            $currentPageNumber += 1;
-            $currentPage = Http::get($this->makeRankingsUrl('f', 'm', '2019', "$currentPageNumber"));
-            @$dom->loadHTML($currentPage);
-        } while ($currentPageNumber <= $totalPages);
+                $currentPageNumber += 1;
+                $currentPage = Http::get($this->makeRankingsUrl($weapon, $gender, $year, "$currentPageNumber"));
+                @$dom->loadHTML($currentPage);
+            } while ($currentPageNumber <= $totalPages);
+        }
     }
 
     /**
@@ -124,7 +142,11 @@ class UpdateFencersFromFie extends Command
      */
     protected function getArguments()
     {
-        return [];
+        return [
+            ['startYear', InputArgument::REQUIRED, 'The year to start searching from'],
+            ['weapon', InputArgument::REQUIRED, 'The weapon to get fencers from'],
+            ['gender', InputArgument::REQUIRED, 'The gender to get fencers from'],
+        ];
     }
 
     /**

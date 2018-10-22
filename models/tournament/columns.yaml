@@ -9,8 +9,12 @@ columns:
     name:
         label: Name
         searchable: true
+    year:
+        label: Year
+        searchable: true
     place:
         label: Place
+        searchable: true
     start_date:
         label: Start Date
         type: date

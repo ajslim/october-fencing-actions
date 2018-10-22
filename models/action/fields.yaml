@@ -6,14 +6,16 @@ fields:
     id:
         label: ID
         disabled: true
-    bout:
-        label: Bout
-        type: relation
-        emptyOption: 'Unknown Bout'
     tournament:
         label: Tournament
+        comment: Select a tournament to filter bouts.
         type: dropdown
         dependsOn: bout
+    bout:
+        label: Bout
+        type: dropdown
+        comment: If no bout is selected, fencers can be manually selected
+        dependsOn: tournament
     left_fencer:
         label: 'Left Fencer'
         type: dropdown

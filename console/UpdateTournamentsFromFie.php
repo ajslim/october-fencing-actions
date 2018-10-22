@@ -45,7 +45,9 @@ class UpdateTournamentsFromFie extends Command
     public function handle()
     {
         $currentPageNumber = 1;
-        $currenUrl = $this->makeTournamentsUrl('f', 'm', "$currentPageNumber");
+        $weapon = $this->argument('weapon');
+        $gender = $this->argument('gender');
+        $currenUrl = $this->makeTournamentsUrl($weapon, $gender, "$currentPageNumber");
         $mensFoiltournamentFirstPage = Http::get($currenUrl);
 
         $dom = new DOMDocument();
@@ -156,7 +158,10 @@ class UpdateTournamentsFromFie extends Command
      */
     protected function getArguments()
     {
-        return [];
+        return [
+            ['weapon', InputArgument::REQUIRED, 'The weapon to get fencers from'],
+            ['gender', InputArgument::REQUIRED, 'The gender to get fencers from'],
+        ];
     }
 
     /**

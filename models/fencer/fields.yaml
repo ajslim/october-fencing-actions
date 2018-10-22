@@ -24,6 +24,12 @@ fields:
     country_code:
         label: Nationality
         type: text
+    gender:
+        label: Gender
+        type: dropdown
+        options:
+            f: F
+            m: M
     birth:
         label: Birth Date
         type: datepicker

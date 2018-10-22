@@ -6,9 +6,10 @@ columns:
     id:
         label: ID
         searchable: true
-    name:
+    cache_name:
         label: 'Name'
         type: text
+        searchable: true
     left_score:
         label: 'Left Score'
         type: number

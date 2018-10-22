@@ -9,6 +9,12 @@ columns:
     first_name:
         label: First Name
         type: text
+        searchable: true
     last_name:
         label: Last Name
         type: text
+        searchable: true
+    gender:
+        label: Gender
+    birth:
+        label: Birth Date

@@ -24,7 +24,7 @@ class Fencer extends Model
      *
      * @var array Fillable fields
      */
-    protected $fillable = ['first_name', 'last_name', 'fie_site_number', 'fie_number', 'birth', 'country_code'];
+    protected $fillable = ['first_name', 'last_name', 'fie_site_number', 'fie_number', 'birth', 'country_code', 'gender'];
 
     /**
      * @var array Relations

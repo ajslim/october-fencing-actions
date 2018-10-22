@@ -12,6 +12,7 @@ class CreateFencersTable extends Migration
         Schema::connection('business')->create('ajslim_fencingactions_fencers', function(Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
+            $table->string('gender', 1);
             $table->string('fie_number')
                 ->nullable();
             $table->string('fie_site_number')

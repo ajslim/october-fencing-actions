@@ -52,4 +52,9 @@ class Tournament extends Model
     public $morphMany = [];
     public $attachOne = [];
     public $attachMany = [];
+
+    public function getFullnameAttribute()
+    {
+        return $this->year . " " . $this->place . " - " . $this->name;
+    }
 }

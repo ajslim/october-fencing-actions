@@ -45,10 +45,13 @@ class Bout extends Model
     public function getNameAttribute()
     {
         $bout = Bout::find($this->id);
+        $tournament = Tournament::find($bout->tournament_id);
+        $leftFencer = Fencer::find($bout->left_fencer_id);
+        $rightFencer = Fencer::find($bout->right_fencer_id);
 
-        return $bout->id . ":" . $bout->tournament->year . " - " . $bout->tournament->place  . ': ' .
-            $bout->left_fencer->last_name . " " . $bout->left_fencer->first_name .
+        return $tournament->fullname . ': ' .
+            $leftFencer->last_name . " " . $leftFencer->first_name .
             '-' .
-            $bout->right_fencer->last_name . " " . $bout->right_fencer->first_name;
+            $rightFencer->last_name . " " . $rightFencer->first_name;
     }
 }

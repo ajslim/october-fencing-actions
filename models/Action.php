@@ -66,29 +66,45 @@ class Action extends Model
     }
 
     public function getTournamentOptions() {
-
         if (isset($this->bout)) {
-            return [];
-        }
-        return Tournament::all()->lists('name', 'id');
+            $tournament = Tournament::find($this->bout->tournament_id);
 
+            // Populate from bout
+            return [
+                null => $tournament->fullname
+            ];
+        }
+
+        // Add an empty option to the beginning of the list
+        return array_merge([null=> "Unknown / Other"], Tournament::all()->lists('fullname', 'id'));
     }
 
     public function getLeftFencerOptions() {
-
         if (isset($this->bout)) {
-            return [];
-        }
-        return Fencer::all()->lists('last_name', 'id');
+            $leftFencer = Fencer::find($this->bout->left_fencer_id);
 
+            // Populate from bout
+            return [
+                null => $leftFencer->name
+            ];
+        }
+
+        // Add an empty option to beginning of the list
+        return array_merge([null=> "Unknown / Other"], Fencer::all()->lists('name', 'id'));
     }
 
     public function getRightFencerOptions() {
 
         if (isset($this->bout)) {
-            return [];
-        }
-        return Fencer::all()->lists('last_name', 'id');
+            $rightFencer = Fencer::find($this->bout->right_fencer_id);
 
+            // Populate from bout
+            return [
+                null => $rightFencer->name
+            ];
+        }
+
+        // Add an empty option to beginning of the list
+        return array_merge([null=> "Unknown / Other"], Fencer::all()->lists('name', 'id'));
     }
 }

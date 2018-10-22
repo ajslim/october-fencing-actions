@@ -9,22 +9,18 @@ fields:
     bout:
         label: Bout
         type: relation
-        nameFrom: name
         emptyOption: 'Unknown Bout'
     tournament:
         label: Tournament
         type: dropdown
-        emptyOption: 'Unknown Tournament'
         dependsOn: bout
     left_fencer:
         label: 'Left Fencer'
         type: dropdown
-        emptyOption: "Unknown / Other"
         dependsOn: bout
     right_fencer:
         label: 'Right Fencer'
         type: dropdown
-        emptyOption: "Unknown / Other"
         dependsOn: bout
 
 tabs:

@@ -42,4 +42,9 @@ class Fencer extends Model
     public function getFiesitelinkAttribute() {
         return "http://fie.org/fencers/fencer/$this->fie_site_number";
     }
+
+    public function getNameAttribute()
+    {
+        return $this->last_name . ", " . $this->first_name;
+    }
 }

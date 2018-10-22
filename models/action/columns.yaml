@@ -6,6 +6,10 @@ columns:
     id:
         label: ID
         searchable: true
+    gfycat:
+        label: 'Thumnail'
+        type: partial
+        path: list_gfycat_poster
     gfycat_id:
         label: 'Gfycat Id'
         type: text

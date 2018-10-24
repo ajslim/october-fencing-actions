@@ -24,3 +24,7 @@ fields:
     right_score:
         label: 'Right Score'
         type: number
+    actions:
+        label: 'Actions'
+        type: partial
+        path: field_actions

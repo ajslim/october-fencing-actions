@@ -4,6 +4,9 @@ use Model;
 
 /**
  * Bout Model
+ *
+ * @mixin \Eloquent
+ * @mixin \Illuminate\Database\Eloquent\Model
  */
 class Bout extends Model
 {
@@ -44,25 +47,84 @@ class Bout extends Model
     public $attachOne = [];
     public $attachMany = [];
 
-    public function getNameAttribute()
-    {
-        if ($this->cache_name) {
-            return $this->cache_name;
-        }
 
-        // Update the bouts name and cache it
+    /**
+     * Reverses left and right fencer
+     *
+     * @return void
+     */
+    public function reverseFencers()
+    {
         $bout = Bout::find($this->id);
+
+        $temp = $bout->left_fencer_id;
+        $bout->left_fencer_id = $bout->right_fencer_id;
+        $bout->right_fencer_id = $temp;
+
+        $temp = $bout->left_score;
+        $bout->left_score = $bout->right_score;
+        $bout->right_score = $temp;
+
+        $bout->cache_name = Bout::generateName($bout);
+
+        $bout->save();
+    }
+
+
+    /**
+     * Generates a name for the bout based on the tournament
+     * and fencers names
+     *
+     * @param Bout $bout Bout to generate name from
+     *
+     * @return string
+     */
+    public static function generateName($bout): string
+    {
         $tournament = Tournament::find($bout->tournament_id);
         $leftFencer = Fencer::find($bout->left_fencer_id);
         $rightFencer = Fencer::find($bout->right_fencer_id);
 
-        $name = $tournament->fullname . ': ' .
-            $leftFencer->last_name . " " . $leftFencer->first_name .
-            '-' .
-            $rightFencer->last_name . " " . $rightFencer->first_name;
+        return $tournament->fullname . ': '
+            . $leftFencer->last_name . " " . $leftFencer->first_name
+            . '-' . $rightFencer->last_name . " " . $rightFencer->first_name;
+    }
 
-        $bout->cache_name = $name;
+
+    /**
+     * Updates the cached name on the bout
+     *
+     * @return string
+     */
+    public function updateCacheName(): string
+    {
+        $bout = Bout::find($this->id);
+
+        // Update the bouts name and cache it
+        $bout->cache_name = $this->generateName($bout);
         $bout->save();
+
+        return $bout->cache_name;
+    }
+
+
+    /**
+     * Returns the cached name of the bout or creates a name
+     * in the form
+     *
+     * <Tournament Full name>: <left name>-<right name>
+     *
+     * and caches it
+     *
+     * @return string
+     */
+    public function getNameAttribute()
+    {
+        if ($this->cache_name !== null) {
+            return $this->cache_name;
+        }
+
+        $name = $this->updateCacheName();
 
         return $name;
     }

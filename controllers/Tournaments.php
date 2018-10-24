@@ -5,6 +5,8 @@ use Backend\Classes\Controller;
 
 /**
  * Tournaments Back-end Controller
+ *
+ * @mixin \Backend\Behaviors\FormController
  */
 class Tournaments extends Controller
 {

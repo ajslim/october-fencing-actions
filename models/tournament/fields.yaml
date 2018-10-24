@@ -32,7 +32,3 @@ fields:
         label: Bouts
         type: partial
         path: field_bouts
-    actions:
-        label: Actions
-        type: partial
-        path: field_actions

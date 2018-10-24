@@ -10,14 +10,17 @@ columns:
         label: 'Thumnail'
         type: partial
         path: list_gfycat_poster
+        sortable: false
     call_on_site:
         label: Call
         relation: call_on_site
         select: name
     leftname:
         label: Left Fencer
+        sortable: false
     rightname:
         label: Right Fencer
+        sortable: false
     priority:
         label: Priority
         type: partial

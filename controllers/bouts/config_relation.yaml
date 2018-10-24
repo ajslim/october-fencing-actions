@@ -8,6 +8,8 @@ actions:
     view:
         list: $/ajslim/fencingactions/models/action/columns.yaml
         form: $/ajslim/fencingactions/models/action/fields.yaml
+        recordsPerPage: 10
+        showSearch: true
         toolbarButtons: create|delete
     manage:
         list: $/ajslim/fencingactions/models/action/columns.yaml

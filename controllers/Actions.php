@@ -57,15 +57,15 @@ class Actions extends Controller
     /**
      * Reverses the fencers in the parent bout
      *
+     * @param integer $id The action Id
+     *
      * @return Redirect
      */
-    public function onReverseBoutFencers($id)
+    public function onReverseFencers($id)
     {
+        /* @var Action $action */
         $action = Action::find($id);
-        $bout = Bout::find($action->bout_id);
-
-        // Reverse the fencers in the parent bout
-        $bout->reverseFencers();
+        $action->reverseFencers();
 
         return Redirect::refresh();
     }

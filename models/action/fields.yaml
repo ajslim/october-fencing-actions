@@ -20,10 +20,22 @@ fields:
         label: 'Left Fencer'
         type: dropdown
         dependsOn: bout
+        span: storm
+        size: small
+        cssClass: col-xs-4
+    fencers_vs:
+        label: VS
+        type: partial
+        path: field_vs
+        span: storm
+        cssClass: col-xs-1
     right_fencer:
         label: 'Right Fencer'
         type: dropdown
         dependsOn: bout
+        span: storm
+        size: small
+        cssClass: col-xs-4
 
 tabs:
     fields:

@@ -5,6 +5,12 @@ use Model;
 
 /**
  * Action Model
+ *
+ * @mixin \Eloquent
+ *
+ * @propery integer left_fencer_id
+ * @propery integer right_fencer_id
+ * @propery Bout bout
  */
 class Action extends Model
 {
@@ -61,33 +67,68 @@ class Action extends Model
     public $attachOne = [];
     public $attachMany = [];
 
+
+    /**
+     * Gets the Gfycat Id
+     *
+     * @return array
+     */
     public function getGfycatAttribute()
     {
         return $this->gfycat_id;
     }
 
-    public function getBoutOptions() {
-        if (isset($this->tournament)) {
+
+    /**
+     * Gets the options for the right fencer field
+     *
+     * @return array
+     */
+    public function getBoutOptions()
+    {
+        if (isset($this->tournament) === true) {
             $tournament = Tournament::find($this->tournament->id);
 
             // Add an empty option to the beginning of the list
-            return [null => 'Unknown / Other'] + Bout::where('tournament_id', '=', $tournament->id)->lists('cache_name', 'id');
+            return (
+                [null => 'Unknown / Other']
+                + Bout::where('tournament_id', '=', $tournament->id)
+                    ->lists('cache_name', 'id')
+            );
         }
 
-        if (isset($this->bout)) {
-            return [null => 'Unknown / Other'] + Bout::where('tournament_id', '=', $this->bout->tournament_id)->lists('cache_name', 'id');
+        if (isset($this->bout) === true) {
+            return (
+                [null => 'Unknown / Other']
+                + Bout::where('tournament_id', '=', $this->bout->tournament_id)
+                    ->lists('cache_name', 'id')
+            );
         }
 
-        return [null=> "Select Tournament"] + [null => 'Unknown / Other'];
+        return ([null => "Select Tournament"] + [null => 'Unknown / Other']);
     }
 
-    public function getTournamentOptions() {
+
+    /**
+     * Gets the options for the tournament field
+     *
+     * @return array
+     */
+    public function getTournamentOptions()
+    {
         // Add an empty option to the beginning of the list
-        return [null => 'Unknown / Other'] + Tournament::all()->lists('fullname', 'id');
+        return ([null => 'Unknown / Other'] + Tournament::all()->lists('fullname', 'id'));
     }
 
-    public function getLeftFencerOptions() {
-        if (isset($this->bout)) {
+
+    /**
+     * Gets the options for the right fencer field
+     *
+     * @return array
+     */
+    public function getLeftFencerOptions()
+    {
+        if (isset($this->bout) === true) {
             $leftFencer = Fencer::find($this->bout->left_fencer_id);
 
             // Populate from bout
@@ -97,12 +138,20 @@ class Action extends Model
         }
 
         // Add an empty option to beginning of the list
-        return [null => 'Unknown / Other'] + Fencer::all()->lists('name', 'id');;
+        $list = ([null => 'Unknown / Other'] + Fencer::all()->lists('name', 'id'));
+        return $list;
     }
 
-    public function getRightFencerOptions() {
 
-        if (isset($this->bout)) {
+    /**
+     * Gets the options for the right fencer field
+     *
+     * @return array
+     */
+    public function getRightFencerOptions()
+    {
+
+        if (isset($this->bout) === true) {
             $rightFencer = Fencer::find($this->bout->right_fencer_id);
 
             // Populate from bout
@@ -112,36 +161,71 @@ class Action extends Model
         }
 
         // Add an empty option to beginning of the list
-        return [null => 'Unknown / Other'] + Fencer::all()->lists('name', 'id');
+        $list = ([null => 'Unknown / Other'] + Fencer::all()->lists('name', 'id'));
+        return $list;
     }
 
+
+    /**
+     * Gets the name of the Left fencer
+     *
+     * @return string
+     */
     public function getLeftnameAttribute()
     {
-        if (isset($this->bout)) {
+        if (isset($this->bout) === true) {
             $leftFencer = Fencer::find($this->bout->left_fencer_id);
         } else {
             $leftFencer = Fencer::find($this->left_fencer_id);
         }
 
-        if ($leftFencer) {
+        if ($leftFencer !== null) {
             return $leftFencer->name;
         }
 
         return '';
     }
 
+
+    /**
+     * Gets the name of the right fencer
+     *
+     * @return string
+     */
     public function getRightnameAttribute()
     {
-        if (isset($this->bout)) {
+        if (isset($this->bout) === true) {
             $rightFencer = Fencer::find($this->bout->right_fencer_id);
         } else {
             $rightFencer = Fencer::find($this->right_fencer_id);
         }
 
-        if ($rightFencer) {
+        if ($rightFencer !== null) {
             return $rightFencer->name;
         }
 
         return '';
+    }
+
+
+    /**
+     * Gets the name of the right fencer
+     *
+     * @return void
+     */
+    public function reverseFencers()
+    {
+        // If the action has a bout, then reverse the bout fencers
+        if ($this->bout_id !== null) {
+            $bout = Bout::find($this->bout_id);
+
+            // Reverse the fencers in the parent bout
+            $bout->reverseFencers();
+        } else {
+            $temp = $this->left_fencer_id;
+            $this->left_fencer_id = $this->right_fencer_id;
+            $this->right_fencer_id = $temp;
+            $this->save();
+        }
     }
 }

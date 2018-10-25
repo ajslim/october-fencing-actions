@@ -257,7 +257,7 @@ class UpdateBoutsFromFie extends Command
                             ]
                         )->get();
 
-                        if ($reversed !== true) {
+                        if (count($reversed) === 0) {
                             $bout = Bout::updateOrCreate(
                                 [
                                     'tournament_id' => $tournament->id,

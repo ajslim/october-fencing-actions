@@ -27,7 +27,7 @@ class Bouts extends Controller
     public $relationConfig = 'config_relation.yaml';
 
     public $parentId;
-    public $parentIdFieldName = 'tournament';
+    public static $parentIdFieldName = 'tournament';
 
 
     /**

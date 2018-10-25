@@ -6,9 +6,20 @@ fields:
     id:
         label: ID
         disabled: true
+        span: storm
+        cssClass: col-xs-1
+    photo_url:
+        type: partial
+        path: field_photo
+        span: storm
+        cssClass: col-xs-1
     fie_site_link:
         type: partial
         path: field_link
+        span: storm
+        cssClass: col-xs-4
+    section:
+        type: section
     fie_number:
         label: FIE Number
         type: text

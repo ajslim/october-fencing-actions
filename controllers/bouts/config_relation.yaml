@@ -8,6 +8,7 @@ actions:
     view:
         list: $/ajslim/fencingactions/models/action/columns.yaml
         form: $/ajslim/fencingactions/models/action/fields.yaml
+        recordUrl: ajslim/fencingactions/actions/update/:id
         recordsPerPage: 10
         showSearch: true
         toolbarButtons: create|delete

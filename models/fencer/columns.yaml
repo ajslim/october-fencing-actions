@@ -6,6 +6,11 @@ columns:
     id:
         label: ID
         searchable: true
+    photo_url:
+        label: 'picture'
+        type: partial
+        path: list_photo
+        sortable: false
     first_name:
         label: First Name
         type: text

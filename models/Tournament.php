@@ -4,6 +4,8 @@ use Model;
 
 /**
  * tournament Model
+ *
+ * @mixin \Eloquent
  */
 class Tournament extends Model
 {

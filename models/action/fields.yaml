@@ -6,36 +6,42 @@ fields:
     id:
         label: ID
         disabled: true
+        span: storm
+        cssClass: col-md-12
     tournament:
         label: Tournament
         comment: Select a tournament to filter bouts.
         type: dropdown
         dependsOn: bout
+        span: storm
+        cssClass: col-md-12
     bout:
         label: Bout
         type: dropdown
         comment: If no bout is selected, fencers can be manually selected
         dependsOn: tournament
+        span: storm
+        cssClass: col-md-12
     left_fencer:
         label: 'Left Fencer'
         type: dropdown
         dependsOn: bout
         span: storm
         size: small
-        cssClass: col-xs-4
+        cssClass: col-md-5
     fencers_vs:
         label: VS
         type: partial
         path: field_vs
         span: storm
-        cssClass: col-xs-1
+        cssClass: col-md-2 text-center
     right_fencer:
         label: 'Right Fencer'
         type: dropdown
         dependsOn: bout
         span: storm
         size: small
-        cssClass: col-xs-4
+        cssClass: col-md-5
 
 tabs:
     fields:

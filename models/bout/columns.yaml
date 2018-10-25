@@ -16,3 +16,7 @@ columns:
     right_score:
         label: 'Right Score'
         type: number
+    actions:
+        label: Actions
+        relation: actions
+        select: gfycat_id

@@ -6,29 +6,58 @@ fields:
     id:
         label: ID
         disabled: true
+        span: storm
+        cssClass: col-md-1
+    fie_id:
+        label: FIE Id
+        span: storm
+        cssClass: col-md-1
     name:
         label: Name
+        span: storm
+        cssClass: col-md-2
+    year:
+        label: Name
+        span: storm
+        cssClass: col-md-1
     place:
         label: Place
+        span: storm
+        cssClass: col-md-3
+    weapon:
+        label: Weapon
+        span: storm
+        cssClass: col-md-1
+    gender:
+        label: Gender
+        span: storm
+        cssClass: col-md-1
+    type:
+        label: Type
+        span: storm
+        cssClass: col-md-1
+    event:
+        label: Event
+        span: storm
+        cssClass: col-md-1
+    spacer:
+        type: section
     start_date:
         label: Start Date
         type: datepicker
         mode: date
+        span: storm
+        cssClass: col-md-2
     end_date:
         label: Start Date
         type: datepicker
         mode: date
-    fie_id:
-        label: FIE Id
-    weapon:
-        label: Weapon
-    gender:
-        label: Gender
-    type:
-        label: Type
-    event:
-        label: Event
-    bouts:
-        label: Bouts
-        type: partial
-        path: field_bouts
+        span: storm
+        cssClass: col-md-2
+tabs:
+    fields:
+        bouts:
+            label: Bouts
+            type: partial
+            path: field_bouts
+            tab: Bouts

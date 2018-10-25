@@ -1,0 +1,18 @@
+# ===================================
+#  Relation Behavior Config
+# ===================================
+
+bouts:
+    label: Bouts
+    deferredBinding: true
+    view:
+        list: $/ajslim/fencingactions/models/bout/columns.yaml
+        form: $/ajslim/fencingactions/models/bout/fields.yaml
+        recordUrl: ajslim/fencingactions/bouts/update/:id
+        toolbarButtons: create|delete
+        showSearch: true
+        recordsPerPage: 10
+    manage:
+        form: $/ajslim/fencingactions/models/bout/fields.yaml
+        list: $/ajslim/fencingactions/models/bout/columns.yaml
+        recordsPerPage: 10

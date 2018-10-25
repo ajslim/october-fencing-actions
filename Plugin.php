@@ -36,6 +36,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.UpdateBoutsFromFie', 'Ajslim\FencingActions\Console\UpdateBoutsFromFie');
         $this->registerConsoleCommand('ajslim.CacheBoutNames', 'Ajslim\FencingActions\Console\CacheBoutNames');
         $this->registerConsoleCommand('ajslim.RemoveDuplicateBouts', 'Ajslim\FencingActions\Console\RemoveDuplicateBouts');
+        $this->registerConsoleCommand('ajslim.UpdateFencerPhotos', 'Ajslim\FencingActions\Console\UpdateFencerPhotos');
     }
 
     /**

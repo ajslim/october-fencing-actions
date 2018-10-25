@@ -21,12 +21,17 @@ class Tournaments extends Controller
     public $listConfig = 'config_list.yaml';
     public $relationConfig = 'config_relation.yaml';
 
+
+    /**
+     * Tournaments constructor.
+     */
     public function __construct()
     {
         parent::__construct();
 
         BackendMenu::setContext('Ajslim.FencingActions', 'fencingactions', 'tournaments');
     }
+
 
     /**
      * An override to navigate to the record rather than use the relation modal
@@ -35,7 +40,8 @@ class Tournaments extends Controller
      *
      * @return mixed
      */
-    public function onRelationButtonCreate($id) {
+    public function onRelationButtonCreate($id)
+    {
         return parent::nonModalOnRelationButtonCreate($id);
     }
 }

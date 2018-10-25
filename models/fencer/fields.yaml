@@ -12,25 +12,49 @@ fields:
     fie_number:
         label: FIE Number
         type: text
+        size: small
+        span: storm
+        cssClass: col-xs-1
     fie_site_number:
         label: FIE Site Number
         type: text
+        size: small
+        span: storm
+        cssClass: col-xs-1
     first_name:
         label: First Name
         type: text
+        span: storm
+        cssClass: col-xs-3
     last_name:
         label: Last Name
         type: text
+        span: storm
+        cssClass: col-xs-3
     country_code:
         label: Nationality
         type: text
+        span: storm
+        cssClass: col-xs-1
     gender:
         label: Gender
         type: dropdown
         options:
             f: F
             m: M
+        span: storm
+        cssClass: col-xs-1
     birth:
         label: Birth Date
         type: datepicker
         mode: date
+        span: storm
+        cssClass: col-xs-2
+tabs:
+    fields:
+        bouts:
+            label: Bouts
+            type: partial
+            path: field_bouts
+            tab: Bouts
+

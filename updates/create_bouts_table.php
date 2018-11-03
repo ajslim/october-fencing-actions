@@ -14,6 +14,8 @@ class CreateBoutsTable extends Migration
             $table->increments('id');
             $table->string('cache_name')
                 ->nullable(); // A place to cache the bout name to speed up lookups
+            $table->string('video_url')
+                ->nullable(); // A place to cache the bout name to speed up lookups
             $table->integer('left_score');
             $table->integer('right_score');
 

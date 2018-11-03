@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Input;
 
 /**
  * Class RoutedController
- * @package Aeg\Tempo\Behaviors
  */
 class RoutedController extends ControllerBehavior
 {
@@ -122,7 +121,7 @@ class RoutedController extends ControllerBehavior
         if ($this->controller->useModals !== true) {
             $relationField = Input::get('_relation_field');
             $relationSlug = str_replace('_', '', $relationField);
-            return Backend::redirect("aeg/tempo/$relationSlug/create/$id");
+            return Backend::redirect("ajslim/fencingactions/$relationSlug/create/$id");
         }
     }
 

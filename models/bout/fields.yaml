@@ -40,7 +40,14 @@ fields:
         span: storm
         size: small
         cssClass: col-xs-2
-    actions:
-        label: 'Actions'
-        type: partial
-        path: field_actions
+
+tabs:
+    fields:
+        video_url:
+            label: 'Video URL'
+            tab: Video
+        actions:
+            label: 'Actions'
+            type: partial
+            path: field_actions
+            tab: Actions

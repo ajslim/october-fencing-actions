@@ -40,12 +40,12 @@ class AnalyzeBout extends Command
         $folder = getcwd() . $this->boutFolder;
 
         // make the thumbs directory if needed
-        if (!file_exists($folder . '/likghtthumbs')) {
-            mkdir($folder . '/likghtthumbs');
+        if (!file_exists($folder . '/lightthumbs')) {
+            mkdir($folder . '/lightthumbs');
         }
 
         // Delete all old thumbs
-        $files = glob($folder . '/likghtthumbs/*'); // get all file names
+        $files = glob($folder . '/lightthumbs/*'); // get all file names
         foreach($files as $file){ // iterate files
             if(is_file($file))
                 unlink($file); // delete file
@@ -273,6 +273,9 @@ class AnalyzeBout extends Command
 
         $lastLightFrame = 0;
         $lightCount = 0;
+        $singleRedCount = 0;
+        $singleGreenCount = 0;
+        $doubleLightCount = 0;
         foreach ($images as $imageNumber => $filename) {
 
             // Ignore non thumbnail files
@@ -309,10 +312,22 @@ class AnalyzeBout extends Command
 
                         if ($isRed) {
                             echo " - Red";
+
+                            if(!$isGreen) {
+                                $singleRedCount += 1;
+                            }
                         }
 
                         if ($isGreen) {
                             echo " - Green";
+
+                            if(!$isRed) {
+                                $singleGreenCount += 1;
+                            }
+                        }
+
+                        if ($isGreen && $isRed) {
+                            $doubleLightCount += 1;
                         }
 
                         if ($this->debugThresholds === false) {
@@ -327,6 +342,13 @@ class AnalyzeBout extends Command
                     $lastLightFrame = $imageNumber;
                 }
             }
+        }
+
+        if ($this->debugThresholds === true) {
+            echo "Ignoring off targets\n";
+            echo "Red Light Count: $singleRedCount\n";
+            echo "Green Light Count: $singleGreenCount\n";
+            echo "BOth: $doubleLightCount\n";
         }
     }
 

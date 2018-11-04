@@ -1,0 +1,28 @@
+{
+  "name": "st-petersberg",
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    10,
+    15,
+    306,
+    322
+  ],
+  "redLightCrop": [
+    9,
+    8,
+    258,
+    312
+  ],
+  "greenLightCrop": [
+    9,
+    8,
+    372,
+    312
+  ],
+  "redLightThreshold": 0.36,
+  "greenLightThreshold": 0.2,
+  "overlayThreshold": 0.04
+}

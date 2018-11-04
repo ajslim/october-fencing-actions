@@ -27,6 +27,9 @@ class AnalyzeBout extends Command
     private $greenLightThreshold;
 
     private $debugThresholds = false;
+    private $forceProfile = null;
+    private $start = null;
+    private $end = null;
 
     private $sampleRate = 1;
 
@@ -190,12 +193,21 @@ class AnalyzeBout extends Command
         foreach ($profileFolders as $profileFolder)
         {
             $json = file_get_contents( $profileFolder . "/profile.json");
-            $profileWrapper = json_decode($json, true);
+            $profile = json_decode($json, true);
 
-            $overlayProfileWrappers[] = [
-                'overlay' => new Imagick( $profileFolder . "/overlay.png"),
-                'profile' => $profileWrapper
-            ];
+            if($this->forceProfile !== null) {
+                if ($profile['name'] === $this->forceProfile) {
+                    $overlayProfileWrappers[] = [
+                        'overlay' => new Imagick( $profileFolder . "/overlay.png"),
+                        'profile' => $profile
+                    ];
+                }
+            } else {
+                $overlayProfileWrappers[] = [
+                    'overlay' => new Imagick( $profileFolder . "/overlay.png"),
+                    'profile' => $profile
+                ];
+            }
         }
 
         $imageFolder = getcwd() . $this->boutFolder;
@@ -203,6 +215,19 @@ class AnalyzeBout extends Command
         $images = array_filter(glob($imageFolder . '/thumbs/*'), 'is_file');
 
         foreach ($images as $index => $filename) {
+
+
+            if ($this->start !== null
+                && $index < $this->start
+            ) {
+                continue;
+            }
+
+            if ($this->end !== null
+                && $index > $this->end
+            ) {
+                break;
+            }
 
             // Ignore non thumbnail files
             if (strpos($filename, 'thumb') === false) {
@@ -215,9 +240,16 @@ class AnalyzeBout extends Command
                 continue;
             }
 
+            if ($this->debugThresholds) {
+                echo $index . "\n";
+            }
 
             // Check to see if the overlay matches any of the profiles
             foreach ($overlayProfileWrappers as $profileWrapper) {
+                if ($this->debugThresholds) {
+                    echo $profileWrapper['profile']['name'] . "\n";
+                }
+
                 $image = new Imagick($filename);
                 $image->resizeImage(
                     $profileWrapper['profile']['imageDimensions'][0],
@@ -245,6 +277,10 @@ class AnalyzeBout extends Command
     public function handle()
     {
         $this->url = $this->argument('url');
+
+        $this->forceProfile = $this->option('profile');
+        $this->start = $this->option('start');
+        $this->end = $this->option('end');
 
         $noDownload = false;
         if ($this->option('no-download') !== null) {
@@ -286,6 +322,18 @@ class AnalyzeBout extends Command
         $singleGreenCount = 0;
         $doubleLightCount = 0;
         foreach ($images as $imageNumber => $filename) {
+
+            if ($this->start !== null
+                && $imageNumber < $this->start
+            ) {
+                continue;
+            }
+
+            if ($this->end !== null
+                && $imageNumber > $this->end
+            ) {
+                break;
+            }
 
             // Ignore non thumbnail files
             if (strpos($filename, 'thumb') === false) {
@@ -381,6 +429,9 @@ class AnalyzeBout extends Command
         return [
             ['debug-thresholds', null, InputOption::VALUE_OPTIONAL, 'Debug mode', null],
             ['no-download', null, InputOption::VALUE_OPTIONAL, 'No download', null],
+            ['profile', null, InputOption::VALUE_OPTIONAL, 'Force a particular profile', null],
+            ['start', null, InputOption::VALUE_OPTIONAL, 'Start Time in seconds', null],
+            ['end', null, InputOption::VALUE_OPTIONAL, 'End Time in seconds', null],
         ];
     }
 }

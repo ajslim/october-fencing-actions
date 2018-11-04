@@ -49,20 +49,29 @@ class AnalyzeBout extends Command
 
         echo "Downloading bout \n";
 
-        exec( "youtube-dl -f 133  $this->url --output $folder/video.mp4");
+        exec( "youtube-dl -f 134  $this->url --output $folder/video.mp4");
+    }
+
+    private function deleteClips()
+    {
+        $folder = getcwd() . $this->boutFolder;
+        // Delete all old clips
+
+        $files = glob($folder . '/clips/*'); // get all file names
+        foreach($files as $file){ // iterate files
+            if(is_file($file))
+                unlink($file); // delete file
+        }
     }
 
     private function makeFrameImages()
     {
         $folder = getcwd() . $this->boutFolder;
 
-
-
         // make the thumbs directory if needed
         if (!file_exists($folder . '/thumbs')) {
             mkdir($folder . '/thumbs');
         }
-
 
         // Delete all old thumbs
         $files = glob($folder . '/thumbs/*'); // get all file names
@@ -210,6 +219,7 @@ class AnalyzeBout extends Command
 
         $this->downloadVideo();
         $this->makeFrameImages();
+        $this->deleteClips();
         $profileWrapper = $this->findProfile();
 
         if ($profileWrapper === false) {

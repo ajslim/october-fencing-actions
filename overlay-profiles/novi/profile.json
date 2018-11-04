@@ -1,0 +1,28 @@
+{
+  "name": "Novi",
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    20,
+    20,
+    285,
+    307
+  ],
+  "redLightCrop": [
+    150,
+    8,
+    105,
+    326
+  ],
+  "greenLightCrop": [
+    150,
+    8,
+    405,
+    326
+  ],
+  "redLightThreshold": 0.16,
+  "greenLightThreshold": 0.10,
+  "overlayThreshold": 0.03
+}

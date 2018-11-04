@@ -37,6 +37,8 @@ class AnalyzeBout extends Command
 
     private function makeLightThumbsDirectory()
     {
+        $folder = getcwd() . $this->boutFolder;
+
         // make the thumbs directory if needed
         if (!file_exists($folder . '/likghtthumbs')) {
             mkdir($folder . '/likghtthumbs');

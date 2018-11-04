@@ -1,0 +1,28 @@
+{
+  "name": "Moscow",
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    8,
+    30,
+    300,
+    286
+  ],
+  "redLightCrop": [
+    15,
+    15,
+    234,
+    319
+  ],
+  "greenLightCrop": [
+    15,
+    15,
+    390,
+    319
+  ],
+  "redLightThreshold": 0.035,
+  "greenLightThreshold": 0.035,
+  "overlayThreshold": 0.03
+}

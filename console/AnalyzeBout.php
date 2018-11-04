@@ -26,11 +26,28 @@ class AnalyzeBout extends Command
     private $redLightThreshold;
     private $greenLightThreshold;
 
+    private $debugThresholds = false;
+
     private $sampleRate = 1;
 
     private static function formatTime($t, $f=':') // t = seconds, f = separator
     {
         return sprintf("%02d%s%02d%s%02d", floor($t/3600), $f, ($t/60)%60, $f, $t%60);
+    }
+
+    private function makeLightThumbsDirectory()
+    {
+        // make the thumbs directory if needed
+        if (!file_exists($folder . '/likghtthumbs')) {
+            mkdir($folder . '/likghtthumbs');
+        }
+
+        // Delete all old thumbs
+        $files = glob($folder . '/likghtthumbs/*'); // get all file names
+        foreach($files as $file){ // iterate files
+            if(is_file($file))
+                unlink($file); // delete file
+        }
     }
 
     private function downloadVideo()
@@ -110,6 +127,10 @@ class AnalyzeBout extends Command
 
     private function checkIsOverlay(Imagick $image, $overlayProfile, $overlayImage)
     {
+        if ($this->debugThresholds === true) {
+            echo "o:" . $this->checkOverlayAmount($image, $overlayProfile, $overlayImage)[1] . "\n";
+        }
+
         $result = $this->checkOverlayAmount($image, $overlayProfile, $overlayImage);
         return $result[1] < $overlayProfile['overlayThreshold'];
     }
@@ -129,6 +150,9 @@ class AnalyzeBout extends Command
 
     private function checkIsRed(Imagick $image)
     {
+        if ($this->debugThresholds === true) {
+            echo "r:" . $this->checkRedAmount($image)[1] . "\n";
+        }
         return $this->checkRedAmount($image)[1] > $this->redLightThreshold;
     }
 
@@ -147,6 +171,9 @@ class AnalyzeBout extends Command
 
     private function checkIsGreen(Imagick $image)
     {
+        if ($this->debugThresholds === true) {
+            echo "g:" . $this->checkGreenAmount($image)[1] . "\n";
+        }
         return $this->checkGreenAmount($image)[1] > $this->greenLightThreshold;
     }
 
@@ -217,14 +244,20 @@ class AnalyzeBout extends Command
     {
         $this->url = $this->argument('url');
 
-        $this->downloadVideo();
-        $this->makeFrameImages();
-        $this->deleteClips();
+        if ($this->debugThresholds === false) {
+            $this->downloadVideo();
+            $this->makeFrameImages();
+            $this->deleteClips();
+        }
         $profileWrapper = $this->findProfile();
 
         if ($profileWrapper === false) {
             echo "Profile not found\n";
             return;
+        }
+
+        if ($this->debugThresholds === true) {
+            $this->makeLightThumbsDirectory();
         }
 
         $this->redLightCrop = $profileWrapper['profile']['redLightCrop'];
@@ -253,6 +286,10 @@ class AnalyzeBout extends Command
                 0
             );
 
+            if ($this->debugThresholds === true) {
+                echo $imageNumber . "\n";
+            }
+
             // If the overlay is showing
             if ($this->checkIsOverlay($image, $profileWrapper['profile'], $profileWrapper['overlay']) === true) {
                 $isRed = $this->checkIsRed($image);
@@ -276,9 +313,13 @@ class AnalyzeBout extends Command
                             echo " - Green";
                         }
 
-                        echo "\n";
+                        if ($this->debugThresholds === false) {
+                            $this->makeClip($seconds);
+                        } else {
+                            $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
+                        }
 
-                        $this->makeClip($seconds);
+                        echo "\n";
                     }
 
                     $lastLightFrame = $imageNumber;

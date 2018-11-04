@@ -246,11 +246,16 @@ class AnalyzeBout extends Command
     {
         $this->url = $this->argument('url');
 
-        if ($this->option('debug') !== null) {
+        $noDownload = false;
+        if ($this->option('no-download') !== null) {
+            $noDownload = true;
+        }
+
+        if ($this->option('debug-thresholds') !== null) {
             $this->debugThresholds = true;
         }
 
-        if ($this->debugThresholds === false) {
+        if ($noDownload === false) {
             $this->downloadVideo();
             $this->makeFrameImages();
             $this->deleteClips();
@@ -374,7 +379,8 @@ class AnalyzeBout extends Command
     protected function getOptions()
     {
         return [
-            ['debugThresholds', null, InputOption::VALUE_OPTIONAL, 'Debug mode', null],
+            ['debug-thresholds', null, InputOption::VALUE_OPTIONAL, 'Debug mode', null],
+            ['no-download', null, InputOption::VALUE_OPTIONAL, 'No download', null],
         ];
     }
 }

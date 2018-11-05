@@ -1,0 +1,28 @@
+{
+  "name": "ireland",
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    12,
+    30,
+    101,
+    301
+  ],
+  "redLightCrop": [
+    14,
+    14,
+    278,
+    278
+  ],
+  "greenLightCrop": [
+    14,
+    14,
+    349,
+    278
+  ],
+  "redLightThreshold": 0.4,
+  "greenLightThreshold": 0.035,
+  "overlayThreshold": 0.03
+}

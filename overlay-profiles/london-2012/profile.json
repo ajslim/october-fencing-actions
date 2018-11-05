@@ -1,0 +1,28 @@
+{
+  "name": "london-2012",
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    9,
+    30,
+    303,
+    294
+  ],
+  "redLightCrop": [
+    8,
+    8,
+    292,
+    311
+  ],
+  "greenLightCrop": [
+    9,
+    9,
+    339,
+    311
+  ],
+  "redLightThreshold": 0.09,
+  "greenLightThreshold": 0.05,
+  "overlayThreshold": 0.07
+}

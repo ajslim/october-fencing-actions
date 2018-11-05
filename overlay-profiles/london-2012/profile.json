@@ -1,5 +1,6 @@
 {
   "name": "london-2012",
+  "type": 2,
   "imageDimensions": [
     640,
     360
@@ -11,18 +12,18 @@
     294
   ],
   "redLightCrop": [
-    8,
-    8,
-    292,
-    311
+    16,
+    16,
+    288,
+    307
   ],
   "greenLightCrop": [
-    9,
-    9,
-    339,
-    311
+    16,
+    16,
+    335,
+    307
   ],
-  "redLightThreshold": 0.09,
-  "greenLightThreshold": 0.05,
+  "redLightThreshold": 0.01,
+  "greenLightThreshold": 0.01,
   "overlayThreshold": 0.07
 }

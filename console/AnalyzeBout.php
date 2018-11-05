@@ -28,6 +28,14 @@ class AnalyzeBout extends Command
     private $redLightThreshold;
     private $greenLightThreshold;
 
+    private $profileType = 1;
+
+    /* @var Imagick $redLightImage */
+    private $redLightImage;
+
+    /* @var Imagick $greenLightImage */
+    private $greenLightImage;
+
     // Options
     private $debugThresholds = false;
     private $noDownload = false;
@@ -214,9 +222,21 @@ class AnalyzeBout extends Command
      */
     private function checkIsRed(Imagick $image)
     {
+        if ($this->profileType === 2) {
+            $imageLightSection = clone $image;
+            $imageLightSection->cropImage(...$this->redLightCrop);
+
+            if ($this->debugThresholds === true) {
+                echo "r:" . $this->redLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . "\n";
+            }
+
+            return $this->redLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->redLightThreshold;
+        }
+
         if ($this->debugThresholds === true) {
             echo "r:" . $this->checkRedAmount($image)[1] . "\n";
         }
+
         return $this->checkRedAmount($image)[1] > $this->redLightThreshold;
     }
 
@@ -245,6 +265,16 @@ class AnalyzeBout extends Command
      */
     private function checkIsGreen(Imagick $image)
     {
+        if ($this->profileType === 2) {
+            $imageLightSection = clone $image;
+            $imageLightSection->cropImage(...$this->greenLightCrop);
+
+            if ($this->debugThresholds === true) {
+                echo "g!:" . $this->greenLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . "\n";
+            }
+            return $this->greenLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->greenLightThreshold;
+        }
+
         if ($this->debugThresholds === true) {
             echo "g:" . $this->checkGreenAmount($image)[1] . "\n";
         }
@@ -258,6 +288,32 @@ class AnalyzeBout extends Command
      */
     private function findProfile()
     {
+        if ($this->forceProfile !== null) {
+
+            $profileFolder = getcwd()
+                . "/plugins/ajslim/fencingactions/overlay-profiles/"
+                . $this->forceProfile;
+            $json = file_get_contents(
+                $profileFolder
+                . "/profile.json"
+            );
+            $profile = json_decode($json, true);
+
+            $overlayProfileWrapper = [
+                'overlay' => new Imagick( $profileFolder . "/overlay.png"),
+                'profile' => $profile
+            ];
+
+
+            if (isset($overlayProfileWrapper['profile']['type']) === true
+                && $overlayProfileWrapper['profile']['type'] === 2
+            ) {
+                $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
+                $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
+            }
+            return $overlayProfileWrapper;
+        }
+
         $profileRootDirectory = getcwd(). "/plugins/ajslim/fencingactions/overlay-profiles/";
         $profileFolders = array_filter(glob($profileRootDirectory . '*'), 'is_dir');
 
@@ -268,19 +324,22 @@ class AnalyzeBout extends Command
             $json = file_get_contents( $profileFolder . "/profile.json");
             $profile = json_decode($json, true);
 
-            if($this->forceProfile !== null) {
-                if ($profile['name'] === $this->forceProfile) {
-                    $overlayProfileWrappers[] = [
-                        'overlay' => new Imagick( $profileFolder . "/overlay.png"),
-                        'profile' => $profile
-                    ];
-                }
-            } else {
-                $overlayProfileWrappers[] = [
-                    'overlay' => new Imagick( $profileFolder . "/overlay.png"),
-                    'profile' => $profile
-                ];
+
+            $overlayProfileWrapper = [
+                'overlay' => new Imagick( $profileFolder . "/overlay.png"),
+                'profile' => $profile
+            ];
+
+
+            if (isset($overlayProfileWrapper['profile']['type']) === true
+                && $overlayProfileWrapper['profile']['type'] === 2
+            ) {
+                $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
+                $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
             }
+
+            // Only add matching profiles, or all if force profile is null
+            $overlayProfileWrappers[] = $overlayProfileWrapper;
         }
 
         $imageFolder = getcwd() . $this->boutFolder;
@@ -371,14 +430,24 @@ class AnalyzeBout extends Command
     /**
      * Sets the red and green crops and profiles
      *
-     * @param $profile
+     * @param $profileWrapper
      */
-    private function setCropsAndThresholds($profile)
+    private function setProfileValues($profileWrapper)
     {
-        $this->redLightCrop = $profile['redLightCrop'];
-        $this->greenLightCrop = $profile['greenLightCrop'];
-        $this->redLightThreshold = $profile['redLightThreshold'];
-        $this->greenLightThreshold = $profile['greenLightThreshold'];
+        $this->redLightCrop = $profileWrapper['profile']['redLightCrop'];
+        $this->greenLightCrop = $profileWrapper['profile']['greenLightCrop'];
+        $this->redLightThreshold = $profileWrapper['profile']['redLightThreshold'];
+        $this->greenLightThreshold = $profileWrapper['profile']['greenLightThreshold'];
+
+        if (isset($profileWrapper['profile']['type']) === true) {
+            $this->profileType = (int)$profileWrapper['profile']['type'];
+        }
+
+        if ($this->profileType === 2) {
+            $this->redLightImage = $profileWrapper['redLightImage'];
+            $this->greenLightImage = $profileWrapper['greenLightImage'];
+        }
+
     }
 
 
@@ -483,7 +552,7 @@ class AnalyzeBout extends Command
             $this->makeLightThumbsDirectory();
         }
 
-        $this->setCropsAndThresholds($profileWrapper['profile']);
+        $this->setProfileValues($profileWrapper);
 
         $boutFolder = getcwd() . $this->boutFolder;
         $images = array_filter(glob($boutFolder . '/thumbs/*'), 'is_file');

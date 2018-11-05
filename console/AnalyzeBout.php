@@ -1,6 +1,5 @@
 <?php namespace Ajslim\Fencingactions\Console;
 
-use DirectoryIterator;
 use Illuminate\Console\Command;
 use Imagick;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,25 +17,61 @@ class AnalyzeBout extends Command
      */
     protected $description = 'No description provided yet...';
 
-    private $boutFolder = "/storage/temp/bout";
+    private $sampleRate = 1;
+    private $boutRootFolder = "/storage/bout";
+    private $boutFolder;
+    private $videoId;
+    private $url;
 
     private $redLightCrop;
     private $greenLightCrop;
-
     private $redLightThreshold;
     private $greenLightThreshold;
 
+    // Options
     private $debugThresholds = false;
+    private $noDownload = false;
     private $forceProfile = null;
     private $start = null;
     private $end = null;
 
-    private $sampleRate = 1;
+    // Frame counts for analysis
+    private $doubleLightCount = 0;
+    private $singleGreenCount = 0;
+    private $singleRedCount = 0;
+    private $lightCount = 0;
+    private $lastLightFrame = 0;
 
     private static function formatTime($t, $f=':') // t = seconds, f = separator
     {
         return sprintf("%02d%s%02d%s%02d", floor($t/3600), $f, ($t/60)%60, $f, $t%60);
     }
+
+
+    /**
+     * @param $folderString
+     * @return string
+     */
+    private function createFolderIfNotExist($folderString): string
+    {
+        $folder = getcwd() . $folderString;
+
+        // make the bout directory if needed
+        if (!file_exists($folder)) {
+            mkdir($folder);
+        }
+        return $folder;
+    }
+
+
+    private function makeBoutFolder()
+    {
+        $this->boutFolder = $this->boutRootFolder . "/" . $this->videoId;
+
+        $this->createFolderIfNotExist($this->boutRootFolder);
+        $this->createFolderIfNotExist($this->boutFolder);
+    }
+
 
     private function makeLightThumbsDirectory()
     {
@@ -71,7 +106,7 @@ class AnalyzeBout extends Command
 
         echo "Downloading bout \n";
 
-        exec( "youtube-dl -f 134  $this->url --output $folder/video.mp4");
+        exec( "youtube-dl -f 134  \"$this->url\" --output $folder/video.mp4");
     }
 
     private function deleteClips()
@@ -122,6 +157,13 @@ class AnalyzeBout extends Command
         exec("ffmpeg -ss $startTime -i $folder/video.mp4 -t $duration -y -c copy $folder/clips/$startSeconds.mp4");
     }
 
+    /**
+     * @param Imagick $image
+     * @param $overlayProfile
+     * @param Imagick $overlayImage
+     * @return array
+     * @throws \ImagickException
+     */
     private function checkOverlayAmount(Imagick $image, $overlayProfile, Imagick $overlayImage)
     {
         $overlayImageCheck = clone $image;
@@ -130,6 +172,13 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @param Imagick $image
+     * @param $overlayProfile
+     * @param $overlayImage
+     * @return bool
+     * @throws \ImagickException
+     */
     private function checkIsOverlay(Imagick $image, $overlayProfile, $overlayImage)
     {
         if ($this->debugThresholds === true) {
@@ -141,6 +190,11 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @param Imagick $image
+     * @return array
+     * @throws \ImagickException
+     */
     private function checkRedAmount(Imagick $image)
     {
         $redLightImageCheck = clone $image;
@@ -153,6 +207,11 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @param Imagick $image
+     * @return bool
+     * @throws \ImagickException
+     */
     private function checkIsRed(Imagick $image)
     {
         if ($this->debugThresholds === true) {
@@ -162,6 +221,11 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @param Imagick $image
+     * @return array
+     * @throws \ImagickException
+     */
     private function checkGreenAmount(Imagick $image)
     {
         $greenLightImageCheck = clone $image;
@@ -174,6 +238,11 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @param Imagick $image
+     * @return bool
+     * @throws \ImagickException
+     */
     private function checkIsGreen(Imagick $image)
     {
         if ($this->debugThresholds === true) {
@@ -183,6 +252,10 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * @return bool|mixed
+     * @throws \ImagickException
+     */
     private function findProfile()
     {
         $profileRootDirectory = getcwd(). "/plugins/ajslim/fencingactions/overlay-profiles/";
@@ -271,27 +344,130 @@ class AnalyzeBout extends Command
     }
 
     /**
-     * Execute the console command.
-     * @return void
+     * Assigns options to local variables
      */
-    public function handle()
+    private function handleOptionsAndArguments()
     {
         $this->url = $this->argument('url');
+
+        $parameters = [];
+        parse_str( parse_url( $this->url, PHP_URL_QUERY ), $parameters );
+        $this->videoId = $parameters['v'];
 
         $this->forceProfile = $this->option('profile');
         $this->start = $this->option('start');
         $this->end = $this->option('end');
 
-        $noDownload = false;
         if ($this->option('no-download') !== null) {
-            $noDownload = true;
+            $this->noDownload = true;
         }
 
         if ($this->option('debug-thresholds') !== null) {
             $this->debugThresholds = true;
         }
+    }
 
-        if ($noDownload === false) {
+
+    /**
+     * Sets the red and green crops and profiles
+     *
+     * @param $profile
+     */
+    private function setCropsAndThresholds($profile)
+    {
+        $this->redLightCrop = $profile['redLightCrop'];
+        $this->greenLightCrop = $profile['greenLightCrop'];
+        $this->redLightThreshold = $profile['redLightThreshold'];
+        $this->greenLightThreshold = $profile['greenLightThreshold'];
+    }
+
+
+
+    /**
+     * Handles a single image
+     *
+     * @param $filename
+     * @param $profileWrapper
+     * @param $imageNumber
+     * @throws \ImagickException
+     */
+    private function handleImage($filename, $profileWrapper, $imageNumber): void
+    {
+        $image = new Imagick($filename);
+        $image->resizeImage(
+            $profileWrapper['profile']['imageDimensions'][0],
+            $profileWrapper['profile']['imageDimensions'][1],
+            Imagick::FILTER_POINT,
+            0
+        );
+
+        if ($this->debugThresholds === true) {
+            echo $imageNumber . "\n";
+        }
+
+        // If the overlay is showing
+        if ($this->checkIsOverlay($image, $profileWrapper['profile'], $profileWrapper['overlay']) === true) {
+            $isRed = $this->checkIsRed($image);
+            $isGreen = $this->checkIsGreen($image);
+
+            $isLight = $isRed || $isGreen;
+            if ($isLight) {
+                if ($imageNumber > $this->lastLightFrame + 1) {
+                    $this->lightCount += 1;
+
+                    echo $this->lightCount . ': ';
+                    $seconds = ($imageNumber + 1) / $this->sampleRate;
+                    echo self::formatTime($seconds) . " - ";
+                    echo $imageNumber + 1;  // ImageNumber is 0 indexed
+
+                    if ($isRed) {
+                        echo " - Red";
+
+                        if (!$isGreen) {
+                            $this->singleRedCount += 1;
+                        }
+                    }
+
+                    if ($isGreen) {
+                        echo " - Green";
+
+                        if (!$isRed) {
+                            $this->singleGreenCount += 1;
+                        }
+                    }
+
+                    if ($isGreen && $isRed) {
+                        $this->doubleLightCount += 1;
+                    }
+
+                    if ($this->debugThresholds === false) {
+                        $this->makeClip($seconds);
+                    } else {
+                        $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
+                    }
+
+                    echo "\n";
+                }
+
+                $this->lastLightFrame = $imageNumber;
+            }
+        }
+    }
+
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     * @throws \ImagickException
+     */
+    public function handle()
+    {
+        $this->handleOptionsAndArguments();
+
+        $this->makeBoutFolder();
+
+        if ($this->noDownload === false) {
             $this->downloadVideo();
             $this->makeFrameImages();
             $this->deleteClips();
@@ -307,31 +483,20 @@ class AnalyzeBout extends Command
             $this->makeLightThumbsDirectory();
         }
 
-        $this->redLightCrop = $profileWrapper['profile']['redLightCrop'];
-        $this->greenLightCrop = $profileWrapper['profile']['greenLightCrop'];
-        $this->redLightThreshold = $profileWrapper['profile']['redLightThreshold'];
-        $this->greenLightThreshold = $profileWrapper['profile']['greenLightThreshold'];
-
+        $this->setCropsAndThresholds($profileWrapper['profile']);
 
         $boutFolder = getcwd() . $this->boutFolder;
         $images = array_filter(glob($boutFolder . '/thumbs/*'), 'is_file');
 
-        $lastLightFrame = 0;
-        $lightCount = 0;
-        $singleRedCount = 0;
-        $singleGreenCount = 0;
-        $doubleLightCount = 0;
+        $this->doubleLightCount = 0;
         foreach ($images as $imageNumber => $filename) {
-
-            if ($this->start !== null
-                && $imageNumber < $this->start
-            ) {
+            // If before start, continue
+            if ($this->start !== null && $imageNumber < $this->start) {
                 continue;
             }
 
-            if ($this->end !== null
-                && $imageNumber > $this->end
-            ) {
+            // If after end, break
+            if ($this->end !== null && $imageNumber > $this->end) {
                 break;
             }
 
@@ -340,72 +505,14 @@ class AnalyzeBout extends Command
                 continue;
             }
 
-            $image = new Imagick($filename);
-            $image->resizeImage(
-                $profileWrapper['profile']['imageDimensions'][0],
-                $profileWrapper['profile']['imageDimensions'][1],
-                Imagick::FILTER_POINT,
-                0
-            );
-
-            if ($this->debugThresholds === true) {
-                echo $imageNumber . "\n";
-            }
-
-            // If the overlay is showing
-            if ($this->checkIsOverlay($image, $profileWrapper['profile'], $profileWrapper['overlay']) === true) {
-                $isRed = $this->checkIsRed($image);
-                $isGreen = $this->checkIsGreen($image);
-
-                $isLight = $isRed || $isGreen;
-                if ($isLight) {
-                    if ($imageNumber > $lastLightFrame + 1) {
-                        $lightCount += 1;
-
-                        echo $lightCount . ': ';
-                        $seconds = ($imageNumber + 1) / $this->sampleRate;
-                        echo self::formatTime($seconds) . " - ";
-                        echo $imageNumber + 1;  // ImageNumber is 0 indexed
-
-                        if ($isRed) {
-                            echo " - Red";
-
-                            if(!$isGreen) {
-                                $singleRedCount += 1;
-                            }
-                        }
-
-                        if ($isGreen) {
-                            echo " - Green";
-
-                            if(!$isRed) {
-                                $singleGreenCount += 1;
-                            }
-                        }
-
-                        if ($isGreen && $isRed) {
-                            $doubleLightCount += 1;
-                        }
-
-                        if ($this->debugThresholds === false) {
-                            $this->makeClip($seconds);
-                        } else {
-                            $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
-                        }
-
-                        echo "\n";
-                    }
-
-                    $lastLightFrame = $imageNumber;
-                }
-            }
+            $this->handleImage($filename, $profileWrapper, $imageNumber);
         }
 
         if ($this->debugThresholds === true) {
             echo "Ignoring off targets\n";
-            echo "Red Light Count: $singleRedCount\n";
-            echo "Green Light Count: $singleGreenCount\n";
-            echo "BOth: $doubleLightCount\n";
+            echo "Red Light Count: $this->singleRedCount\n";
+            echo "Green Light Count: $this->singleGreenCount\n";
+            echo "BOth: $this->doubleLightCount\n";
         }
     }
 

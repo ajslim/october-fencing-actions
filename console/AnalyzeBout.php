@@ -511,9 +511,10 @@ class AnalyzeBout extends Command
 
                     if ($this->debugThresholds === false) {
                         $this->makeClip($seconds);
-                    } else {
-                        $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
                     }
+
+                    $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
+
 
                     echo "\n";
                 }
@@ -535,6 +536,7 @@ class AnalyzeBout extends Command
         $this->handleOptionsAndArguments();
 
         $this->makeBoutFolder();
+        $this->makeLightThumbsDirectory();
 
         if ($this->noDownload === false) {
             $this->downloadVideo();
@@ -546,10 +548,6 @@ class AnalyzeBout extends Command
         if ($profileWrapper === false) {
             echo "Profile not found\n";
             return;
-        }
-
-        if ($this->debugThresholds === true) {
-            $this->makeLightThumbsDirectory();
         }
 
         $this->setProfileValues($profileWrapper);

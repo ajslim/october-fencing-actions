@@ -304,6 +304,30 @@ class AnalyzeBout extends Command
     }
 
 
+    private function getOverlayProfileWrapper($profileFolder)
+    {
+        $json = file_get_contents(
+            $profileFolder
+            . "/profile.json"
+        );
+        $profile = json_decode($json, true);
+
+        $overlayProfileWrapper = [
+            'overlay' => new Imagick( $profileFolder . "/overlay.png"),
+            'profile' => $profile
+        ];
+
+
+        if (isset($overlayProfileWrapper['profile']['type']) === true
+            && $overlayProfileWrapper['profile']['type'] === 2
+        ) {
+            $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
+            $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
+        }
+        return $overlayProfileWrapper;
+    }
+
+
     /**
      * @return bool|mixed
      * @throws \ImagickException
@@ -311,75 +335,32 @@ class AnalyzeBout extends Command
     private function findProfile()
     {
         if ($this->forceProfile !== null) {
-
             $profileFolder = getcwd()
                 . "/plugins/ajslim/fencingactions/overlay-profiles/"
                 . $this->forceProfile;
-            $json = file_get_contents(
-                $profileFolder
-                . "/profile.json"
-            );
-            $profile = json_decode($json, true);
-
-            $overlayProfileWrapper = [
-                'overlay' => new Imagick( $profileFolder . "/overlay.png"),
-                'profile' => $profile
-            ];
-
-
-            if (isset($overlayProfileWrapper['profile']['type']) === true
-                && $overlayProfileWrapper['profile']['type'] === 2
-            ) {
-                $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
-                $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
-            }
-            return $overlayProfileWrapper;
+            return $this->getOverlayProfileWrapper($profileFolder);
         }
 
         $profileRootDirectory = getcwd(). "/plugins/ajslim/fencingactions/overlay-profiles/";
         $profileFolders = array_filter(glob($profileRootDirectory . '*'), 'is_dir');
 
         $overlayProfileWrappers = [];
-
         foreach ($profileFolders as $profileFolder)
         {
-            $json = file_get_contents( $profileFolder . "/profile.json");
-            $profile = json_decode($json, true);
-
-
-            $overlayProfileWrapper = [
-                'overlay' => new Imagick( $profileFolder . "/overlay.png"),
-                'profile' => $profile
-            ];
-
-
-            if (isset($overlayProfileWrapper['profile']['type']) === true
-                && $overlayProfileWrapper['profile']['type'] === 2
-            ) {
-                $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
-                $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
-            }
-
-            // Only add matching profiles, or all if force profile is null
-            $overlayProfileWrappers[] = $overlayProfileWrapper;
+            $overlayProfileWrappers[] = $this->getOverlayProfileWrapper($profileFolder);
         }
 
+        echo "Searching for matching profile\n";
+
+        $profileBestMatch = 10000;
         $imageFolder = getcwd() . $this->boutFolder;
-
         $images = array_filter(glob($imageFolder . '/thumbs/*'), 'is_file');
-
         foreach ($images as $index => $filename) {
-
-
-            if ($this->start !== null
-                && $index < $this->start
-            ) {
+            if ($this->start !== null && $index < $this->start) {
                 continue;
             }
 
-            if ($this->end !== null
-                && $index > $this->end
-            ) {
+            if ($this->end !== null && $index > $this->end) {
                 break;
             }
 
@@ -389,8 +370,8 @@ class AnalyzeBout extends Command
                 continue;
             }
 
-            // Check every 10 images for speed sake
-            if ($index % 10 !== 0) {
+            // Check 5% images for speed sake
+            if ($index % 20 !== 0) {
                 continue;
             }
 
@@ -399,7 +380,7 @@ class AnalyzeBout extends Command
             }
 
             // Check to see if the overlay matches any of the profiles
-            foreach ($overlayProfileWrappers as $profileWrapper) {
+            foreach ($overlayProfileWrappers as $profileIndex => $profileWrapper) {
                 if ($this->debug) {
                     echo $profileWrapper['profile']['name'] . "\n";
                 }
@@ -412,12 +393,21 @@ class AnalyzeBout extends Command
                     0
                 );
 
-                // If the overlay  is showing
-                if ($this->checkIsOverlay($image, $profileWrapper['profile'], $profileWrapper['overlay']) === true) {
-                    echo "found matching profile " . $profileWrapper['profile']['name'] . "\n";
-                    return $profileWrapper;
+                $overlayMatch
+                    = $this->checkOverlayAmount($image, $profileWrapper['profile'], $profileWrapper['overlay'])[1];
+
+                if ($overlayMatch < $profileBestMatch) {
+                    $profileBestMatch = $overlayMatch;
+                    $profileBestMatchIndex = $profileIndex;
                 }
             }
+        }
+
+        // If the best match meets the profile minimum threshold the return
+        $profileWrapper = $overlayProfileWrappers[$profileBestMatchIndex];
+        if ($profileBestMatch < $profileWrapper['profile']['overlayThreshold']) {
+            echo "Using profile " . $profileWrapper['profile']['name'] . "\n";
+            return $profileWrapper;
         }
 
         // Return false if not found

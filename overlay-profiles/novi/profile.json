@@ -1,5 +1,6 @@
 {
   "name": "novi",
+  "type": 2,
   "imageDimensions": [
     640,
     360
@@ -11,18 +12,18 @@
     307
   ],
   "redLightCrop": [
-    150,
-    8,
-    105,
+    207,
+    9,
+    75,
     326
   ],
   "greenLightCrop": [
-    150,
-    8,
-    405,
+    207,
+    9,
+    358,
     326
   ],
-  "redLightThreshold": 0.16,
-  "greenLightThreshold": 0.10,
+  "redLightThreshold": 0.01,
+  "greenLightThreshold": 0.01,
   "overlayThreshold": 0.07
 }

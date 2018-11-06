@@ -65,10 +65,6 @@ tabs:
             options:
                 1: Left
                 2: Right
-        alternate_calls:
-            label: 'Alternate Calls'
-            type: relation
-            tab: Details
         tags:
             label: tags
             type: relation

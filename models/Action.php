@@ -53,12 +53,6 @@ class Action extends Model
             'table' => 'ajslim_fencingactions_action_tag',
             'key' => 'action_id',
             'otherKey' => 'tag_id',
-        ],
-        'alternate_calls' => [
-            'Ajslim\Fencingactions\Models\Call',
-            'table' => 'ajslim_fencingactions_action_call',
-            'key' => 'action_id',
-            'otherKey' => 'call_id',
         ]
     ];
     public $morphTo = [];

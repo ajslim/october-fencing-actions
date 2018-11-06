@@ -1,5 +1,6 @@
 {
   "name": "moscow",
+  "type": 2,
   "imageDimensions": [
     640,
     360
@@ -11,18 +12,18 @@
     286
   ],
   "redLightCrop": [
-    15,
-    15,
-    234,
-    319
+    19,
+    19,
+    232,
+    317
   ],
   "greenLightCrop": [
-    15,
-    15,
-    390,
-    319
+    19,
+    19,
+    388,
+    317
   ],
-  "redLightThreshold": 0.25,
-  "greenLightThreshold": 0.2,
+  "redLightThreshold": 0.01,
+  "greenLightThreshold": 0.01,
   "overlayThreshold": 0.04
 }

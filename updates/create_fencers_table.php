@@ -31,6 +31,11 @@ class CreateFencersTable extends Migration
                 // when importing bouts
                 $table->integer('highest_rank')
                     ->nullable();
+                // This is useful for grabbing fencers who achieved a certain rank
+                // when importing bouts
+                $table->string('primary_weapon')
+                    ->nullable();
+
                 $table->timestamps();
             }
         );

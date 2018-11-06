@@ -41,7 +41,7 @@ class Actions extends Controller
 
 
     /**
-     * Updates the gfycat fields on save
+     * Updates the video fields on save
      *
      * @param null $context The Context
      *
@@ -50,7 +50,7 @@ class Actions extends Controller
     public function update_onSave($context = null)
     {
         parent::update_onSave($context);
-        $this->vars['value'] = $this->formGetModel()->gfycat_id;
+        $this->vars['value'] = $this->formGetModel()->video_url;
     }
 
 

@@ -22,44 +22,44 @@ class SeedAllTables extends Seeder
         Tag::create(['name' => 'Attack no - Attack']);
         Tag::create(['name' => 'Separating Attacks']);
 
-        Fencer::create([
-            'first_name' => 'Alessio',
-            'last_name' => 'Foconi',
-            'fie_site_number' => '15860',
-            'country_code' => 'ITA',
-            'gender' => 'M'
-        ]);
-
-        Fencer::create([
-            'first_name' => 'Richard',
-            'last_name' => 'Kruse',
-            'fie_site_number' => '3256',
-            'country_code' => 'ITA',
-            'gender' => 'M'
-        ]);
-
-        Tournament::create([
-            'name' => '2018 World Championships',
-            'year' => '2018',
-            'start_date' => '2018-07-21',
-            'end_date' => '2018-07-24',
-            'fie_id' => '244',
-            'country_code' => 'CHN',
-            'place' => 'Wuxi',
-            'weapon' => 'F',
-            'gender' => 'M',
-            'category' => 'S',
-            'type' => 'CHM',
-            'event' => 'I',
-        ]);
-
-        Bout::create([
-            'left_fencer_id' => 2,
-            'right_fencer_id' => 1,
-            'left_score' => 8,
-            'right_score' => 15,
-            'tournament_id' => 1,
-            'cache_name' => '2018 mens foil World Championship Final'
-        ]);
+//        Fencer::create([
+//            'first_name' => 'Alessio',
+//            'last_name' => 'Foconi',
+//            'fie_site_number' => '15860',
+//            'country_code' => 'ITA',
+//            'gender' => 'M'
+//        ]);
+//
+//        Fencer::create([
+//            'first_name' => 'Richard',
+//            'last_name' => 'Kruse',
+//            'fie_site_number' => '3256',
+//            'country_code' => 'ITA',
+//            'gender' => 'M'
+//        ]);
+//
+//        Tournament::create([
+//            'name' => '2018 World Championships',
+//            'year' => '2018',
+//            'start_date' => '2018-07-21',
+//            'end_date' => '2018-07-24',
+//            'fie_id' => '244',
+//            'country_code' => 'CHN',
+//            'place' => 'Wuxi',
+//            'weapon' => 'F',
+//            'gender' => 'M',
+//            'category' => 'S',
+//            'type' => 'CHM',
+//            'event' => 'I',
+//        ]);
+//
+//        Bout::create([
+//            'left_fencer_id' => 2,
+//            'right_fencer_id' => 1,
+//            'left_score' => 8,
+//            'right_score' => 15,
+//            'tournament_id' => 1,
+//            'cache_name' => '2018 mens foil World Championship Final'
+//        ]);
     }
 }

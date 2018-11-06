@@ -19,4 +19,4 @@ columns:
     actions:
         label: Actions
         relation: actions
-        select: gfycat_id
+        select: video_url

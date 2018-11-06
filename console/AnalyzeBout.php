@@ -133,7 +133,7 @@ class AnalyzeBout extends Command
 
         echo "Downloading bout \n";
 
-        exec( "youtube-dl -f 134  \"$this->url\" --output $folder/video.mp4");
+        echo exec( "youtube-dl -f 134  \"$this->url\" --output $folder/video.mp4");
     }
 
     private function deleteClips()
@@ -556,7 +556,8 @@ class AnalyzeBout extends Command
                     }
 
                     $this->makeLightImages($isRed, $isGreen, $image, $imageNumber);
-                    $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
+                    $filename = ($imageNumber + 1);
+                    $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$filename.png");
 
                     echo "\n";
                 }

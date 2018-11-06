@@ -3,6 +3,11 @@
 # ===================================
 
 fields:
+    photo_url:
+        type: partial
+        path: field_photo
+        span: storm
+        cssClass: col-xs-1
     id:
         label: ID
         disabled: true
@@ -13,9 +18,9 @@ fields:
         disabled: true
         span: storm
         cssClass: col-xs-1
-    photo_url:
-        type: partial
-        path: field_photo
+    primary_weapon:
+        label: Primary Weapon
+        disabled: true
         span: storm
         cssClass: col-xs-1
     fie_site_link:

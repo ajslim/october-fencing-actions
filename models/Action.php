@@ -29,7 +29,7 @@ class Action extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = ['gfycat_id', 'priority', 'tags'];
+    protected $fillable = ['bout_id', 'video_url', 'thumb_url', 'priority', 'tags'];
 
     /**
      * @var array Relations
@@ -73,9 +73,9 @@ class Action extends Model
      *
      * @return array
      */
-    public function getGfycatAttribute()
+    public function getVideoAttribute()
     {
-        return $this->gfycat_id;
+        return $this->video_url;
     }
 
 

@@ -131,6 +131,9 @@ class UpdateFencersFromFie extends Command
                         // Update the rank as we go
                         if (!$fencer->highest_rank || $rank < $fencer->highest_rank) {
                             $fencer->highest_rank = $rank;
+
+                            // Their primary weapon is their best ranked weapon
+                            $fencer->primary_weapon = $weapon;
                         }
                         $fencer->save();
                     }

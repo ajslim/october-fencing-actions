@@ -7,6 +7,11 @@ use Model;
  *
  * @mixin \Eloquent
  * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @property Action[] actions
+ * @property string   video_url
+ * @property string name
+ * @property string cache_name
  */
 class Bout extends Model
 {

@@ -1,5 +1,6 @@
 {
   "name": "wuxi",
+  "type": 2,
   "imageDimensions": [
     640,
     360
@@ -11,18 +12,18 @@
     283
   ],
   "redLightCrop": [
-    180,
-    3,
-    77,
+    230,
+    6,
+    53,
     310
   ],
   "greenLightCrop": [
-    180,
-    3,
-    377,
+    230,
+    6,
+    357,
     310
   ],
-  "redLightThreshold": 0.035,
-  "greenLightThreshold": 0.035,
+  "redLightThreshold": 0.01,
+  "greenLightThreshold": 0.01,
   "overlayThreshold": 0.03
 }

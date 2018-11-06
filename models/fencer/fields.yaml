@@ -8,6 +8,11 @@ fields:
         disabled: true
         span: storm
         cssClass: col-xs-1
+    highest_rank:
+        label: Highest Rank
+        disabled: true
+        span: storm
+        cssClass: col-xs-1
     photo_url:
         type: partial
         path: field_photo

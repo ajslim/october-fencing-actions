@@ -6,6 +6,9 @@ columns:
     id:
         label: ID
         searchable: true
+    highest_rank:
+        label: Highest Rank
+        sortable: true
     photo_url:
         label: 'picture'
         type: partial

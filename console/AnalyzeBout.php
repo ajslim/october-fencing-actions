@@ -37,8 +37,9 @@ class AnalyzeBout extends Command
     private $greenLightImage;
 
     // Options
-    private $debugThresholds = false;
+    private $debug = false;
     private $noDownload = false;
+    private $makeLightImagesOption = false;
     private $forceProfile = null;
     private $start = null;
     private $end = null;
@@ -78,6 +79,24 @@ class AnalyzeBout extends Command
 
         $this->createFolderIfNotExist($this->boutRootFolder);
         $this->createFolderIfNotExist($this->boutFolder);
+    }
+
+
+    private function makeLightImagesDirectory()
+    {
+        $folder = getcwd() . $this->boutFolder;
+
+        // make the thumbs directory if needed
+        if (!file_exists($folder . '/lights')) {
+            mkdir($folder . '/lights');
+        }
+
+        // Delete all old thumbs
+        $files = glob($folder . '/lights/*'); // get all file names
+        foreach($files as $file){ // iterate files
+            if(is_file($file))
+                unlink($file); // delete file
+        }
     }
 
 
@@ -189,7 +208,7 @@ class AnalyzeBout extends Command
      */
     private function checkIsOverlay(Imagick $image, $overlayProfile, $overlayImage)
     {
-        if ($this->debugThresholds === true) {
+        if ($this->debug === true) {
             echo "o:" . $this->checkOverlayAmount($image, $overlayProfile, $overlayImage)[1] . "\n";
         }
 
@@ -226,18 +245,19 @@ class AnalyzeBout extends Command
             $imageLightSection = clone $image;
             $imageLightSection->cropImage(...$this->redLightCrop);
 
-            if ($this->debugThresholds === true) {
+            if ($this->debug === true) {
                 echo "r:" . $this->redLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . "\n";
             }
 
             return $this->redLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->redLightThreshold;
         }
 
-        if ($this->debugThresholds === true) {
-            echo "r:" . $this->checkRedAmount($image)[1] . "\n";
+        $redAmount = $this->checkRedAmount($image)[1];
+        $isRed = $redAmount > $this->redLightThreshold;
+        if ($this->debug === true) {
+            echo "r:" . $redAmount . "\n";
         }
-
-        return $this->checkRedAmount($image)[1] > $this->redLightThreshold;
+        return $isRed;
     }
 
 
@@ -269,16 +289,18 @@ class AnalyzeBout extends Command
             $imageLightSection = clone $image;
             $imageLightSection->cropImage(...$this->greenLightCrop);
 
-            if ($this->debugThresholds === true) {
+            if ($this->debug === true) {
                 echo "g!:" . $this->greenLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . "\n";
             }
             return $this->greenLightImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->greenLightThreshold;
         }
 
-        if ($this->debugThresholds === true) {
-            echo "g:" . $this->checkGreenAmount($image)[1] . "\n";
+        $greenAmount = $this->checkGreenAmount($image)[1];
+        $isGreen = $greenAmount > $this->greenLightThreshold;
+        if ($this->debug === true) {
+            echo "g:" . $greenAmount . "\n";
         }
-        return $this->checkGreenAmount($image)[1] > $this->greenLightThreshold;
+        return $isGreen;
     }
 
 
@@ -372,13 +394,13 @@ class AnalyzeBout extends Command
                 continue;
             }
 
-            if ($this->debugThresholds) {
+            if ($this->debug) {
                 echo $index . "\n";
             }
 
             // Check to see if the overlay matches any of the profiles
             foreach ($overlayProfileWrappers as $profileWrapper) {
-                if ($this->debugThresholds) {
+                if ($this->debug) {
                     echo $profileWrapper['profile']['name'] . "\n";
                 }
 
@@ -422,7 +444,11 @@ class AnalyzeBout extends Command
         }
 
         if ($this->option('debug-thresholds') !== null) {
-            $this->debugThresholds = true;
+            $this->debug = true;
+        }
+
+        if ($this->option('make-light-images') !== null) {
+            $this->makeLightImagesOption = true;
         }
     }
 
@@ -451,6 +477,32 @@ class AnalyzeBout extends Command
     }
 
 
+    /**
+     * Saves cropped light images if the make light images flag is set. This is useful for converting
+     * profiles to type 2
+     *
+     * @param bool    $isRed
+     * @param bool    $isGreen
+     * @param Imagick $image
+     * @param integer $imageNumber
+     */
+    private function makeLightImages($isRed, $isGreen, Imagick $image, $imageNumber)
+    {
+        if ($this->makeLightImagesOption === true) {
+            if ($isRed === true) {
+                $redLightImage = clone $image;
+                $redLightImage->cropImage(...$this->redLightCrop);
+                $redLightImage->writeImage(getcwd() . $this->boutFolder . "/lights/red-$imageNumber.png");
+            }
+
+            if ($isGreen === true) {
+                $greenLightImage = clone $image;
+                $greenLightImage->cropImage(...$this->greenLightCrop);
+                $greenLightImage->writeImage(getcwd() . $this->boutFolder . "/lights/green-$imageNumber.png");
+            }
+        }
+    }
+
 
     /**
      * Handles a single image
@@ -470,7 +522,7 @@ class AnalyzeBout extends Command
             0
         );
 
-        if ($this->debugThresholds === true) {
+        if ($this->debug === true) {
             echo $imageNumber . "\n";
         }
 
@@ -509,12 +561,12 @@ class AnalyzeBout extends Command
                         $this->doubleLightCount += 1;
                     }
 
-                    if ($this->debugThresholds === false) {
+                    if ($this->debug === false) {
                         $this->makeClip($seconds);
                     }
 
+                    $this->makeLightImages($isRed, $isGreen, $image, $imageNumber);
                     $image->writeImage(getcwd() . $this->boutFolder . "/lightthumbs/$imageNumber.png");
-
 
                     echo "\n";
                 }
@@ -537,6 +589,10 @@ class AnalyzeBout extends Command
 
         $this->makeBoutFolder();
         $this->makeLightThumbsDirectory();
+
+        if ($this->makeLightImagesOption === true) {
+            $this->makeLightImagesDirectory();
+        }
 
         if ($this->noDownload === false) {
             $this->downloadVideo();
@@ -575,7 +631,7 @@ class AnalyzeBout extends Command
             $this->handleImage($filename, $profileWrapper, $imageNumber);
         }
 
-        if ($this->debugThresholds === true) {
+        if ($this->debug === true) {
             echo "Ignoring off targets\n";
             echo "Red Light Count: $this->singleRedCount\n";
             echo "Green Light Count: $this->singleGreenCount\n";
@@ -606,6 +662,7 @@ class AnalyzeBout extends Command
             ['profile', null, InputOption::VALUE_OPTIONAL, 'Force a particular profile', null],
             ['start', null, InputOption::VALUE_OPTIONAL, 'Start Time in seconds', null],
             ['end', null, InputOption::VALUE_OPTIONAL, 'End Time in seconds', null],
+            ['make-light-images', null, InputOption::VALUE_OPTIONAL, 'Make light images', null],
         ];
     }
 }

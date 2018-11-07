@@ -45,13 +45,13 @@ fields:
 
 tabs:
     fields:
-        gfycat_id:
-            label: 'Gfycat Id'
+        video_url:
+            label: 'Clip URL'
             type: text
             tab: Main
-        gfycat:
+        video:
             type: partial
-            path: field_gfycat
+            path: field_video
             tab: Main
         call_on_site:
             label: 'Call on site'

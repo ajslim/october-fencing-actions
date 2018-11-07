@@ -128,15 +128,13 @@ class UpdateFencersFromFie extends Command
                                 'gender' => $gender, // Determined by list at top of function
                             ]
                         );
-
                         // Update the rank as we go
                         if (!$fencer->highest_rank || $rank < $fencer->highest_rank) {
                             $fencer->highest_rank = $rank;
 
-                            // The primary weapon, is the weapon that they've been ranked highest in
+                            // Their primary weapon is their best ranked weapon
                             $fencer->primary_weapon = $weapon;
                         }
-
                         $fencer->save();
                     }
                 }

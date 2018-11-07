@@ -24,5 +24,7 @@ columns:
         searchable: true
     gender:
         label: Gender
+    primary_weapon:
+        label: Primary Weapon
     birth:
         label: Birth Date

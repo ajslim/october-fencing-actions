@@ -12,6 +12,7 @@ use Redirect;
  * @mixin \Backend\Behaviors\ListController
  * @mixin \Backend\Behaviors\RelationController
  * @mixin \Ajslim\FencingActions\Behaviors\RoutedController
+ *
  */
 class Bouts extends Controller
 {

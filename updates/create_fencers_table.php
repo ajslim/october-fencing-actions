@@ -31,8 +31,8 @@ class CreateFencersTable extends Migration
                 // when importing bouts
                 $table->integer('highest_rank')
                     ->nullable();
-
-                // Fencers may fence multiple weapons, but this is used to determine their main weapon
+                // This is useful for grabbing fencers who achieved a certain rank
+                // when importing bouts
                 $table->string('primary_weapon')
                     ->nullable();
 

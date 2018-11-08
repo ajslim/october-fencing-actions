@@ -49,6 +49,11 @@ class SearchYoutubeUrlsForTournament extends Command
 
         foreach ($bouts as $bout) {
 
+            if ($bout->left_score <= 5 || $bout->left_score <= 5) {
+                echo "Bout is likely a pool bout \n";
+                continue;
+            }
+
             echo "Searching for " . $bout->cache_name . "\n";
 
             // Place might be 'Anaheim, California' we only want the first part

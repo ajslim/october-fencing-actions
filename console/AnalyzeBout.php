@@ -140,6 +140,8 @@ class AnalyzeBout extends Command
             return false;
         }
 
+        echo "Downloading bout \n";
+
         echo exec( "youtube-dl -f 134  \"$this->url\" --output $folder/video.mp4");
         return true;
     }

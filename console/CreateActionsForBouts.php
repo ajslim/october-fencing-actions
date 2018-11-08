@@ -45,7 +45,7 @@ class CreateActionsForBouts extends Command
             if (file_exists(getcwd() . $folder . '/clips') !== true) {
                 echo 'can not find ' . getcwd() . $folder . '/clips' . "\n";
                 echo "Clips folder not created, something went wrong\n";
-                return;
+                continue;
             }
 
             echo "Updating or creating actions for bout:" . $bout->id . "\n";

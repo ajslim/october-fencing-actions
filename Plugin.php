@@ -40,6 +40,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.AnalyzeBout', 'Ajslim\FencingActions\Console\AnalyzeBout');
         $this->registerConsoleCommand('ajslim.CreateActionsForBouts', 'Ajslim\FencingActions\Console\CreateActionsForBouts');
         $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
+        $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
     }
 
     /**
@@ -70,9 +71,13 @@ class Plugin extends PluginBase
     public function registerPermissions()
     {
         return [
-            'ajslim.fencingactions.some_permission' => [
+            'ajslim.fencingactions.admin' => [
                 'tab' => 'FencingActions',
-                'label' => 'Some permission'
+                'label' => 'Admin Permissions'
+            ],
+            'ajslim.fencingactions.view' => [
+                'tab' => 'FencingActions',
+                'label' => 'View Permissions'
             ],
         ];
     }

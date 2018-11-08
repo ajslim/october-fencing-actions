@@ -39,6 +39,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.UpdateFencerPhotos', 'Ajslim\FencingActions\Console\UpdateFencerPhotos');
         $this->registerConsoleCommand('ajslim.AnalyzeBout', 'Ajslim\FencingActions\Console\AnalyzeBout');
         $this->registerConsoleCommand('ajslim.CreateActionsForBouts', 'Ajslim\FencingActions\Console\CreateActionsForBouts');
+        $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
     }
 
     /**

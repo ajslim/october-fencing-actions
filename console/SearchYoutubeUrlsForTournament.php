@@ -90,12 +90,22 @@ class SearchYoutubeUrlsForTournament extends Command
                     && strpos($words, strtolower($bout->right_fencer->last_name)) !== false
                 ) {
                     $anchors = $video->getElementsByTagName('a');
-                    if ($anchors->item(1) !== null) {
 
-                        // Weird double string
-                        $url = $anchors->item(1)->getAttribute('href');
+                    // Find the anchor with the right url
+                    foreach ($anchors as $anchor) {
+                        $url = $anchor->getAttribute('href');
+                        if (strpos($url, '//www.youtube.com/') !== false) {
+                            break;
+                        }
+                        $url = null;
+                    }
+
+                    if ($url !== null) {
+
+                       // Weird double string
                         $start = strpos($url, '%3Fv%3D') + 7;
                         $videoUrl = 'https://www.youtube.com/watch?v=' . substr($url, $start, 11);
+                        echo "$url\n";
                         echo "$videoUrl\n";
 
                         // Update the bout video URL

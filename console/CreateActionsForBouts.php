@@ -28,8 +28,13 @@ class CreateActionsForBouts extends Command
         foreach ($bouts as $bout) {
             $url = $bout->video_url;
             parse_str( parse_url( $url, PHP_URL_QUERY ), $parameters );
-            $this->videoId = $parameters['v'];
 
+            // Continue if bout is missing youtube id
+            if (isset($parameters['v']) !== true) {
+                continue;
+            }
+
+            $this->videoId = $parameters['v'];
             $folder = "/storage/bout/" . $this->videoId;
 
             // If the clips don't exist, analyse the bout
@@ -55,9 +60,9 @@ class CreateActionsForBouts extends Command
                         'bout_id' => $bout->id,
                         'video_url' => $folder . '/clips/' . $pathParts['filename'] . '.mp4',
                         'thumb_url' => $folder . '/lightthumbs/' . $pathParts['filename'] . '.png',
-                        'time' => (integer) $pathParts['filename'],
                     ]
                 );
+                $action->time = (integer) $pathParts['filename'];
                 $action->save();
             }
         }

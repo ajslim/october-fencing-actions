@@ -64,10 +64,12 @@ class Actions extends Controller
      */
     public function onReverseFencers($id)
     {
-        /* @var Action $action */
-        $action = Action::find($id);
-        $action->reverseFencers();
+        if ($this->isAdmin() === true) {
+            /* @var Action $action */
+            $action = Action::find($id);
+            $action->reverseFencers();
 
-        return Redirect::refresh();
+            return Redirect::refresh();
+        }
     }
 }

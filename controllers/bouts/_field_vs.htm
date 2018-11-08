@@ -1,12 +1,16 @@
 <div class="form-buttons">
     <div class="loading-indicator-container">
-        <button
-                type="submit"
-                data-request="onReverseBoutFencers"
-                data-request-data="redirect:0"
-                data-load-indicator="Reversing Bout Fencers..."
-                class="btn btn-primary">
-            < - >
-        </button>
+        <?php if ($isAdmin === true) { ?>
+            <button
+                    type="submit"
+                    data-request="onReverseBoutFencers"
+                    data-request-data="redirect:0"
+                    data-load-indicator="Reversing Bout Fencers..."
+                    class="btn btn-primary">
+                < - >
+            </button>
+        <?php } else { ?>
+            Vs
+        <?php } ?>
     </div>
 </div>

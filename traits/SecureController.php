@@ -32,7 +32,7 @@ trait SecureController
 
     public function preview($id)
     {
-
+        $this->vars['isAdmin'] = $this->isAdmin();
         return parent::preview($id);
     }
 

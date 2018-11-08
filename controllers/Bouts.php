@@ -67,12 +67,14 @@ class Bouts extends Controller
      */
     public function onReverseBoutFencers($id)
     {
-        /* @var Bout $bout */
-        $bout = Bout::find($id);
+        if ($this->isAdmin() === true) {
+            /* @var Bout $bout */
+            $bout = Bout::find($id);
 
-        // Reverse the fencers in the parent bout
-        $bout->reverseFencers();
+            // Reverse the fencers in the parent bout
+            $bout->reverseFencers();
 
-        return Redirect::refresh();
+            return Redirect::refresh();
+        }
     }
 }

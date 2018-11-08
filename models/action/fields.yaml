@@ -49,6 +49,9 @@ tabs:
             label: 'Clip URL'
             type: text
             tab: Main
+        time:
+            label: 'Time'
+            tab: Main
         video:
             type: partial
             path: field_video

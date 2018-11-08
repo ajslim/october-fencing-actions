@@ -50,4 +50,4 @@ tabs:
             label: 'Actions'
             type: partial
             path: field_actions
-            tab: Actions
+            tab: Video

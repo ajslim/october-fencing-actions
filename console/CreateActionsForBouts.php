@@ -54,7 +54,8 @@ class CreateActionsForBouts extends Command
                     [
                         'bout_id' => $bout->id,
                         'video_url' => $folder . '/clips/' . $pathParts['filename'] . '.mp4',
-                        'thumb_url' => $folder . '/lightthumbs/' . $pathParts['filename'] . '.png'
+                        'thumb_url' => $folder . '/lightthumbs/' . $pathParts['filename'] . '.png',
+                        'time' => (integer) $pathParts['filename'],
                     ]
                 );
                 $action->save();

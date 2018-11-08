@@ -22,6 +22,8 @@ class CreateActionsTable extends Migration
                     ->nullable();
                 $table->string('thumb_url', 300)
                     ->nullable();
+                $table->integer('time')
+                    ->nullable();
                 $table->integer('priority')
                     ->nullable();
 

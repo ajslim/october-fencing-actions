@@ -267,6 +267,14 @@ class UpdateBoutsFromFie extends Command
                                     'right_score' => $rightScore,
                                 ]
                             );
+
+                            $name = $tournament->fullname . ': ' .
+                                $leftFencer->last_name . " " . $leftFencer->first_name .
+                                '-' .
+                                $rightFencer->last_name . " " . $rightFencer->first_name;
+
+                            $bout->cache_name = $name;
+
                             $bout->save();
                         }
                     }

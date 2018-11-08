@@ -131,9 +131,17 @@ class AnalyzeBout extends Command
             unlink("$folder/video.mp4");
         }
 
-        echo "Downloading bout \n";
+        echo "Checking bout \n";
+
+        $boutDetails = json_decode(exec( "youtube-dl -j \"$this->url\""));
+
+        if ($boutDetails->duration > 5400) {
+            echo "bout more than 1:300 - too long \n";
+            return false;
+        }
 
         echo exec( "youtube-dl -f 134  \"$this->url\" --output $folder/video.mp4");
+        return true;
     }
 
     private function deleteClips()
@@ -586,7 +594,10 @@ class AnalyzeBout extends Command
         }
 
         if ($this->noDownload === false) {
-            $this->downloadVideo();
+            if ($this->downloadVideo() !== true) {
+                return;
+            }
+
             $this->makeFrameImages();
             $this->deleteClips();
         }

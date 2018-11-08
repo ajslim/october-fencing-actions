@@ -51,9 +51,12 @@ class SearchYoutubeUrlsForTournament extends Command
 
             echo "Searching for " . $bout->cache_name . "\n";
 
+            // Place might be 'Anaheim, California' we only want the first part
+            $place = explode(',', $tournament->place)[0];
+
             $url = $this->makeYoutubeSearchUrl(
                 $tournament->year,
-                $tournament->place,
+                $place,
                 $bout->left_fencer->last_name,
                 $bout->right_fencer->last_name
             );
@@ -85,7 +88,7 @@ class SearchYoutubeUrlsForTournament extends Command
 
                 if ($isAcceptableUploader === true
                     && strpos($words, $tournament->year) !== false
-                    && strpos($words, strtolower($tournament->place)) !== false
+                    && strpos($words, strtolower($place)) !== false
                     && strpos($words, strtolower($bout->left_fencer->last_name)) !== false
                     && strpos($words, strtolower($bout->right_fencer->last_name)) !== false
                 ) {

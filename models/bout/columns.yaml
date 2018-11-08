@@ -16,6 +16,8 @@ columns:
     right_score:
         label: 'Right Score'
         type: number
+    video_url:
+        label: Video Url
     actions:
         label: Actions
         relation: actions

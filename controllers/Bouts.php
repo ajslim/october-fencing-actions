@@ -1,6 +1,7 @@
 <?php namespace Ajslim\FencingActions\Controllers;
 
 use Ajslim\FencingActions\Models\Bout;
+use Ajslim\FencingActions\Traits\SecureController;
 use BackendMenu;
 use Backend\Classes\Controller;
 use Redirect;
@@ -16,6 +17,8 @@ use Redirect;
  */
 class Bouts extends Controller
 {
+    use SecureController;
+
     public $implement = [
         'Backend.Behaviors.FormController',
         'Backend.Behaviors.ListController',

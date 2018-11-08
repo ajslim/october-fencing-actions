@@ -8,6 +8,8 @@ use Backend\Classes\Controller;
  */
 class Tags extends Controller
 {
+    use SecureController;
+
     public $implement = [
         'Backend.Behaviors.FormController',
         'Backend.Behaviors.ListController'

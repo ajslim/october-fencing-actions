@@ -1,7 +1,7 @@
 <?php namespace Ajslim\FencingActions\Controllers;
 
 use Ajslim\FencingActions\Models\Action;
-use Ajslim\FencingActions\Models\Bout;
+use Ajslim\FencingActions\Traits\SecureController;
 use BackendMenu;
 use Backend\Classes\Controller;
 use Redirect;
@@ -15,6 +15,8 @@ use Redirect;
  */
 class Actions extends Controller
 {
+    use SecureController;
+
     /**
      * @var array $implement The implemented behaviors
      */
@@ -35,7 +37,6 @@ class Actions extends Controller
     public function __construct()
     {
         parent::__construct();
-
         BackendMenu::setContext('Ajslim.FencingActions', 'fencingactions', 'actions');
     }
 

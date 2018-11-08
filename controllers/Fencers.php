@@ -1,5 +1,6 @@
 <?php namespace Ajslim\Fencingactions\Controllers;
 
+use Ajslim\FencingActions\Traits\SecureController;
 use BackendMenu;
 use Backend\Classes\Controller;
 
@@ -13,6 +14,8 @@ use Backend\Classes\Controller;
  */
 class Fencers extends Controller
 {
+    use SecureController;
+
     public $implement = [
         'Backend.Behaviors.FormController',
         'Backend.Behaviors.ListController',

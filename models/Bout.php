@@ -12,6 +12,9 @@ use Model;
  * @property string   video_url
  * @property string name
  * @property string cache_name
+ *
+ * @property Fencer left_fencer
+ * @property Fencer right_fencer
  */
 class Bout extends Model
 {

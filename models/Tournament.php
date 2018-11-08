@@ -6,6 +6,12 @@ use Model;
  * tournament Model
  *
  * @mixin \Eloquent
+ *
+ * @property string year
+ * @property string place
+ * @property string weapon
+ * @property string name
+ * @property string gender
  */
 class Tournament extends Model
 {

@@ -25,7 +25,19 @@ class CreateActionsForBouts extends Command
     {
         $bouts = Bout::whereNotNull('video_url')->get();
 
+
+        $totalBouts = 0;
         foreach ($bouts as $bout) {
+            $totalBouts += 1;
+
+            if ($totalBouts > 80) {
+                echo "Stopping at 80 bouts - get a bigger server \n";
+                break;
+            }
+
+            echo "Creating actions for " . $bout->cache_name . "\n";
+
+
             $url = $bout->video_url;
             parse_str( parse_url( $url, PHP_URL_QUERY ), $parameters );
 

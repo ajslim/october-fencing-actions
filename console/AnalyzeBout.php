@@ -67,9 +67,24 @@ class AnalyzeBout extends Command
 
         // make the bout directory if needed
         if (!file_exists($folder)) {
+            echo "creating $folder\n";
+
             mkdir($folder);
         }
         return $folder;
+    }
+
+
+    private function removeThumbs()
+    {
+        $folder = getcwd() . $this->boutFolder;
+
+        // Delete all old thumbs
+        $files = glob($folder . '/thumbs/*'); // get all file names
+        foreach($files as $file){ // iterate files
+            if(is_file($file))
+                unlink($file); // delete file
+        }
     }
 
 
@@ -431,6 +446,11 @@ class AnalyzeBout extends Command
     {
         $this->url = $this->argument('url');
 
+        if (strpbrk($this->url, "\\/?%*:|\"<>") === true) {
+            echo "Invalid youtube id\n";
+            return false;
+        }
+
         $parameters = [];
         parse_str( parse_url( $this->url, PHP_URL_QUERY ), $parameters );
         $this->videoId = $parameters['v'];
@@ -586,7 +606,10 @@ class AnalyzeBout extends Command
      */
     public function handle()
     {
-        $this->handleOptionsAndArguments();
+        if($this->handleOptionsAndArguments() === false) {
+            echo "There was a problem creating actions\n";
+            return;
+        };
 
         $this->makeBoutFolder();
         $this->makeLightThumbsDirectory();

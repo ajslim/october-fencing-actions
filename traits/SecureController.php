@@ -38,6 +38,7 @@ trait SecureController
 
     public function update($id)
     {
+        $this->vars['isAdmin'] = $this->isAdmin();
         if($this->isAdmin() !== true) {
             $url = $_SERVER['REQUEST_URI'];
 

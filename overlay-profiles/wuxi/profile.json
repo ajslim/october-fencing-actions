@@ -23,7 +23,7 @@
     357,
     310
   ],
-  "redLightThreshold": 0.01,
-  "greenLightThreshold": 0.01,
+  "redLightThreshold": 0.015,
+  "greenLightThreshold": 0.015,
   "overlayThreshold": 0.03
 }

@@ -30,6 +30,7 @@ class CreateActionsForBouts extends Command
         foreach ($bouts as $bout) {
             $totalBouts += 1;
 
+            echo "Total bouts: " . $totalBouts . "\n";
             if ($totalBouts > 80) {
                 echo "Stopping at 80 bouts - get a bigger server \n";
                 break;

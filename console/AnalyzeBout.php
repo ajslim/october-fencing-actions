@@ -446,14 +446,14 @@ class AnalyzeBout extends Command
     {
         $this->url = $this->argument('url');
 
-        if (strpbrk($this->url, "\\/?%*:|\"<>") === true) {
-            echo "Invalid youtube id\n";
-            return false;
-        }
-
         $parameters = [];
         parse_str( parse_url( $this->url, PHP_URL_QUERY ), $parameters );
         $this->videoId = $parameters['v'];
+
+        if (strpbrk($this->videoId, "\\/?%*:|\"<>") === true) {
+            echo "Invalid youtube id\n";
+            return false;
+        }
 
         $this->forceProfile = $this->option('profile');
         $this->start = $this->option('start');

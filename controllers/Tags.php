@@ -1,5 +1,6 @@
 <?php namespace Ajslim\FencingActions\Controllers;
 
+use Ajslim\FencingActions\Traits\SecureController;
 use BackendMenu;
 use Backend\Classes\Controller;
 

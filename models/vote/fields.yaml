@@ -1,0 +1,18 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    id:
+        label: ID
+        disabled: true
+
+    priority:
+        tab: Main
+        label: Priority for
+        type: dropdown
+        emptyOption: "Unknown / Other"
+        options:
+            1: Left
+            2: Right
+

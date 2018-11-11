@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Vote
+
+# Model Form Field configuration
+form: $/ajslim/fencingactions/models/vote/fields.yaml
+
+# Model Class name
+modelClass: Ajslim\Fencingactions\Models\Vote
+
+# Default redirect location
+defaultRedirect: ajslim/fencingactions/votes
+
+# Create page
+create:
+    title: Create Vote
+    redirect: ajslim/fencingactions/votes/update/:id
+    redirectClose: ajslim/fencingactions/votes
+
+# Update page
+update:
+    title: Edit Vote
+    redirect: ajslim/fencingactions/votes
+    redirectClose: ajslim/fencingactions/votes
+
+# Preview page
+preview:
+    title: Preview Vote

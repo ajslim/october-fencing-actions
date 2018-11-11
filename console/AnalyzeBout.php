@@ -61,7 +61,7 @@ class AnalyzeBout extends Command
      * @param $folderString
      * @return string
      */
-    private function createFolderIfNotExist($folderString): string
+    private function createFolderIfNotExist($folderString)
     {
         $folder = getcwd() . $folderString;
 
@@ -532,7 +532,7 @@ class AnalyzeBout extends Command
      * @param $imageNumber
      * @throws \ImagickException
      */
-    private function handleImage($filename, $profileWrapper, $imageNumber): void
+    private function handleImage($filename, $profileWrapper, $imageNumber)
     {
         $image = new Imagick($filename);
         $image->resizeImage(

@@ -24,6 +24,8 @@ class CreateActionsTable extends Migration
                     ->nullable();
                 $table->integer('time')
                     ->nullable();
+
+                // 1 is left, 2 is right
                 $table->integer('priority')
                     ->nullable();
 

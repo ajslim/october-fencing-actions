@@ -9,3 +9,7 @@
     - create_action_tag_table.php
     - create_action_call_table.php
     - seed_all_tables.php
+1.0.2:
+    - Add votes
+    - create_votes_table.php
+    - create_vote_comments_table.php

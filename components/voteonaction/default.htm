@@ -1,0 +1,194 @@
+<html>
+
+<head>
+    <style>
+        label, a {
+            display: block;
+            width: 100%;
+            height: 60px;
+            line-height: 40px;
+            margin: 0;
+            padding: 10px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        :checked + label {
+            background: yellow;
+        }
+
+        input {
+            display: none;
+        }
+
+        .submit {
+            background: lightgreen;
+        }
+
+        h6 {
+            margin-top: 30px;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .other {
+            margin-bottom: 30px;
+        }
+
+        select {
+            width: 100%;
+            height: 50px;
+        }
+
+
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h6 class="text-muted">Bout info</h6>
+            {{ boutName }}
+        </div>
+    </div>
+    <div class="row">
+
+        <video class="col" controls loop autoplay="true" playsinline="" preload="auto" tabindex="-1">
+            <source src="{{ videoUrl }}" type="video/mp4">
+        </video>
+
+    </div>
+
+    <div class="row">
+        <div class="col text-center">
+            {{ leftFencer }}
+        </div>
+        <div class="col text-center">
+            {{ rightFencer }}
+        </div>
+    </div>
+
+    {% if voteForm == true %}
+
+        {{ form_open() }}
+            <input type="hidden" name="action-id" value="{{ actionId }}" />
+
+            <h6 class="text-muted">Action For</h6>
+            <div class="row">
+                <div class="col text-center">
+                    <input id="priority-left" name="priority" type="radio" value="1">
+                    <label for="priority-left" class="test">
+                        Left
+                    </label>
+
+                </div>
+                <div class="col text-center">
+                    <input id="priority-right" name="priority" type="radio" value="2">
+                    <label for="priority-right">
+                        Right
+                    </label>
+                </div>
+            </div>
+
+            <h6 class="text-muted">Call</h6>
+
+            <input id="call-attack" name="call" type="radio" value="1">
+            <label for="call-attack">
+                Attack
+            </label>
+
+            <input id="call-counter-attack" name="call" type="radio" value="2">
+            <label for="call-counter-attack">
+
+                Counter-Attack
+            </label>
+
+            <input id="call-riposte" name="call" type="radio" value="3">
+            <label for="call-riposte">
+                Riposte
+            </label>
+
+            <input id="call-remise" name="call" type="radio" value="4">
+            <label for="call-remise">
+                Remise
+            </label>
+
+            <input id="call-line" name="call" type="radio" value="5">
+            <label for="call-line">
+                Line
+            </label>
+
+            <input id="call-other" name="call" type="radio" value="6">
+            <label for="call-other">
+                Unknown / Other
+            </label>
+
+            <h6 class="text-muted">Difficulty / Certainty</h6>
+
+            <div class="row">
+                <div class="col text-center">
+                    <input id="difficulty-easy" name="difficulty" type="radio" value="1">
+                    <label for="difficulty-easy" class="test">
+                        Easy
+                    </label>
+        
+                </div>
+                <div class="col text-center">
+                    <input id="difficulty-medium" name="difficulty" type="radio" value="2">
+                    <label for="difficulty-medium">
+                        Medium
+                    </label>
+                </div>
+                <div class="col text-center">
+                    <input id="difficulty-hard" name="difficulty" type="radio" value="3">
+                    <label for="difficulty-hard">
+                        Hard
+                    </label>
+                </div>
+            </div>
+    
+    
+            <h6 class="text-muted">Other</h6>
+            <div class="other">
+                {{ form_select(
+                    'vote-comment',
+                    voteComments
+                ) }}
+            </div>
+
+            <label class="submit">
+                Submit
+                {{ form_submit() }}
+            </label>
+        {{ form_close() }}
+    {% else %}
+
+        <h6 class="text-muted">Votes so far</h6>
+        {% for call, vote in votes %}
+            <div>
+            {{ call }} : {{ vote }}
+                {% if totalVotes > 0 %}
+                    - {{ (vote / totalVotes) * 100 }}%
+                {% endif %}
+            </div>
+        {% endfor %}
+
+    {% endif %}
+
+     <hr>
+
+    <a href="/">Next Action</a>
+
+</div>
+
+
+
+</body>
+
+</html>
+

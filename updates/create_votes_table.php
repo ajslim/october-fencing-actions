@@ -15,7 +15,13 @@ class CreateVotesTable extends Migration
                 ->nullable();
             $table->integer('call_id')
                 ->nullable();
+
+            // 1: Left, 2: Right
             $table->integer('priority')
+                ->nullable();
+
+            // 1: Left, 2: Right
+            $table->integer('card_for')
                 ->nullable();
             $table->integer('difficulty')
                 ->nullable();

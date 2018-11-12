@@ -2,7 +2,7 @@
     <div class="loading-indicator-container">
 
 
-        <?php if ($isAdmin === true) { ?>
+        <?php if (isset($isAdmin) && $isAdmin === true) { ?>
             <button
                     type="submit"
                     data-request="onReverseFencers"

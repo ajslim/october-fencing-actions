@@ -2,8 +2,11 @@
 
 use Ajslim\FencingActions\Models\Action;
 use Ajslim\Fencingactions\Models\Vote;
+use Ajslim\Fencingactions\Models\Call;
 use Ajslim\Fencingactions\Models\VoteComment;
 use Cms\Classes\ComponentBase;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
@@ -20,44 +23,24 @@ class VoteOnAction extends ComponentBase
     }
 
 
+    private static function getVoteCount($actionId, $callId, $priority)
+    {
+        return Vote::where('action_id', $actionId)
+            ->where('call_id', $callId)
+            ->where('priority', $priority)
+            ->whereNull('card_for')
+            ->count();
+    }
+
     private static function getVotesForAction($actionId)
     {
         $votes = [];
-        $attackCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 1)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
-
-        $counterAttackCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 2)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
-
-        $riposteCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 3)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
-
-        $remiseCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 4)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
-
-        $lineCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 5)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
-
-        $otherCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 6)
-            ->where('priority', 1)
-            ->whereNull('card_for')
-            ->count();
+        $attackCount = self::getVoteCount($actionId, Call::ATTACK_ID, Action::LEFT_FENCER_ID);
+        $counterAttackCount = self::getVoteCount($actionId, Call::COUNTER_ATTACK_ID, Action::LEFT_FENCER_ID);
+        $riposteCount = self::getVoteCount($actionId, Call::RIPOSTE_ID, Action::LEFT_FENCER_ID);
+        $remiseCount = self::getVoteCount($actionId, Call::REMISE_ID, Action::LEFT_FENCER_ID);
+        $lineCount = self::getVoteCount($actionId, Call::LINE_ID, Action::LEFT_FENCER_ID);
+        $otherCount = self::getVoteCount($actionId, Call::OTHER_ID, Action::LEFT_FENCER_ID);
 
         $votes['left'] = [
             'attack' => $attackCount,
@@ -68,42 +51,12 @@ class VoteOnAction extends ComponentBase
             'other' => $otherCount,
         ];
 
-
-        $attackCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 1)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
-
-        $counterAttackCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 2)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
-
-        $riposteCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 3)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
-
-        $remiseCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 4)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
-
-        $lineCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 5)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
-
-        $otherCount = Vote::where('action_id', $actionId)
-            ->where('call_id', 6)
-            ->where('priority', 2)
-            ->whereNull('card_for')
-            ->count();
+        $attackCount = self::getVoteCount($actionId, Call::ATTACK_ID, Action::RIGHT_FENCER_ID);
+        $counterAttackCount = self::getVoteCount($actionId, Call::COUNTER_ATTACK_ID, Action::RIGHT_FENCER_ID);
+        $riposteCount = self::getVoteCount($actionId, Call::RIPOSTE_ID, Action::RIGHT_FENCER_ID);
+        $remiseCount = self::getVoteCount($actionId, Call::REMISE_ID, Action::RIGHT_FENCER_ID);
+        $lineCount = self::getVoteCount($actionId, Call::LINE_ID, Action::RIGHT_FENCER_ID);
+        $otherCount = self::getVoteCount($actionId, Call::OTHER_ID, Action::RIGHT_FENCER_ID);
 
         $votes['right'] = [
             'attack' => $attackCount,
@@ -114,41 +67,92 @@ class VoteOnAction extends ComponentBase
             'other' => $otherCount,
         ];
 
-        $cardLeft = Vote::where('action_id', $actionId)
-            ->where('card_for', 1)
-            ->count();
-
+        $cardLeft = Vote::where('action_id', $actionId)->where('card_for', Action::LEFT_FENCER_ID)->count();
         $votes['cardLeft'] = $cardLeft;
 
-        $cardRight = Vote::where('action_id', $actionId)
-            ->where('card_for', 2)
-            ->count();
-
+        $cardRight = Vote::where('action_id', $actionId)->where('card_for', Action::RIGHT_FENCER_ID)->count();
         $votes['cardRight'] = $cardRight;
 
-        $totalPriority = Vote::where('action_id', $actionId)
-            ->whereNotNull('priority')
-            ->count();
-
+        $totalPriority = Vote::where('action_id', $actionId)->whereNotNull('priority')->count();
         $votes['totalPriority'] = $totalPriority;
 
-        $totalCards = Vote::where('action_id', $actionId)
-            ->whereNotNull('card_for')
-            ->count();
-
+        $totalCards = Vote::where('action_id', $actionId)->whereNotNull('card_for')->count();
         $votes['totalCards'] = $totalCards;
 
-        $total = Vote::where('action_id', $actionId)
-            ->count();
+        $total = Vote::where('action_id', $actionId)->where('vote_comment_id', 1)->count();
         $votes['total'] = $total;
 
         return $votes;
+    }
+
+
+    private static function sqlToActionArray($sql)
+    {
+        $actionArray = DB::connection('business')->select($sql);
+        $idArray = array_map(function($element) { return $element->id; }, $actionArray);
+        return Action::find($idArray);
+    }
+
+    private function getActionsWithMinimumVotes($minimumVotes)
+    {
+        $actionArray = DB::connection('business')->select('
+            SELECT ajslim_fencingactions_actions.id, COUNT(ajslim_fencingactions_votes.id) as VoteCount
+	          FROM ajslim_fencingactions_actions
+		        LEFT OUTER JOIN 
+		            (
+		              SELECT * FROM ajslim_fencingactions_votes
+		              WHERE vote_comment_id = 1
+		            ) 
+		            AS ajslim_fencingactions_votes
+		          ON ajslim_fencingactions_actions.id = ajslim_fencingactions_votes.action_id
+		        GROUP BY ajslim_fencingactions_actions.id
+		        HAVING VoteCount >= ?
+        ', [$minimumVotes]);
+
+        $idArray = [];
+        if (count($actionArray) > 0) {
+            $idArray = array_map(function ($element) {
+                return $element->id;
+            }, $actionArray);
+        }
+        return Action::find($idArray);
+    }
+
+
+    private function getActionsWithNoVotes()
+    {
+        $query = '
+          SELECT id 
+            FROM ajslim_fencingactions_actions actions 
+            WHERE NOT EXISTS (
+              SELECT * 
+                FROM ajslim_fencingactions_votes votes 
+                WHERE votes.action_id = actions.id
+            );
+        ';
+
+        return self::sqlToActionArray($query);
+    }
+
+
+
+
+    private function getRandomActionFromCollection(Collection $collection)
+    {
+        $totalNumberOfActions = count($collection);
+        $actionIndex = rand(1, $totalNumberOfActions) - 1;
+        return $collection->get($actionIndex);
     }
 
     public function onRun()
     {
         $post = Input::post();
         $get = Input::get();
+
+        if (isset($get['minvotes'])) {
+            $this->page['minvotes'] = $get['minvotes'];
+        }
+
         if (isset($post['action-id']) === true) {
             $actionId = $post['action-id'];
             $action = Action::find($actionId);
@@ -184,12 +188,17 @@ class VoteOnAction extends ComponentBase
             // Unlikely, but the get variable overrides the post
             if (isset($get['id'])) {
                 $actionId = $get['id'];
+                $action = Action::find($actionId);
+            } else if (isset($get['minvotes'])) {
+                $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
             } else {
-                $totalNumberOfActions = Action::count();
-                $actionId = rand(1, $totalNumberOfActions);
+                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
             }
 
-            $action = Action::find($actionId);
+            if ($action === null) {
+                return 'No Actions found';
+            }
+            $actionId = $action->id;
 
             if (isset($get['results'])) {
                 $this->page['voteForm'] = false;

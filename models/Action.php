@@ -15,7 +15,10 @@ use Model;
 class Action extends Model
 {
     protected $connection = 'business';
-    
+
+    public const LEFT_FENCER_ID = 1;
+    public const RIGHT_FENCER_ID = 2;
+
     /**
      * @var string The database table used by the model.
      */

@@ -33,8 +33,14 @@
         }
 
         input {
+            display: block;
+        }
+
+        input[type='radio'], input[type='submit'] {
             display: none;
         }
+
+
 
         .submit {
             background: mediumseagreen;
@@ -88,10 +94,10 @@
     </div>
     <div class="row">
         <div class="col">
-            <a href="/?id={{ actionId }}">Votes</a>
+            <a href="/?id={{ actionId }}{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Votes</a>
         </div>
         <div class="col">
-            <a href="/?id={{ actionId }}&results=true">Results</a>
+            <a href="/?id={{ actionId }}&results=true{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Results</a>
         </div>
     </div>
 
@@ -283,9 +289,11 @@
     </div>
     {% endif %}
 
-     <hr>
+    <hr>
 
-    <a href="/">Next Action</a>
+
+    <a href="/{% if minvotes %}?minvotes={{ minvotes }}{% endif %}">Next Action</a>
+
 
 </div>
 

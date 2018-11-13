@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        label, a {
+        label {
             display: block;
             width: 100%;
             height: 60px;
@@ -39,8 +39,6 @@
         input[type='radio'], input[type='submit'] {
             display: none;
         }
-
-
 
         .submit {
             background: mediumseagreen;
@@ -78,226 +76,313 @@
             max-height: 500px;
         }
 
+        nav {
+            background-color: #6b0000;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .nav-tab  {
+            display: inline-block;
+            height: 40px;
+            line-height: 20px;
+            width: 180px;
+            color: white;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #993333;
+            text-align: center;
+        }
+
+        .nav-tab.active {
+            background: #993333;
+        }
+
+        .nav-tab a {
+            color: white;
+        }
+
+        .nav-tab a:hover {
+            color: white;
+        }
+
+        .vote-tab {
+            position: absolute;
+            right: 10px;
+        }
+
+        .minvotes-label {
+            border:0;
+            margin: 0;
+        }
+
+        #minvotes {
+            display:inline;
+        }
+
+        @media screen and (min-width: 992px ) {
+            label {
+                height: 40px;
+                line-height:20px;
+            }
+
+            .calls label {
+                width: 45%;
+                margin-right: 5px;
+            }
+        }
+
+        .next-action {
+            cursor: pointer;
+            box-shadow: lightgray 4px 4px 4px 4px;
+        }
+
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 
 <body>
 
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">Quarte Riposte Fencing Actions</a>
 
-<div class="container-fluid vote">
-    <div class="row">
-        <div class="col">
-            <h6 class="text-muted">Bout info</h6>
-            {{ boutName }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <a href="/?id={{ actionId }}{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Votes</a>
-        </div>
-        <div class="col">
-            <a href="/?id={{ actionId }}&results=true{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Results</a>
-        </div>
-    </div>
+        <ul class="vote-tab">
+            <li class="nav-tab {% if voteForm %}active{% endif %}">
+                <a class='nav-link' href="/?id={{ actionId }}{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Vote</a>
+            </li>
+            <li class="nav-tab {% if not voteForm %}active{% endif %}">
+                <a class='nav-link' href="/?id={{ actionId }}&results=true{% if minvotes %}&minvotes={{ minvotes }}{% endif %}">Results</a>
+            </li>
+        </ul>
+
+    </nav>
 
 
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6">
+                <video controls loop autoplay="true" playsinline="" preload="auto" tabindex="-1">
+                    <source src="{{ videoUrl }}" type="video/mp4">
+                </video>
 
-    <video controls loop autoplay="true" playsinline="" preload="auto" tabindex="-1">
-        <source src="{{ videoUrl }}" type="video/mp4">
-    </video>
-
-
-
-    <div class="row">
-        <div class="col text-center">
-            {{ leftFencer }}
-        </div>
-        <div class="col text-center">
-            {{ rightFencer }}
-        </div>
-    </div>
-
-    {% if voteForm == true %}
-
-        {{ form_open() }}
-            <input type="hidden" name="action-id" value="{{ actionId }}" />
-
-            <h6 class="text-muted">Action For</h6>
-            <div class="row">
-                <div class="col text-center">
-                    <input id="priority-left" name="priority" type="radio" value="1">
-                    <label for="priority-left" class="test">
-                        Left
-                    </label>
-                </div>
-                <div class="col text-center">
-                    <input id="priority-none" name="priority" type="radio" value="0"  checked="checked">
-                    <label for="priority-none" class="test">
-                        - neither -
-                    </label>
-                </div>
-                <div class="col text-center">
-                    <input id="priority-right" name="priority" type="radio" value="2">
-                    <label for="priority-right">
-                        Right
-                    </label>
-                </div>
-            </div>
-
-            <div class="calls">
-                <h6 class="text-muted">Call</h6>
-
-                <input id="call-attack" name="call" type="radio" value="1">
-                <label for="call-attack">
-                    Attack
-                </label>
-
-                <input id="call-counter-attack" name="call" type="radio" value="2">
-                <label for="call-counter-attack">
-
-                    Counter-Attack
-                </label>
-
-                <input id="call-riposte" name="call" type="radio" value="3">
-                <label for="call-riposte">
-                    Riposte
-                </label>
-
-                <input id="call-remise" name="call" type="radio" value="4">
-                <label for="call-remise">
-                    Remise
-                </label>
-
-                <input id="call-line" name="call" type="radio" value="5">
-                <label for="call-line">
-                    Line
-                </label>
-
-                <input id="call-other" name="call" type="radio" value="6">
-                <label for="call-other">
-                    Unknown / Other
-                </label>
-            </div>
-
-
-            <div class="cards">
-                <h6 class="text-muted">Card For</h6>
                 <div class="row">
                     <div class="col text-center">
-                        <input id="card-for-left" name="card-for" type="radio" value="1">
-                        <label for="card-for-left" class="test">
-                            Left
-                        </label>
+                        {{ leftFencer }}
                     </div>
                     <div class="col text-center">
-                        <input id="card-for-none" name="card-for" type="radio" value="0" checked="checked">
-                        <label for="card-for-none" class="test">
-                            - neither -
-                        </label>
+                        {{ rightFencer }}
                     </div>
-                    <div class="col text-center">
-                        <input id="card-for-right" name="card-for" type="radio" value="2">
-                        <label for="card-for-right">
-                            Right
-                        </label>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h6 class="text-muted">Bout info</h6>
+                        {{ boutName }}
                     </div>
                 </div>
             </div>
 
+            {% if voteForm == true %}
+            <div class="col-lg-6">
+                <div class="vote-form">
+                    {{ form_open() }}
+                        <input type="hidden" name="action-id" value="{{ actionId }}" />
 
-            <h6 class="text-muted">Difficulty / Certainty</h6>
+                        <h6 class="text-muted">Action For</h6>
+                        <div class="row">
+                            <div class="col text-center">
+                                <input id="priority-left" name="priority" type="radio" value="1">
+                                <label for="priority-left" class="test">
+                                    Left
+                                </label>
+                            </div>
+                            <div class="col text-center">
+                                <input id="priority-none" name="priority" type="radio" value="0"  checked="checked">
+                                <label for="priority-none" class="test">
+                                    - neither -
+                                </label>
+                            </div>
+                            <div class="col text-center">
+                                <input id="priority-right" name="priority" type="radio" value="2">
+                                <label for="priority-right">
+                                    Right
+                                </label>
+                            </div>
+                        </div>
 
-            <div class="row">
-                <div class="col text-center">
-                    <input id="difficulty-easy" name="difficulty" type="radio" value="1">
-                    <label for="difficulty-easy" class="test">
-                        Easy
-                    </label>
-        
-                </div>
-                <div class="col text-center">
-                    <input id="difficulty-medium" name="difficulty" type="radio" value="2">
-                    <label for="difficulty-medium">
-                        Medium
-                    </label>
-                </div>
-                <div class="col text-center">
-                    <input id="difficulty-hard" name="difficulty" type="radio" value="3">
-                    <label for="difficulty-hard">
-                        Hard
-                    </label>
+                        <div class="calls">
+                            <h6 class="text-muted">Call</h6>
+
+                            <input id="call-attack" name="call" type="radio" value="1">
+                            <label for="call-attack">
+                                Attack
+                            </label>
+
+                            <input id="call-counter-attack" name="call" type="radio" value="2">
+                            <label for="call-counter-attack">
+
+                                Counter-Attack
+                            </label>
+
+                            <input id="call-riposte" name="call" type="radio" value="3">
+                            <label for="call-riposte">
+                                Riposte
+                            </label>
+
+                            <input id="call-remise" name="call" type="radio" value="4">
+                            <label for="call-remise">
+                                Remise
+                            </label>
+
+                            <input id="call-line" name="call" type="radio" value="5">
+                            <label for="call-line">
+                                Line
+                            </label>
+
+                            <input id="call-other" name="call" type="radio" value="6">
+                            <label for="call-other">
+                                Unknown / Other
+                            </label>
+                        </div>
+
+
+                        <div class="cards">
+                            <h6 class="text-muted">Card For</h6>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input id="card-for-left" name="card-for" type="radio" value="1">
+                                    <label for="card-for-left" class="test">
+                                        Left
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="card-for-none" name="card-for" type="radio" value="0" checked="checked">
+                                    <label for="card-for-none" class="test">
+                                        - neither -
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="card-for-right" name="card-for" type="radio" value="2">
+                                    <label for="card-for-right">
+                                        Right
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <h6 class="text-muted">Difficulty / Certainty</h6>
+
+                        <div class="row">
+                            <div class="col text-center">
+                                <input id="difficulty-easy" name="difficulty" type="radio" value="1">
+                                <label for="difficulty-easy" class="test">
+                                    Easy
+                                </label>
+
+                            </div>
+                            <div class="col text-center">
+                                <input id="difficulty-medium" name="difficulty" type="radio" value="2">
+                                <label for="difficulty-medium">
+                                    Medium
+                                </label>
+                            </div>
+                            <div class="col text-center">
+                                <input id="difficulty-hard" name="difficulty" type="radio" value="3">
+                                <label for="difficulty-hard">
+                                    Hard
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <h6 class="text-muted">Other</h6>
+                        <div class="other">
+                            {{ form_select(
+                                'vote-comment',
+                                voteComments
+                            ) }}
+                        </div>
+
+                        <label class="submit">
+                            Submit
+                            {{ form_submit() }}
+                        </label>
+                    {{ form_close() }}
                 </div>
             </div>
-    
-    
-            <h6 class="text-muted">Other</h6>
-            <div class="other">
-                {{ form_select(
-                    'vote-comment',
-                    voteComments
-                ) }}
+            {% else %}
+
+            <div class="col-lg-6">
+                <h6 class="text-muted">Votes so far ({{ votes.total }})</h6>
+                <div class="row">
+                    <div class="col">
+                        <b>Left</b>
+                        {% for call, vote in votes.left %}
+                            <div>
+                                {{ call }} : {{ vote }}
+                            </div>
+                            {% if votes.total > 0 %}
+                                <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="col">
+                        <b>Right</b>
+                        {% for call, vote in votes.right %}
+                            <div>
+                                {{ call }} : {{ vote }}
+                            </div>
+                            {% if votes.total > 0 %}
+                                <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <h6 class="text-muted">Cards</h6>
+                <div class="row">
+                    <div class="col">
+                        Card Left: {{ votes.cardLeft }}
+                        {% if votes.total > 0 %}
+                            <div class="graph-bar" style="width: {{ (votes.cardLeft / votes.total) * 100 }}%;">{{ ((votes.cardLeft / votes.total) * 100)|round }}%</div>
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        Card Right: {{ votes.cardRight }}
+                        {% if votes.total > 0 %}
+                            <div class="graph-bar" style="width: {{ (votes.cardRight / votes.total) * 100 }}%;">{{ ((votes.cardRight / votes.total) * 100)|round }}%</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
-            <label class="submit">
-                Submit
-                {{ form_submit() }}
-            </label>
-        {{ form_close() }}
-    {% else %}
 
-    <h6 class="text-muted">Votes so far ({{ votes.total }})</h6>
-    <div class="row">
-        <div class="col">
-            <b>Left</b>
-            {% for call, vote in votes.left %}
-                <div>
-                    {{ call }} : {{ vote }}
-                </div>
-                {% if votes.total > 0 %}
-                    <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
-                {% endif %}
-            {% endfor %}
         </div>
-        <div class="col">
-            <b>Right</b>
-            {% for call, vote in votes.right %}
-                <div>
-                    {{ call }} : {{ vote }}
-                </div>
-                {% if votes.total > 0 %}
-                    <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
-                {% endif %}
-            {% endfor %}
-        </div>
+
+
+
     </div>
-
-    <h6 class="text-muted">Cards</h6>
-    <div class="row">
-        <div class="col">
-            Card Left: {{ votes.cardLeft }}
-            {% if votes.total > 0 %}
-                <div class="graph-bar" style="width: {{ (votes.cardLeft / votes.total) * 100 }}%;">{{ ((votes.cardLeft / votes.total) * 100)|round }}%</div>
-            {% endif %}
-        </div>
-        <div class="col">
-            Card Right: {{ votes.cardRight }}
-            {% if votes.total > 0 %}
-                <div class="graph-bar" style="width: {{ (votes.cardRight / votes.total) * 100 }}%;">{{ ((votes.cardRight / votes.total) * 100)|round }}%</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
-
     <hr>
+    <div class="container-fluid">
+        <form action="/" method="get">
+            <div class="row">
+                <div class="col">
+                    <label class="minvotes-label" for="minvotes">
+                        Minimum Votes:
+                        <input type="number" id="minvotes" value="{{ minvotes }}" name="minvotes"/>
+                    </label>
+                </div>
+                <div class="col">
+                    <label class="next-action">
+                        Next Action
+                        <input type="submit">
+                    </label>
 
-
-    <a href="/{% if minvotes %}?minvotes={{ minvotes }}{% endif %}">Next Action</a>
-
-
-</div>
-
-
+                </div>
+            </div>
+        </form>
+    </div>
 
 </body>
 

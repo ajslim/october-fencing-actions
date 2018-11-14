@@ -29,6 +29,12 @@ class ListActions extends ComponentBase
         return Action::find($idArray);
     }
 
+
+    /**
+     * @param $minimumVotes
+     *
+     * @return Collection
+     */
     private function getActionsWithMinimumVotes($minimumVotes)
     {
         $actionArray = DB::connection('business')->select('
@@ -96,11 +102,15 @@ class ListActions extends ComponentBase
 
 
         $linkArray = [];
+
+        /* @var Action $action */
         foreach ($actions as $action) {
             $linkArray[] = [
-                'name' => $action->bout->name . " - " . $action->time,
+                'name' => $action->bout->name,
                 'votes' => count($action->votes),
                 'call' => self::idToAction($action->topVote()),
+                'consensus' => $action->getConsensusAttribute(),
+                'time' => $action->time,
                 'link' => '/?id=' . $action->id . '&results=true'
             ];
         }

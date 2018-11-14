@@ -15,7 +15,13 @@
     <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script>
         var data = [{% for action in actions %}
-        ['{{ action.name }}','{{ action.votes }}','{{ action.call }}','{{ action.link }}'],
+        [
+            '{{ action.name }}',
+            '{{ action.votes }}',
+            '{{ action.call }}',
+            '{{ action.consensus }}',
+            '{{ action.time }}',
+            '{{ action.link }}'],
         {% endfor %}
         ];
 
@@ -27,6 +33,8 @@
                     { title: "Name" },
                     { title: "Votes"},
                     { title: "Top vote"},
+                    { title: "Consensus"},
+                    { title: "Time"},
                     {
                         title: "link",
                         "render": function(data, type, row, meta){

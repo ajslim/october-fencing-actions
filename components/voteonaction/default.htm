@@ -269,26 +269,11 @@
 
                         <div class="cards">
                             <h6 class="text-muted">Card For</h6>
-                            <div class="row">
-                                <div class="col text-center">
-                                    <input id="card-for-left" name="card-for" type="radio" value="1">
-                                    <label for="card-for-left">
-                                        Left
-                                    </label>
-                                </div>
-                                <div class="col text-center">
-                                    <input id="card-for-none" name="card-for" type="radio" value="0" checked="checked">
-                                    <label for="card-for-none">
-                                        - neither -
-                                    </label>
-                                </div>
-                                <div class="col text-center">
-                                    <input id="card-for-right" name="card-for" type="radio" value="2">
-                                    <label for="card-for-right">
-                                        Right
-                                    </label>
-                                </div>
-                            </div>
+                            <select id="card-for" name="card-for">
+                                <option>No Card</option>
+                                <option value="1">Card For left</option>
+                                <option value="2">Card For Right</option>
+                            </select>
                         </div>
 
                         <hr>
@@ -381,8 +366,6 @@
                 </div>
                 {% endif %}
             </div>
-
-
         </div>
 
 

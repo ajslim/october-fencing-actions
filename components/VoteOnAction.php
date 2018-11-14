@@ -79,7 +79,7 @@ class VoteOnAction extends ComponentBase
         $totalCards = Vote::where('action_id', $actionId)->whereNotNull('card_for')->count();
         $votes['totalCards'] = $totalCards;
 
-        $total = Vote::where('action_id', $actionId)->where('vote_comment_id', 1)->count();
+        $total = Vote::where('action_id', $actionId)->count();
         $votes['total'] = $total;
 
         return $votes;

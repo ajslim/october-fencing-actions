@@ -1,6 +1,7 @@
 <?php namespace Ajslim\FencingActions\Models;
 
 use Assetic\Filter\PackerFilter;
+use Illuminate\Support\Collection;
 use Model;
 
 /**
@@ -67,7 +68,7 @@ class Action extends Model
     public $attachMany = [];
 
 
-    public function topVote()
+    private function getCallsArray()
     {
         $calls = [
             '1' => 0,
@@ -82,10 +83,69 @@ class Action extends Model
                 $calls[$vote->call->id] += 1;
             }
         }
-        asort ($calls);
-        reset($calls);
-        return key($calls);
+        return $calls;
     }
+
+
+    public function topVote()
+    {
+        if (count($this->getCallVotesAttribute()) === 0) {
+            return null;
+        }
+
+        $calls = $this->getCallsArray();
+        $highestVoteCount = -1;
+        $highestCountCallId = 0;
+        foreach ($calls as $callId => $count) {
+            if ($count > $highestVoteCount) {
+                $highestVoteCount = $count;
+                $highestCountCallId = $callId;
+            }
+        }
+
+        return $highestCountCallId;
+    }
+
+
+    public function getConsensusAttribute()
+    {
+        $voteCount = count($this->getCallVotesAttribute());
+        if ($voteCount === 0) {
+            return null;
+        }
+
+        $calls = $this->getCallsArray();
+        $highestVoteCount = -1;
+
+        foreach ($calls as $callId => $count) {
+            if ($count > $highestVoteCount) {
+                $highestVoteCount = $count;
+            }
+        }
+
+        return $highestVoteCount / $voteCount;
+    }
+
+
+    public function getCallVotesAttribute()
+    {
+        $votes = $this->votes()
+            ->get();
+
+
+        $returnCollection = new Collection();
+
+        foreach ($votes as $vote) {
+            if ($vote->call !== null
+                || $vote->card_for !== null
+            ) {
+                $returnCollection->push($vote);
+            }
+        }
+
+        return $returnCollection;
+    }
+
 
     /**
      * Gets the Gfycat Id

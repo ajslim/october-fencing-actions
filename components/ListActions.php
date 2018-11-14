@@ -109,7 +109,7 @@ class ListActions extends ComponentBase
                 'name' => $action->bout->name,
                 'votes' => count($action->votes),
                 'call' => self::idToAction($action->topVote()),
-                'consensus' => $action->getConsensusAttribute(),
+                'consensus' => round($action->getConsensusAttribute() * 100) . '%',
                 'time' => $action->time,
                 'link' => '/?id=' . $action->id . '&results=true'
             ];

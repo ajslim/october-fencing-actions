@@ -38,7 +38,9 @@ class Action extends Model
      * @var array Relations
      */
     public $hasOne = [];
-    public $hasMany = [];
+    public $hasMany = [
+        'votes' => 'Ajslim\Fencingactions\Models\Vote'
+    ];
     public $belongsTo = [
         'call_on_site' =>
             [
@@ -64,6 +66,26 @@ class Action extends Model
     public $attachOne = [];
     public $attachMany = [];
 
+
+    public function topVote()
+    {
+        $calls = [
+            '1' => 0,
+            '2' => 0,
+            '3' => 0,
+            '4' => 0,
+            '5' => 0,
+            '6' => 0,
+        ];
+        foreach ($this->votes as $vote) {
+            if ($vote->call !== null) {
+                $calls[$vote->call->id] += 1;
+            }
+        }
+        asort ($calls);
+        reset($calls);
+        return key($calls);
+    }
 
     /**
      * Gets the Gfycat Id

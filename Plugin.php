@@ -61,7 +61,8 @@ class Plugin extends PluginBase
     public function registerComponents()
     {
         return [
-            'Ajslim\FencingActions\Components\VoteOnAction' => 'voteOnAction'
+            'Ajslim\FencingActions\Components\VoteOnAction' => 'voteOnAction',
+            'Ajslim\FencingActions\Components\ListActions' => 'listActions'
         ]; // Remove this line to activate
     }
 

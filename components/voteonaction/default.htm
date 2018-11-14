@@ -27,7 +27,8 @@
     }
 
     .cards label {
-        background: lightgray;
+        background: lightcoral;
+
     }
 
     input {
@@ -264,19 +265,20 @@
                             </div>
                         </div>
 
+                        <hr>
 
                         <div class="cards">
                             <h6 class="text-muted">Card For</h6>
                             <div class="row">
                                 <div class="col text-center">
                                     <input id="card-for-left" name="card-for" type="radio" value="1">
-                                    <label for="card-for-left" class="test">
+                                    <label for="card-for-left">
                                         Left
                                     </label>
                                 </div>
                                 <div class="col text-center">
                                     <input id="card-for-none" name="card-for" type="radio" value="0" checked="checked">
-                                    <label for="card-for-none" class="test">
+                                    <label for="card-for-none">
                                         - neither -
                                     </label>
                                 </div>
@@ -289,6 +291,7 @@
                             </div>
                         </div>
 
+                        <hr>
 
                         <h6 class="text-muted">Difficulty / Certainty</h6>
 
@@ -358,6 +361,8 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <hr>
 
                 <h6 class="text-muted">Cards</h6>
                 <div class="row">

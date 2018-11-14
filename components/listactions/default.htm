@@ -1,0 +1,74 @@
+<html>
+<head>
+    <style>
+        nav {
+            background-color: #6b0000;
+            color: white;
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script>
+        var data = [{% for action in actions %}
+        ['{{ action.name }}','{{ action.votes }}','{{ action.call }}','{{ action.link }}'],
+        {% endfor %}
+        ];
+
+        $(document).ready(function() {
+            $('#list').DataTable( {
+                data: data,
+                pageLength: 20,
+                columns: [
+                    { title: "Name" },
+                    { title: "Votes"},
+                    { title: "Top vote"},
+                    {
+                        title: "link",
+                        "render": function(data, type, row, meta){
+                            if(type === 'display'){
+                                data = '<a href="' + data + '">' + data + '</a>';
+                            }
+
+                            return data;
+                        }
+                    }
+                ]
+            } );
+        } );
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="#">Quarte Riposte Fencing Actions</a>
+    </nav>
+
+
+
+
+    {% if message %}
+        <div class="container-fluid">
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endif %}
+
+
+
+    <div class="container-fluid tabs">
+
+        <table id="list" class="display" width="100%"></table>
+
+    </div>
+
+</body>
+
+</html>
+

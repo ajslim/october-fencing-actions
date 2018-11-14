@@ -196,7 +196,8 @@ class VoteOnAction extends ComponentBase
             }
 
             if ($action === null) {
-                return 'No Actions found';
+                $this->page['message'] = "No actions found with that many votes";
+                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
             }
             $actionId = $action->id;
 
@@ -221,7 +222,13 @@ class VoteOnAction extends ComponentBase
         $this->page['voteComments'] = $voteCommentsArray;
         $this->page['actionId'] = $action->id;
         $this->page['videoUrl'] = $action->video_url;
-        $this->page['boutName'] = $action->bout->cache_name;
+
+        $this->page['boutName'] = '';
+        if ($action->bout !== null
+            && $action->bout->tournament !== null) {
+            $this->page['boutName'] = $action->bout->tournament->year . ' ' . $action->bout->tournament->place . ' ' . $action->bout->tournament->name;
+        }
+
         $this->page['leftFencer'] = $action->getLeftnameAttribute();
         $this->page['rightFencer'] = $action->getRightnameAttribute();
     }

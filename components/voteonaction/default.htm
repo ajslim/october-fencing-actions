@@ -89,16 +89,16 @@
         height: 40px;
         line-height: 40px;
         width: 100%;
-        color: #CC6666;
+        color: #ff9999;
         padding: 0;
         margin: 0;
         border: 1px solid #993333;
-        background: #6b0000;
+        background: #996666;
         text-align: center;
     }
 
     a.nav-tab.active {
-        background: #993333;
+        background: #6b0000;
         color: white;
     }
 
@@ -122,11 +122,6 @@
             height: 40px;
             line-height:20px;
         }
-
-        .calls label {
-            width: 45%;
-            margin-right: 5px;
-        }
     }
 
     .next-action {
@@ -144,9 +139,19 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="#">Quarte Riposte Fencing Actions</a>
-
-
     </nav>
+
+
+    {% if message %}
+        <div class="container-fluid">
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        </div>
+    {% endif %}
+
+
+
     <div class="container-fluid tabs">
         <div class="row">
             <div class="offset-lg-6 col-lg-6">
@@ -164,24 +169,25 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-6">
+                <div class="row">
+                    <div class="col">
+                        <h6 class="text-muted">{{ boutName }}</h6>
+                    </div>
+                </div>
+
                 <video controls loop autoplay="true" playsinline="" preload="auto" tabindex="-1">
                     <source src="{{ videoUrl }}" type="video/mp4">
                 </video>
 
                 <div class="row">
                     <div class="col text-center">
-                        {{ leftFencer }}
+                        <b>{{ leftFencer }}</b>
                     </div>
                     <div class="col text-center">
-                        {{ rightFencer }}
+                        <b>{{ rightFencer }}</b>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <h6 class="text-muted">Bout info</h6>
-                        {{ boutName }}
-                    </div>
-                </div>
+
             </div>
 
             {% if voteForm == true %}
@@ -214,37 +220,48 @@
 
                         <div class="calls">
                             <h6 class="text-muted">Call</h6>
-
-                            <input id="call-attack" name="call" type="radio" value="1">
-                            <label for="call-attack">
-                                Attack
-                            </label>
-
-                            <input id="call-counter-attack" name="call" type="radio" value="2">
-                            <label for="call-counter-attack">
-
-                                Counter-Attack
-                            </label>
-
-                            <input id="call-riposte" name="call" type="radio" value="3">
-                            <label for="call-riposte">
-                                Riposte
-                            </label>
-
-                            <input id="call-remise" name="call" type="radio" value="4">
-                            <label for="call-remise">
-                                Remise
-                            </label>
-
-                            <input id="call-line" name="call" type="radio" value="5">
-                            <label for="call-line">
-                                Line
-                            </label>
-
-                            <input id="call-other" name="call" type="radio" value="6">
-                            <label for="call-other">
-                                Unknown / Other
-                            </label>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input id="call-attack" name="call" type="radio" value="1">
+                                    <label for="call-attack">
+                                        Attack
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="call-counter-attack" name="call" type="radio" value="2">
+                                    <label for="call-counter-attack">
+                                        Counter-Attack
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input id="call-riposte" name="call" type="radio" value="3">
+                                    <label for="call-riposte">
+                                        Riposte
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="call-remise" name="call" type="radio" value="4">
+                                    <label for="call-remise">
+                                        Remise
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input id="call-line" name="call" type="radio" value="5">
+                                    <label for="call-line">
+                                        Line
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="call-other" name="call" type="radio" value="6">
+                                    <label for="call-other">
+                                        Unknown / Other
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
 
@@ -367,12 +384,12 @@
 
     </div>
     <hr>
-    <div class="container-fluid">
-        <form action="/" method="get">
+    <form action="/" method="get">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col">
                     <label class="minvotes-label" for="minvotes">
-                        Minimum Votes:
+                        Min-Votes:
                         <input type="number" id="minvotes" value="{{ minvotes }}" name="minvotes"/>
                     </label>
                 </div>
@@ -383,8 +400,8 @@
                     </label>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 
 </body>
 

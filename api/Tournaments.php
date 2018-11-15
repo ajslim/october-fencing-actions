@@ -126,8 +126,8 @@ class Tournaments extends Controller
                 'thumb' => $action->thumb_url,
                 'votes' => count($action->votes),
                 'top_vote' => self::idToAction($action->topVote()),
-                'consensus' => $action->getConsensusAttribute(),
-                'difficulty' => $action->getAverageDifficultyRatingAttribute(),
+                'consensus' => round($action->getConsensusAttribute(), 3),
+                'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 3),
                 'time' => $action->time,
                 'link' => '/?id=' . $action->id . '&results=true'
             ];

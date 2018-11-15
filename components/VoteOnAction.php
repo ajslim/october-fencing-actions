@@ -67,6 +67,8 @@ class VoteOnAction extends ComponentBase
             'other' => $otherCount,
         ];
 
+        $votes['simultaneous'] = self::getVoteCount($actionId, Call::SIMULTANEOUS_ID, Action::NEITHER_FENCER_ID);
+
         $cardLeft = Vote::where('action_id', $actionId)->where('card_for', Action::LEFT_FENCER_ID)->count();
         $votes['cardLeft'] = $cardLeft;
 
@@ -172,6 +174,16 @@ class VoteOnAction extends ComponentBase
                 $vote->call_id = $post['call'];
                 $vote->priority = $post['priority'];
             }
+
+            if (isset($post['priority']) === true
+                && isset($post['call']) === true
+                && $post['priority'] === '0'
+                && $post['call'] === '7'
+            ) {
+                $vote->call_id = $post['call'];
+                $vote->priority = $post['priority'];
+            }
+
             if (isset($post['card-for']) === true && $post['card-for'] !== '0') {
                 $vote->card_for = $post['card-for'];
             }

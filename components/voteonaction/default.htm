@@ -263,6 +263,14 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <input id="call-simultaneous" name="call" type="radio" value="7">
+                                    <label for="call-simultaneous">
+                                        Simultaneous / Together
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
                         <hr>
@@ -327,7 +335,7 @@
                         <b>Left</b>
                         {% for call, vote in votes.left %}
                             <div>
-                                {{ call }} : {{ vote }}
+                                {{ call|capitalize }} : {{ vote }}
                             </div>
                             {% if votes.total > 0 %}
                                 <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
@@ -338,12 +346,27 @@
                         <b>Right</b>
                         {% for call, vote in votes.right %}
                             <div>
-                                {{ call }} : {{ vote }}
+                                {{ call|capitalize }} : {{ vote }}
                             </div>
                             {% if votes.total > 0 %}
                                 <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
                             {% endif %}
                         {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <b>Neither</b>
+
+                        <div>
+                            Simultaneous : {{ vote.simultaneous }}
+                        </div>
+
+                        {% if votes.total > 0 %}
+                            <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                        {% endif %}
+
                     </div>
                 </div>
 

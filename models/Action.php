@@ -17,6 +17,7 @@ class Action extends Model
 {
     protected $connection = 'business';
 
+    public const NEITHER_FENCER_ID = 0;
     public const LEFT_FENCER_ID = 1;
     public const RIGHT_FENCER_ID = 2;
 
@@ -71,16 +72,17 @@ class Action extends Model
     private function getCallsArray()
     {
         $calls = [
-            '1' => 0,
-            '2' => 0,
-            '3' => 0,
-            '4' => 0,
-            '5' => 0,
-            '6' => 0,
+            '1' => [0, 0, 0],
+            '2' => [0, 0, 0],
+            '3' => [0, 0, 0],
+            '4' => [0, 0, 0],
+            '5' => [0, 0, 0],
+            '6' => [0, 0, 0],
+            '7' => [0, 0, 0],
         ];
         foreach ($this->votes as $vote) {
             if ($vote->call !== null) {
-                $calls[$vote->call->id] += 1;
+                $calls[$vote->call->id][$vote->priority] += 1;
             }
         }
         return $calls;
@@ -96,9 +98,10 @@ class Action extends Model
         $calls = $this->getCallsArray();
         $highestVoteCount = -1;
         $highestCountCallId = 0;
-        foreach ($calls as $callId => $count) {
-            if ($count > $highestVoteCount) {
-                $highestVoteCount = $count;
+        foreach ($calls as $callId => $votes) {
+            $total = array_sum($votes);
+            if ($total > $highestVoteCount) {
+                $highestVoteCount = $total;
                 $highestCountCallId = $callId;
             }
         }
@@ -117,9 +120,11 @@ class Action extends Model
         $calls = $this->getCallsArray();
         $highestVoteCount = -1;
 
-        foreach ($calls as $callId => $count) {
-            if ($count > $highestVoteCount) {
-                $highestVoteCount = $count;
+        foreach ($calls as $callId => $priority) {
+            foreach ($priority as $count) {
+                if ($count > $highestVoteCount) {
+                    $highestVoteCount = $count;
+                }
             }
         }
 

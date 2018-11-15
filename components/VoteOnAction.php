@@ -241,6 +241,7 @@ class VoteOnAction extends ComponentBase
         if ($action->bout !== null
             && $action->bout->tournament !== null) {
             $this->page['boutName'] = $action->bout->tournament->year . ' ' . $action->bout->tournament->place . ' ' . $action->bout->tournament->name;
+            $this->page['boutVideoUrl'] = $action->bout->video_url . "&t=" . ($action->time - 8);
         }
 
         $this->page['leftFencer'] = $action->getLeftnameAttribute();

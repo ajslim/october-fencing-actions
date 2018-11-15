@@ -18,6 +18,7 @@ class SeedAllTables extends Seeder
         Call::create(['name' => 'Remise']);
         Call::create(['name' => 'Line']);
         Call::create(['name' => 'Unknown / Other']);
+        Call::create(['name' => 'Simultaneous / Together']);
 
         Tag::create(['name' => 'In preparation']);
         Tag::create(['name' => 'Attack no - Attack']);

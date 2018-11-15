@@ -39,6 +39,11 @@ class CreateBoutsTable extends Migration
             $table->foreign('tournament_id')
                 ->references('id')
                 ->on('ajslim_fencingactions_tournaments');
+
+            // If the fencers are reversed the date is logged so you can match against warnings
+            $table->timestamp('fencers_reversed')
+                ->nullable();
+
             $table->timestamps();
         });
     }

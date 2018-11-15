@@ -10,6 +10,8 @@ columns:
         label: 'Name'
         type: text
         searchable: true
+    fencersWrongWayWarning:
+        label: 'Fencers Wrong Way'
     left_score:
         label: 'Left Score'
         type: number

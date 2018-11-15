@@ -1,5 +1,6 @@
 <?php namespace Ajslim\FencingActions\Models;
 
+use DateTime;
 use Model;
 
 /**
@@ -74,8 +75,38 @@ class Bout extends Model
         $bout->right_score = $temp;
 
         $bout->cache_name = Bout::generateName($bout);
+        $bout->fencers_reversed = new DateTime();
 
         $bout->save();
+    }
+
+
+    /**
+     * Counts the number of reversed fencer votes made after the fencers were last reversed
+     *
+     * @return int|null
+     */
+    public function getFencersWrongWayWarningAttribute()
+    {
+        $count = 0;
+        foreach ($this->actions as $action) {
+            foreach ($action->votes as $vote) {
+                if ($vote->vote_comment_id === 3
+                    && (
+                        $this->fencers_reversed === null
+                        || $vote->created_at > $this->fencers_reversed
+                        )
+                ) {
+                        $count += 1;
+                }
+            }
+        }
+
+        if ($count > 0) {
+            return $count;
+        }
+
+        return null;
     }
 
 

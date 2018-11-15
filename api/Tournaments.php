@@ -8,6 +8,7 @@ namespace Ajslim\FencingActions\Api;
 
 use Ajslim\FencingActions\Models\Action;
 use Ajslim\FencingActions\Models\Bout;
+use Ajslim\FencingActions\Models\Call;
 use Ajslim\Fencingactions\Models\Tournament;
 use Backend\Classes\Controller;
 use Illuminate\Support\Facades\Input;
@@ -50,6 +51,25 @@ class Tournaments extends Controller
         }
 
         return $this->makeDataTablesResponse(Tournament::all());
+    }
+
+
+    public static function idToAction($id)
+    {
+        if ($id === Call::ATTACK_ID) {
+            return "Attack";
+        } else if ($id === Call::COUNTER_ATTACK_ID){
+            return "Counter Attack";
+        } else if ($id === Call::RIPOSTE_ID){
+            return "Riposte";
+        } else if ($id === Call::REMISE_ID){
+            return "Remise";
+        } else if ($id === Call::LINE_ID){
+            return "Line";
+        } else if ($id === Call::OTHER_ID){
+            return "Other";
+        }
+        return null;
     }
 
 
@@ -105,7 +125,7 @@ class Tournaments extends Controller
             $records[] = [
                 'thumb' => $action->thumb_url,
                 'votes' => count($action->votes),
-                'top_vote' => $action->topVote(),
+                'top_vote' => self::idToAction($action->topVote()),
                 'consensus' => $action->getConsensusAttribute(),
                 'difficulty' => $action->getAverageDifficultyRatingAttribute(),
                 'time' => $action->time,

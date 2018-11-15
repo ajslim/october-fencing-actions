@@ -139,7 +139,7 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">Quarte Riposte Fencing Actions</a>
+        <a class="navbar-brand" href="/">Quarte Riposte Fencing Actions</a>
     </nav>
 
 
@@ -360,13 +360,15 @@
                         <b>Neither</b>
 
                         <div>
-                            Simultaneous : {{ vote.simultaneous }}
+                            Simultaneous : {{ votes.simultaneous }}
                         </div>
 
                         {% if votes.total > 0 %}
-                            <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                            <div class="graph-bar" style="width: {{ (votes.simultaneous / votes.total) * 100 }}%;">{{ ((votes.simultaneous  / votes.total) * 100)|round }}%</div>
                         {% endif %}
 
+                    </div>
+                    <div class="col">
                     </div>
                 </div>
 

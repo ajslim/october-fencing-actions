@@ -110,6 +110,7 @@ class ListActions extends ComponentBase
                 'votes' => count($action->votes),
                 'call' => self::idToAction($action->topVote()),
                 'consensus' => round($action->getConsensusAttribute() * 100) . '%',
+                'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 2),
                 'time' => $action->time,
                 'link' => '/?id=' . $action->id . '&results=true'
             ];

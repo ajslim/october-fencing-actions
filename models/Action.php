@@ -110,6 +110,23 @@ class Action extends Model
     }
 
 
+    public function getAverageDifficultyRatingAttribute()
+    {
+        $votes = $this->votes()->whereNotNull('difficulty')->get();
+
+        $voteCount = count($votes);
+        if($voteCount === 0) {
+            return null;
+        }
+
+        $totalDifficulty = 0;
+        foreach ($votes as $vote) {
+            $totalDifficulty += $vote->difficulty;
+        }
+        return $totalDifficulty / $voteCount;
+    }
+
+
     public function getConsensusAttribute()
     {
         $voteCount = count($this->getCallVotesAttribute());

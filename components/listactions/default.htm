@@ -27,9 +27,12 @@
         ];
 
         $(document).ready(function() {
+
+
+            $("#list").append('<tfoot><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></tfoot>');
+
             $('#list').DataTable( {
                 data: data,
-                pageLength: 20,
                 columns: [
                     { title: "Name" },
                     { title: "Votes"},
@@ -38,16 +41,47 @@
                     { title: "Difficulty"},
                     { title: "Time"},
                     {
-                        title: "link",
+                        title: "Link",
                         "render": function(data, type, row, meta){
                             if(type === 'display'){
                                 data = '<a href="' + data + '">' + data + '</a>';
                             }
 
                             return data;
-                        }
+                        },
+                        disableFilter: false
                     }
-                ]
+                ],
+                initComplete: function () {
+                    this.api().columns().every( function () {
+                        var column = this;
+
+                        if (column[0][0] === 5
+                            || column[0][0] === 6
+                        ) {
+                            // No filter on Time or Link columns
+                            return;
+                        }
+
+                        var select = $('<select><option value=""></option></select>')
+                            .appendTo( $(column.footer()) )
+                            .on( 'change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search( val ? '^'+val+'$' : '', true, false )
+                                    .draw();
+                            } );
+
+                        column.data().unique().sort().each( function ( d, j ) {
+                            if (d !== '') {
+                                select.append('<option value="' + d + '">' + d + '</option>')
+                            }
+                        } );
+                    } );
+                }
             } );
         } );
     </script>

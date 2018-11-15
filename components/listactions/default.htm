@@ -53,16 +53,8 @@
                     }
                 ],
                 initComplete: function () {
-                    this.api().columns().every( function () {
+                    this.api().columns([0,1,2,3,4]).every( function () {
                         var column = this;
-
-                        if (column[0][0] === 5
-                            || column[0][0] === 6
-                        ) {
-                            // No filter on Time or Link columns
-                            return;
-                        }
-
                         var select = $('<select><option value=""></option></select>')
                             .appendTo( $(column.footer()) )
                             .on( 'change', function () {

@@ -62,7 +62,7 @@
                                 'title': title
                             };
 
-                            if (key === 'thumb'){
+                            if (key === 'thumb' || key === 'photo_url'){
                                 column.render = function(data, type, row) {
                                     return '<img width="120" src="'+data+'" />';
                                 }

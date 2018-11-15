@@ -9,6 +9,7 @@ namespace Ajslim\FencingActions\Api;
 use Ajslim\FencingActions\Models\Action;
 use Ajslim\FencingActions\Models\Bout;
 use Ajslim\FencingActions\Models\Call;
+use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\Fencingactions\Models\Tournament;
 use Backend\Classes\Controller;
 use Illuminate\Support\Collection;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Input;
 /**
  * Api Controller
  */
-class Tournaments extends Api
+class Fencers extends Api
 {
     /**
      * The index controller
@@ -25,8 +26,8 @@ class Tournaments extends Api
      * @return array
      */
     public function index(
-        $tournamentId = null,
-        $tournamentChild = null,
+        $fencerId = null,
+        $fencerChild = null,
         $boutId = null,
         $boutChild = null,
         $actionId = null
@@ -43,23 +44,33 @@ class Tournaments extends Api
             return $this->displayModel(Bout::find($boutId), ['actions']);
         }
 
-        if ($tournamentChild === 'bouts' && $tournamentId !== null) {
-            return $this->makeDataTablesResponse(Tournament::find($tournamentId)->bouts);
+        if ($fencerChild === 'bouts' && $fencerId !== null) {
+
+            return $this->makeDataTablesResponse($this->getFencerBouts($fencerId));
         }
 
-        if ($tournamentChild === 'actions' && $tournamentId !== null) {
+        if ($fencerChild === 'actions' && $fencerId !== null) {
+            $bouts = $this->getFencerBouts($fencerId);
             $actions = new Collection();
-            foreach (Tournament::find($tournamentId)->bouts as $bout) {
+            foreach ($bouts as $bout) {
                 $actions = $actions->merge($bout->actions);
             }
 
             return $this->makeDataTablesActionResponse($actions);
         }
 
-        if ($tournamentId !== null) {
-            return $this->displayModel(Tournament::find($tournamentId), ['bouts', 'actions']);
+        if ($fencerId !== null) {
+            return $this->displayModel(Fencer::find($fencerId), ['bouts', 'actions']);
         }
 
-        return $this->makeDataTablesResponse(Tournament::all());
+        return $this->makeDataTablesResponse(Fencer::all());
+    }
+
+    private function getFencerBouts($fencerId)
+    {
+        $leftBouts = Bout::where('left_fencer_id', $fencerId)->get();
+        $rightBouts = Bout::where('right_fencer_id', $fencerId)->get();
+
+        return $leftBouts->merge($rightBouts);
     }
 }

@@ -20,7 +20,9 @@
 
             Object.keys(data).forEach(function(key, index) {
                 if (key === 'children') {
-                    $display.append('<a href="' + window.location + '/' +  data[key] + '">' + data[key] + '</a>');
+                    data[key].forEach(function(child) {
+                        $display.append('<div><a href="' + window.location + '/' +  child + '">' + child + '</a></div>');
+                    });
                 } else {
                     $display.append('<div><span>' + key +'</span> : <span>' + data[key] + '</span>');
                 }

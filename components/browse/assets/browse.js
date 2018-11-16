@@ -85,16 +85,19 @@
             }
         });
 
-        $list.on('click', 'td', function () {
+        $list.on('click', 'tbody td', function() {
             if($(this).index() !== 0) {
-                var data = $table.row(this.parent).data();
+
+                //get the value of the TD using the API
+                var data = $table.row(this.parentNode.rowIndex - 1).data();
+
                 if (data.link !== undefined) {
                     window.location = window.location = data.link
                 } else {
                     window.location = window.location + '/' + data.id;
                 }
             }
-        })
+        });
     }
 
     $(document).ready(function () {

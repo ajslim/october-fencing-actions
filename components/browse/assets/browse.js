@@ -61,6 +61,10 @@
             "columns": columns,
             "ajax": endpoint,
             "responsive": true,
+            dom: 'Bfrtip',
+            buttons: [
+                'colvis'
+            ],
             initComplete: function () {
                 this.api().columns().every(function () {
                     var column = this;

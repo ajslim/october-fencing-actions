@@ -60,6 +60,7 @@
         var $table = $list.DataTable({
             "columns": columns,
             "ajax": endpoint,
+            "responsive": true,
             initComplete: function () {
                 this.api().columns().every(function () {
                     var column = this;
@@ -84,12 +85,14 @@
             }
         });
 
-        $list.on('click', 'tr', function () {
-            var data = $table.row(this).data();
-            if (data.link !== undefined) {
-                window.location = window.location = data.link
-            } else {
-                window.location = window.location + '/' + data.id;
+        $list.on('click', 'td', function () {
+            if($(this).index() !== 0) {
+                var data = $table.row(this.parent).data();
+                if (data.link !== undefined) {
+                    window.location = window.location = data.link
+                } else {
+                    window.location = window.location + '/' + data.id;
+                }
             }
         })
     }

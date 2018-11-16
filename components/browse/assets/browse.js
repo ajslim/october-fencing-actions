@@ -37,12 +37,6 @@
                 }
             }
 
-            if (key === 'confidence' || key === 'consensus') {
-                column.render = function (data, type, row) {
-                    return Math.floor(data * 100) + '%';
-                }
-            }
-
             if (key !== 'thumb' && key !== 'link') {
                 columns.push(column);
             }
@@ -61,9 +55,13 @@
             "columns": columns,
             "ajax": endpoint,
             "responsive": true,
-            dom: 'Bfrtip',
-            buttons: [
-                'colvis'
+            "dom": 'Bfrtip',
+            "buttons": [
+                'colvis', 'pageLength'
+            ],
+            "lengthMenu": [
+                [ 10, 25, 50, 100, -1 ],
+                [ '10 rows', '25 rows', '50 rows', '100 rows', 'Show all' ]
             ],
             initComplete: function () {
                 this.api().columns().every(function () {

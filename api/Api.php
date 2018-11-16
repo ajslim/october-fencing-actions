@@ -69,14 +69,14 @@ class Api extends Controller
         foreach ($collection as $action) {
             $records[] = [
                 'id' => $action->id,
-                'bout_name' => $action->bout->name,
                 'thumb' => $action->thumb_url,
-                'votes' => count($action->votes),
+                'votes' => count($action->getCallVotesAttribute()),
                 'top_vote' => $action->getTopVoteNameAttribute(),
                 'confidence' => round($action->getConfidenceAttribute(), 3),
                 'consensus' => round($action->getConsensusAttribute(), 3),
                 'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 3),
                 'time' => $action->time,
+                'bout_name' => $action->bout->name,
                 'link' => '/?id=' . $action->id . '&results=true'
             ];
         }

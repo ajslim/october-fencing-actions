@@ -206,6 +206,11 @@ class VoteOnAction extends ComponentBase
                 $action = Action::find($actionId);
             } else if (isset($get['minvotes'])) {
                 $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
+
+                // Just retry once, if they get another non action, they can label it
+                if ($action->getIsNotActionAttribute() === true) {
+                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+                }
             } else {
                 $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
 

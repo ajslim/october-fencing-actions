@@ -19,5 +19,11 @@ Route::group(
                 'uses' =>'Ajslim\FencingActions\Api\Fencers@index',
             ]
         );
+        Route::get(
+            'actions/{actionId?}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Actions@index',
+            ]
+        );
     }
 );

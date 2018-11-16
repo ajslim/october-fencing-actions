@@ -68,6 +68,8 @@ class Api extends Controller
         /** @var Action $action */
         foreach ($collection as $action) {
             $records[] = [
+                'id' => $action->id,
+                'bout_name' => $action->bout->name,
                 'thumb' => $action->thumb_url,
                 'votes' => count($action->votes),
                 'top_vote' => $action->getTopVoteNameAttribute(),

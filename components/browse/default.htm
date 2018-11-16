@@ -62,17 +62,57 @@
                                 'title': title
                             };
 
-                            if (key === 'thumb' || key === 'photo_url'){
+                            if (key === 'thumb' || key === 'photo_url') {
                                 column.render = function(data, type, row) {
                                     return '<img width="120" src="'+data+'" />';
                                 }
                             }
-                            columns.push(column);
+
+                            if (key === 'confidence' || key === 'consensus') {
+                                column.render = function(data, type, row) {
+                                    return Math.floor(data * 100) + '%';
+                                }
+                            }
+
+                            if (key !== 'thumb' && key !== 'link') {
+                                columns.push(column);
+                            }
                         });
+
+                        var $footer = $('<tfoot></tfoot>');
+                        var $footerRow = $('<tr></tr>');
+                        columns.forEach(function () {
+                           $footerRow.append('<th></th>');
+                        });
+                        $footer.append($footerRow);
+                        $list.append($footer);
+
 
                         var $table = $list.DataTable({
                             "columns": columns,
-                            "ajax": endpoint
+                            "ajax": endpoint,
+                            initComplete: function () {
+                                this.api().columns().every( function () {
+                                    var column = this;
+                                    var select = $('<select><option value=""></option></select>')
+                                        .appendTo( $(column.footer()) )
+                                        .on( 'change', function () {
+                                            var val = $.fn.dataTable.util.escapeRegex(
+                                                $(this).val()
+                                            );
+
+                                            column
+                                                .search( val ? '^'+val+'$' : '', true, false )
+                                                .draw();
+                                        } );
+
+                                    column.data().unique().sort().each( function ( d, j ) {
+                                        if (d !== '') {
+                                            select.append('<option value="' + d + '">' + d + '</option>')
+                                        }
+                                    } );
+                                } );
+                            }
                         });
 
                         $list.on('click', 'tr', function () {

@@ -25,7 +25,6 @@ class Browse extends ComponentBase
 
     public function onRun()
     {
-
     }
 
 

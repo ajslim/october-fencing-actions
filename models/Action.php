@@ -1,5 +1,6 @@
 <?php namespace Ajslim\FencingActions\Models;
 
+use Ajslim\FencingActions\Utility\Utility;
 use Assetic\Filter\PackerFilter;
 use Illuminate\Support\Collection;
 use Model;
@@ -12,6 +13,8 @@ use Model;
  * @propery integer left_fencer_id
  * @propery integer right_fencer_id
  * @propery Bout bout
+ * @propery Collection votes
+ * @method votes
  */
 class Action extends Model
 {
@@ -72,24 +75,50 @@ class Action extends Model
     private function getCallsArray()
     {
         $calls = [
-            '1' => [0, 0, 0],
-            '2' => [0, 0, 0],
-            '3' => [0, 0, 0],
-            '4' => [0, 0, 0],
-            '5' => [0, 0, 0],
-            '6' => [0, 0, 0],
-            '7' => [0, 0, 0],
+            Call::ATTACK_ID => [0, 0, 0],
+            Call::COUNTER_ATTACK_ID => [0, 0, 0],
+            Call::RIPOSTE_ID => [0, 0, 0],
+            Call::REMISE_ID => [0, 0, 0],
+            Call::LINE_ID => [0, 0, 0],
+            Call::OTHER_ID => [0, 0, 0],
+            Call::SIMULTANEOUS_ID => [0, 0, 0],
+            Call::CARD_ID => [0, 0 ,0]
         ];
-        foreach ($this->votes as $vote) {
+        foreach ($this->getCallVotesAttribute() as $vote) {
             if ($vote->call !== null) {
                 $calls[$vote->call->id][$vote->priority] += 1;
+            }
+            if ($vote->card_for !== null) {
+                $calls[Call::CARD_ID][$vote->card_for] += 1;
             }
         }
         return $calls;
     }
 
 
-    public function topVote()
+    public function getTopVoteNameAttribute()
+    {
+        $voteId = $this->getTopVoteIdAttribute();
+
+        if ($voteId === null) {
+            return '';
+        }
+
+        if ($voteId === Call::CARD_ID) {
+            return "Card";
+        }
+
+        $call =  Call::find($voteId);
+
+        if ($call !== null) {
+            return $call->name;
+        }
+
+        return '';
+    }
+
+
+    public function getTopVoteIdAttribute()
     {
         if (count($this->getCallVotesAttribute()) === 0) {
             return null;
@@ -110,6 +139,16 @@ class Action extends Model
     }
 
 
+    public function getIsNotActionAttribute()
+    {
+        $votes = $this->votes()->where('vote_comment_id', 2)->get();
+        if (count($votes) > 1) {
+            return true;
+        }
+        return false;
+    }
+
+
     public function getAverageDifficultyRatingAttribute()
     {
         $votes = $this->votes()->whereNotNull('difficulty')->get();
@@ -127,13 +166,8 @@ class Action extends Model
     }
 
 
-    public function getConsensusAttribute()
+    public function getHighestVoteCountAttribute()
     {
-        $voteCount = count($this->getCallVotesAttribute());
-        if ($voteCount === 0) {
-            return null;
-        }
-
         $calls = $this->getCallsArray();
         $highestVoteCount = -1;
 
@@ -144,6 +178,32 @@ class Action extends Model
                 }
             }
         }
+
+        return $highestVoteCount;
+    }
+
+
+    public function getConfidenceAttribute()
+    {
+        $voteCount = count($this->getCallVotesAttribute());
+        if ($voteCount === 0) {
+            return null;
+        }
+
+        $highestVoteCount = $this->getHighestVoteCountAttribute();
+        return Utility::calculateBinaryConfidenceInterval($highestVoteCount, $voteCount);
+    }
+
+
+
+    public function getConsensusAttribute()
+    {
+        $voteCount = count($this->getCallVotesAttribute());
+        if ($voteCount === 0) {
+            return null;
+        }
+
+        $highestVoteCount = $this->getHighestVoteCountAttribute();
 
         return $highestVoteCount / $voteCount;
     }

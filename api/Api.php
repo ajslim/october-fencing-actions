@@ -18,25 +18,6 @@ use Illuminate\Support\Facades\Input;
  */
 class Api extends Controller
 {
-    public static function idToAction($id)
-    {
-        if ($id === Call::ATTACK_ID) {
-            return "Attack";
-        } else if ($id === Call::COUNTER_ATTACK_ID){
-            return "Counter Attack";
-        } else if ($id === Call::RIPOSTE_ID){
-            return "Riposte";
-        } else if ($id === Call::REMISE_ID){
-            return "Remise";
-        } else if ($id === Call::LINE_ID){
-            return "Line";
-        } else if ($id === Call::OTHER_ID){
-            return "Other";
-        }
-        return null;
-    }
-
-
     public function displayModel($model, $children = null)
     {
         $array = $model->toArray();
@@ -89,7 +70,8 @@ class Api extends Controller
             $records[] = [
                 'thumb' => $action->thumb_url,
                 'votes' => count($action->votes),
-                'top_vote' => self::idToAction($action->topVote()),
+                'top_vote' => $action->getTopVoteNameAttribute(),
+                'confidence' => round($action->getConfidenceAttribute(), 3),
                 'consensus' => round($action->getConsensusAttribute(), 3),
                 'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 3),
                 'time' => $action->time,

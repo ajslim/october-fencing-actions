@@ -81,7 +81,6 @@ class VoteOnAction extends ComponentBase
         $totalCards = Vote::where('action_id', $actionId)->whereNotNull('card_for')->count();
         $votes['totalCards'] = $totalCards;
 
-
         $action = Action::find($actionId);
         $total = count($action->getCallVotesAttribute());
         $votes['total'] = $total;
@@ -200,6 +199,8 @@ class VoteOnAction extends ComponentBase
 
         } else {
             // Unlikely, but the get variable overrides the post
+
+            /* @var Action $action */
             if (isset($get['id'])) {
                 $actionId = $get['id'];
                 $action = Action::find($actionId);
@@ -207,12 +208,23 @@ class VoteOnAction extends ComponentBase
                 $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
             } else {
                 $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+
+                // Just retry once, if they get another non action, they can label it
+                if ($action->getIsNotActionAttribute() === true) {
+                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+                }
             }
 
             if ($action === null) {
                 $this->page['message'] = "No actions found with that many votes";
                 $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+
+                // Just retry once, if they get another non action, they can label it
+                if ($action->getIsNotActionAttribute() === true) {
+                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+                }
             }
+
             $actionId = $action->id;
 
             if (isset($get['results'])) {

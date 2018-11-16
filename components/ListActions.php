@@ -76,25 +76,6 @@ class ListActions extends ComponentBase
         return self::sqlToActionArray($query);
     }
 
-
-    public static function idToAction($id)
-    {
-        if ($id === Call::ATTACK_ID) {
-            return "Attack";
-        } else if ($id === Call::COUNTER_ATTACK_ID){
-            return "Counter Attack";
-        } else if ($id === Call::RIPOSTE_ID){
-            return "Riposte";
-        } else if ($id === Call::REMISE_ID){
-            return "Remise";
-        } else if ($id === Call::LINE_ID){
-            return "Line";
-        } else if ($id === Call::OTHER_ID){
-            return "Other";
-        }
-        return null;
-    }
-
     public function onRun()
     {
 
@@ -107,9 +88,10 @@ class ListActions extends ComponentBase
         foreach ($actions as $action) {
             $linkArray[] = [
                 'name' => $action->bout->name,
-                'votes' => count($action->votes),
-                'call' => self::idToAction($action->topVote()),
+                'votes' => count($action->getCallVotesAttribute()),
+                'call' => $action->getTopVoteNameAttribute(),
                 'consensus' => round($action->getConsensusAttribute() * 100) . '%',
+                'confidence' => round($action->getConfidenceAttribute() * 100) . '%',
                 'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 2),
                 'time' => $action->time,
                 'link' => '/?id=' . $action->id . '&results=true'

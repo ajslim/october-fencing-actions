@@ -16,6 +16,7 @@ class Call extends Model
     public const LINE_ID = 5;
     public const OTHER_ID = 6;
     public const SIMULTANEOUS_ID = 7;
+    public const CARD_ID = 99;
 
     /**
      * @var string The database table used by the model.

@@ -12,7 +12,14 @@
                     $display.append('<div><a href="' + window.location + '/' + child + '">' + child + '</a></div>');
                 });
             } else {
-                $display.append('<div><span>' + key + '</span> : <span>' + data[key] + '</span>');
+                var value = data[key];
+                if (typeof value === 'object') {
+                    value = JSON.stringify(value);
+                }
+                var title = key.charAt(0).toUpperCase() + key.slice(1);
+                title = title.replace(/_/g, " ");
+
+                $display.append('<div><span>' + title + '</span> : <span>' + value + '</span>');
             }
         });
     }

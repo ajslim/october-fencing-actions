@@ -9,6 +9,7 @@ namespace Ajslim\FencingActions\Api;
 use Ajslim\FencingActions\Models\Action;
 use Ajslim\FencingActions\Models\Bout;
 use Ajslim\FencingActions\Models\Call;
+use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\Fencingactions\Models\Tournament;
 use Backend\Classes\Controller;
 use Illuminate\Support\Facades\Input;
@@ -25,6 +26,36 @@ class Api extends Controller
             $array['children'] = $children;
         }
         return json_encode($array);
+    }
+
+    public function makeFencerResponse(Fencer $fencer, $children)
+    {
+
+        $calls = $fencer->getCallPercentages();
+        $response = [
+            'id' => $fencer->id,
+            'last_name' => $fencer->last_name,
+            'first_name' => $fencer->first_name,
+            'gender' => $fencer->gender,
+            'fie_site_number' => $fencer->fie_site_number,
+            'photo_url' => $fencer->photo_url,
+            'country_code' => $fencer->country_code,
+            'birth' => $fencer->birth,
+            'highest_rank' => $fencer->highest_rank,
+            'primary_weapon' => $fencer->primary_weapon,
+            'attack_percentage' => $calls[Call::ATTACK_ID],
+            'counter_attack_percentage' => $calls[Call::COUNTER_ATTACK_ID],
+            'riposte_percentage' => $calls[Call::RIPOSTE_ID],
+            'remise_percentage' => $calls[Call::REMISE_ID],
+            'line_percentage' => $calls[Call::LINE_ID],
+            'other_percentage' => $calls[Call::OTHER_ID],
+            'created_at' => $fencer->created_at,
+            'updated_at' => $fencer->created_at,
+            'children' => $children,
+        ];
+
+        return json_encode($response);
+
     }
 
     public function makeDataTablesResponse($collection)

@@ -75,21 +75,44 @@ class Action extends Model
     private function getCallsArray()
     {
         $calls = [
-            Call::ATTACK_ID => [0, 0, 0],
-            Call::COUNTER_ATTACK_ID => [0, 0, 0],
-            Call::RIPOSTE_ID => [0, 0, 0],
-            Call::REMISE_ID => [0, 0, 0],
-            Call::LINE_ID => [0, 0, 0],
-            Call::OTHER_ID => [0, 0, 0],
-            Call::SIMULTANEOUS_ID => [0, 0, 0],
-            Call::CARD_ID => [0, 0 ,0]
+            Action::LEFT_FENCER_ID => [
+                Call::ATTACK_ID => 0,
+                Call::COUNTER_ATTACK_ID => 0,
+                Call::RIPOSTE_ID => 0,
+                Call::REMISE_ID => 0,
+                Call::LINE_ID => 0,
+                Call::OTHER_ID => 0,
+                Call::SIMULTANEOUS_ID => 0,
+                Call::CARD_ID => 0
+            ],
+            Action::RIGHT_FENCER_ID => [
+                Call::ATTACK_ID => 0,
+                Call::COUNTER_ATTACK_ID => 0,
+                Call::RIPOSTE_ID => 0,
+                Call::REMISE_ID => 0,
+                Call::LINE_ID => 0,
+                Call::OTHER_ID => 0,
+                Call::SIMULTANEOUS_ID => 0,
+                Call::CARD_ID => 0
+            ],
+            Action::NEITHER_FENCER_ID => [
+                Call::ATTACK_ID => 0,
+                Call::COUNTER_ATTACK_ID => 0,
+                Call::RIPOSTE_ID => 0,
+                Call::REMISE_ID => 0,
+                Call::LINE_ID => 0,
+                Call::OTHER_ID => 0,
+                Call::SIMULTANEOUS_ID => 0,
+                Call::CARD_ID => 0
+            ]
+
         ];
         foreach ($this->getCallVotesAttribute() as $vote) {
             if ($vote->call !== null) {
-                $calls[$vote->call->id][$vote->priority] += 1;
+                $calls[$vote->priority][$vote->call->id] += 1;
             }
             if ($vote->card_for !== null) {
-                $calls[Call::CARD_ID][$vote->card_for] += 1;
+                $calls[$vote->card_for][Call::CARD_ID] += 1;
             }
         }
         return $calls;
@@ -98,17 +121,17 @@ class Action extends Model
 
     public function getTopVoteNameAttribute()
     {
-        $voteId = $this->getTopVoteIdAttribute();
-
-        if ($voteId === null) {
+        $topVote = $this->getTopVoteAttribute();
+        if ($topVote === null) {
             return '';
         }
 
-        if ($voteId === Call::CARD_ID) {
+        $callId = $this->getTopVoteAttribute()->callId;
+        if ($callId === Call::CARD_ID) {
             return "Card";
         }
 
-        $call =  Call::find($voteId);
+        $call =  Call::find($callId);
 
         if ($call !== null) {
             return $call->name;
@@ -117,8 +140,7 @@ class Action extends Model
         return '';
     }
 
-
-    public function getTopVoteIdAttribute()
+    public function getTopVoteAttribute()
     {
         if (count($this->getCallVotesAttribute()) === 0) {
             return null;
@@ -126,16 +148,21 @@ class Action extends Model
 
         $calls = $this->getCallsArray();
         $highestVoteCount = -1;
-        $highestCountCallId = 0;
-        foreach ($calls as $callId => $votes) {
-            $total = array_sum($votes);
-            if ($total > $highestVoteCount) {
-                $highestVoteCount = $total;
-                $highestCountCallId = $callId;
+        $highestCountVote = 0;
+        foreach ($calls as $priorityId => $priorityCalls) {
+            foreach ($priorityCalls as $callId => $count) {
+                if ($count > $highestVoteCount) {
+                    $highestVoteCount = $count;
+                    $highestCountVote = (object) [
+                      'priorityId' => $priorityId,
+                      'callId' => $callId,
+                      'count' => $count,
+                    ];
+                }
             }
         }
 
-        return $highestCountCallId;
+        return $highestCountVote;
     }
 
 
@@ -171,8 +198,8 @@ class Action extends Model
         $calls = $this->getCallsArray();
         $highestVoteCount = -1;
 
-        foreach ($calls as $callId => $priority) {
-            foreach ($priority as $count) {
+        foreach ($calls as $priority => $priorityCalls) {
+            foreach ($priorityCalls as $count) {
                 if ($count > $highestVoteCount) {
                     $highestVoteCount = $count;
                 }

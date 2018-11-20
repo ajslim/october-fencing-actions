@@ -1,5 +1,6 @@
 <?php namespace Ajslim\FencingActions\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Model;
 use October\Rain\Database\QueryBuilder;
 
@@ -66,6 +67,97 @@ class Fencer extends Model
     public $morphMany = [];
     public $attachOne = [];
     public $attachMany = [];
+
+
+
+    /**
+     * Gets all the fencers actions
+     *
+     * @return Action[]|Collection
+     */
+    public function getActionsAttribute()
+    {
+        $returnCollection = new Collection();
+
+        $leftActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'left_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+
+        /* @var Action $action */
+        foreach ($leftActions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+
+            if ($topVote !== null && $topVote->priorityId === Action::LEFT_FENCER_ID) {
+                $returnCollection->push($action);
+            }
+        }
+
+        $rightActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'right_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+        /* @var Action $action */
+        foreach ($rightActions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+
+            if ($topVote !== null && $topVote->priorityId === Action::RIGHT_FENCER_ID) {
+                $returnCollection->push($action);
+            }
+
+        }
+
+        return $returnCollection;
+    }
+
+
+    public function getCallPercentages()
+    {
+        $actions = $this->getActionsAttribute();
+
+        $totalNumberOfActions = count($actions);
+
+        if ($totalNumberOfActions === 0) {
+            return [];
+        }
+
+        $calls = [
+            Call::ATTACK_ID => 0,
+            Call::COUNTER_ATTACK_ID => 0,
+            Call::RIPOSTE_ID => 0,
+            Call::REMISE_ID => 0,
+            Call::LINE_ID => 0,
+            Call::OTHER_ID => 0,
+            Call::SIMULTANEOUS_ID => 0,
+        ];
+
+        foreach ($actions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+            $calls[$topVote->callId] += 1;
+        }
+
+        foreach ($calls as $callId => $call) {
+            $calls[$callId] = $call / $totalNumberOfActions;
+        }
+
+        return $calls;
+    }
+
+
 
 
     /**

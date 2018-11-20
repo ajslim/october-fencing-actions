@@ -60,7 +60,7 @@ class Fencers extends Api
         }
 
         if ($fencerId !== null) {
-            return $this->displayModel(Fencer::find($fencerId), ['bouts', 'actions']);
+            return $this->makeFencerResponse(Fencer::find($fencerId), ['bouts', 'actions']);
         }
 
         return $this->makeDataTablesResponse(Fencer::all());

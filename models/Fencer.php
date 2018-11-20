@@ -147,11 +147,13 @@ class Fencer extends Model
 
         foreach ($actions as $action) {
             $topVote = $action->getTopVoteAttribute();
-            $calls[$topVote->callId] += 1;
+            if (isset($calls[$topVote->callId])) {
+                $calls[$topVote->callId] += 1;
+            }
         }
 
         foreach ($calls as $callId => $call) {
-            $calls[$callId] = $call / $totalNumberOfActions;
+            $calls[$callId] = number_format(($call / $totalNumberOfActions), 3);
         }
 
         return $calls;

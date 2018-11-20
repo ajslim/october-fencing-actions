@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 
 
 class VoteOnAction extends ComponentBase
@@ -138,8 +139,6 @@ class VoteOnAction extends ComponentBase
     }
 
 
-
-
     private function getRandomActionFromCollection(Collection $collection)
     {
         $totalNumberOfActions = count($collection);
@@ -147,99 +146,103 @@ class VoteOnAction extends ComponentBase
         return $collection->get($actionIndex);
     }
 
-    public function onRun()
+
+    private function saveVote($actionId)
     {
         $post = Input::post();
+
+        $action = Action::find($actionId);
+        $votes = $action->getCallVotesAttribute();
+
+        $voteCount = Session::get('voteCount', 0);
+        $voteCount += 1;
+        Session::put('voteCount', $voteCount);
+
+        if (count($votes) === 0) {
+            $newActionVoteCount = Session::get('newActionVoteCount', 0);
+            $newActionVoteCount += 1;
+            Session::put('newActionVoteCount', $newActionVoteCount);
+            Session::put('newAction', true);
+        }
+
+        $vote = Vote::create(
+            [
+                'action_id' => $actionId
+            ]
+        );
+
+        if (isset($post['priority']) === true
+            && isset($post['call']) === true
+            && $post['priority'] !== '0'
+        ) {
+            $vote->call_id = $post['call'];
+            $vote->priority = $post['priority'];
+        }
+
+        if (isset($post['priority']) === true
+            && isset($post['call']) === true
+            && $post['priority'] === '0'
+            && $post['call'] === '7'
+        ) {
+            $vote->call_id = $post['call'];
+            $vote->priority = $post['priority'];
+        }
+
+        if (isset($post['card-for']) === true && $post['card-for'] !== '0') {
+            $vote->card_for = $post['card-for'];
+        }
+
+        if (isset($post['difficulty']) === true) {
+            $vote->difficulty = $post['difficulty'];
+        }
+        if (isset($post['vote-comment']) === true) {
+            $vote->vote_comment_id = $post['vote-comment'];
+        }
+
+        $vote->save();
+    }
+
+
+    private function getAction()
+    {
         $get = Input::get();
 
-        if (isset($get['minvotes'])) {
-            $this->page['minvotes'] = $get['minvotes'];
-        }
-
-        if (isset($post['action-id']) === true) {
-            $actionId = $post['action-id'];
+        /* @var Action $action */
+        if (isset($get['id'])) {
+            $actionId = $get['id'];
             $action = Action::find($actionId);
+        } else if (isset($get['minvotes'])) {
+            $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
 
-            $vote = Vote::create(
-                [
-                    'action_id' => $actionId
-                ]
-            );
-
-            if (isset($post['priority']) === true
-                && isset($post['call']) === true
-                && $post['priority'] !== '0'
-            ) {
-                $vote->call_id = $post['call'];
-                $vote->priority = $post['priority'];
+            // Just retry once, if they get another non action, they can label it
+            if ($action->getIsNotActionAttribute() === true) {
+                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
             }
-
-            if (isset($post['priority']) === true
-                && isset($post['call']) === true
-                && $post['priority'] === '0'
-                && $post['call'] === '7'
-            ) {
-                $vote->call_id = $post['call'];
-                $vote->priority = $post['priority'];
-            }
-
-            if (isset($post['card-for']) === true && $post['card-for'] !== '0') {
-                $vote->card_for = $post['card-for'];
-            }
-
-            if (isset($post['difficulty']) === true) {
-                $vote->difficulty = $post['difficulty'];
-            }
-            if (isset($post['vote-comment']) === true) {
-                $vote->vote_comment_id = $post['vote-comment'];
-            }
-            $vote->save();
-
-            return Redirect::to("/?id=$actionId&results=true");
-
         } else {
-            // Unlikely, but the get variable overrides the post
+            $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
 
-            /* @var Action $action */
-            if (isset($get['id'])) {
-                $actionId = $get['id'];
-                $action = Action::find($actionId);
-            } else if (isset($get['minvotes'])) {
-                $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
-
-                // Just retry once, if they get another non action, they can label it
-                if ($action->getIsNotActionAttribute() === true) {
-                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-                }
-            } else {
+            // Just retry once, if they get another non action, they can label it
+            if ($action->getIsNotActionAttribute() === true) {
                 $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-
-                // Just retry once, if they get another non action, they can label it
-                if ($action->getIsNotActionAttribute() === true) {
-                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-                }
-            }
-
-            if ($action === null) {
-                $this->page['message'] = "No actions found with that many votes";
-                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-
-                // Just retry once, if they get another non action, they can label it
-                if ($action->getIsNotActionAttribute() === true) {
-                    $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-                }
-            }
-
-            $actionId = $action->id;
-
-            if (isset($get['results'])) {
-                $this->page['voteForm'] = false;
-                $this->page['results'] = true;
-            } else {
-                $this->page['voteForm'] = true;
             }
         }
 
+        if ($action === null) {
+            $this->page['warning'] = "No actions found with that many votes";
+            $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+
+            // Just retry once, if they get another non action, they can label it
+            if ($action->getIsNotActionAttribute() === true) {
+                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+            }
+        }
+
+        return $action;
+    }
+
+
+    private function addVotesToPage($actionId)
+    {
         $votes = self::getVotesForAction($actionId);
 
         $this->page['votes'] = $votes;
@@ -251,6 +254,11 @@ class VoteOnAction extends ComponentBase
         }
 
         $this->page['voteComments'] = $voteCommentsArray;
+    }
+
+
+    private function addBoutAndActionDetailsToPage(Action $action)
+    {
         $this->page['actionId'] = $action->id;
         $this->page['videoUrl'] = $action->video_url;
 
@@ -263,6 +271,83 @@ class VoteOnAction extends ComponentBase
 
         $this->page['leftFencer'] = $action->getLeftnameAttribute();
         $this->page['rightFencer'] = $action->getRightnameAttribute();
+    }
+
+
+    private function addMotivationalMessage()
+    {
+        $newAction = Session::pull('newAction', false);
+
+        if ($newAction) {
+            $newActionVoteCount = Session::get('newActionVoteCount', 0);
+
+            if ($newActionVoteCount < 10) {
+                $actionsRemaining = 10 - $newActionVoteCount;
+                $message = "You've refereed $newActionVoteCount new actions! Keep it up! Only "
+                 . "$actionsRemaining more to go!";
+            } else if ($newActionVoteCount == 10) {
+                $message = '<i class="fa fa-trophy" style="font-size:48px;color:#B77B4B"></i> You\'ve earned the bronze trophy!';
+                Session::put('newActionTrophy', 'bronze');
+            } else if ($newActionVoteCount < 25) {
+                $actionsRemaining = 25 - $newActionVoteCount;
+                $message = "You've refereed $newActionVoteCount new actions! Keep it up! Only "
+                    . "$actionsRemaining more to go!";
+            } else if ($newActionVoteCount == 25) {
+                $message = '<i class="fa fa-trophy" style="font-size:48px;color:#D2CFD5"></i> You\'ve earned the silver trophy!';
+                Session::put('newActionTrophy', 'silver');
+            } else if ($newActionVoteCount < 50) {
+                $actionsRemaining = 50 - $newActionVoteCount;
+                $message = "You've refereed $newActionVoteCount new actions! Keep it up! Only "
+                    . "$actionsRemaining more to go!";
+            } else if ($newActionVoteCount == 50) {
+                $message = '<i class="fa fa-trophy" style="font-size:48px;color:#E8DC1D"></i> You\'ve earned the gold trophy!';
+                Session::put('newActionTrophy', 'gold');
+            } else {
+                $message = "You've refereed $newActionVoteCount new actions! Keep it up!";
+            }
+
+            $this->page['message'] = $message;
+        } else {
+            $voteCount = Session::get('voteCount', 0);
+
+            if (in_array($voteCount, [5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200])) {
+                $message = "You've refereed $voteCount actions! Keep it up!";
+                $this->page['message'] = $message;
+            }
+        }
+    }
+
+
+    public function onRun()
+    {
+        $post = Input::post();
+        $get = Input::get();
+
+        if (isset($get['minvotes'])) {
+            $this->page['minvotes'] = $get['minvotes'];
+        }
+
+        // If vote form was submitted
+        if (isset($post['action-id']) === true) {
+            $actionId = $post['action-id'];
+            $this->saveVote($actionId);
+            return Redirect::to("/?id=$actionId&results=true");
+        } else {
+            $action = $this->getAction();
+            $actionId = $action->id;
+
+            if (isset($get['results'])) {
+                $this->addMotivationalMessage();
+                $this->page['voteForm'] = false;
+                $this->page['results'] = true;
+            } else {
+                $this->page['voteForm'] = true;
+            }
+        }
+
+        $this->page['trophy'] = Session::get('newActionTrophy');
+        $this->addVotesToPage($actionId);
+        $this->addBoutAndActionDetailsToPage($action);
     }
 
 

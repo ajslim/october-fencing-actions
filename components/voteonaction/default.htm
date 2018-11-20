@@ -42,9 +42,7 @@
     .submit {
         background: mediumseagreen;
         color: white;
-        cursor: pointer;
         border: 1px solid gray;
-        box-shadow: lightgray 4px 4px 4px 4px;
     }
 
     .vote h6 {
@@ -125,32 +123,63 @@
         }
     }
 
-    .next-action {
+    .next-action,
+    .submit
+    {
         cursor: pointer;
         box-shadow: lightgray 4px 4px 4px 4px;
+    }
+
+    .next-action:active,
+    .submit:active
+    {
+        box-shadow: none;
     }
 
 </style>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
 </head>
 
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="/">Quarte Riposte Fencing Actions</a>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Quarte Riposte</a>
+
+            <div class="nav navbar-nav navbar-right">
+                {% if trophy is defined and trophy is not null %}
+                    {% if trophy == 'bronze' %}
+                        <i class="fa fa-trophy" style="font-size:48px;color:#B77B4B"></i>
+                    {% elseif trophy == 'silver' %}
+                        <i class="fa fa-trophy" style="font-size:48px;color:#D2CFD5"></i>
+                    {% elseif trophy == 'gold' %}
+                        <i class="fa fa-trophy" style="font-size:48px;color:#E8DC1D"></i>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
     </nav>
 
 
-    {% if message %}
+
+    {% if warning is defined and warning is not null %}
         <div class="container-fluid">
             <div class="alert alert-danger" role="alert">
-                {{ message }}
+                {{ warning }}
             </div>
         </div>
     {% endif %}
 
+    {% if message is defined and message is not null %}
+        <div class="container-fluid">
+            <div class="alert alert-success" role="alert">
+                {{ message|raw }}
+            </div>
+        </div>
+    {% endif %}
 
 
     <div class="container-fluid tabs">

@@ -199,6 +199,9 @@ class VoteOnAction extends ComponentBase
             $vote->vote_comment_id = $post['vote-comment'];
         }
 
+        // Log the ip address of the vote, just in case some craziness happens
+        $vote->ip_address = $_SERVER['REMOTE_ADDR'];
+
         $vote->save();
     }
 

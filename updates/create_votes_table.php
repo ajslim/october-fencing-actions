@@ -27,6 +27,10 @@ class CreateVotesTable extends Migration
                 ->nullable();
             $table->integer('vote_comment_id')
                 ->nullable();
+
+            $table->string('ip_address')
+                ->nullable();
+
             $table->timestamps();
         });
     }

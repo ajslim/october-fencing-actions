@@ -1,6 +1,7 @@
 (function browse() {
     var url = new URL(window.location);
-    var endpoint = '/api/' + url.searchParams.get("u");
+    var resource = url.searchParams.get("u");
+    var endpoint = '/api/' + resource;
 
     function displayObject(data) {
         var $display = $('#display');
@@ -29,6 +30,17 @@
             var column = {
                 'data': key,
                 'title': title
+            };
+
+            column.render = function (data, type, row) {
+                var rowData = row;
+                var link =  '/browse?u=' + resource + '/' + rowData.id;
+
+                if (rowData.link !== undefined) {
+                    link = rowData.link
+                }
+
+                return '<a href="' + link + '">' + data + '</a>';
             };
 
             if (key === 'thumb' || key === 'photo_url') {
@@ -84,20 +96,6 @@
                         }
                     });
                 });
-            }
-        });
-
-        $list.on('click', 'tbody td', function() {
-            if($(this).index() !== 0) {
-
-                //get the value of the TD using the API
-                var data = $table.row(this.parentNode.rowIndex - 1).data();
-
-                if (data.link !== undefined) {
-                    window.location = window.location = data.link
-                } else {
-                    window.location = window.location + '/' + data.id;
-                }
             }
         });
     }

@@ -62,7 +62,6 @@ class Plugin extends PluginBase
     {
         return [
             'Ajslim\FencingActions\Components\VoteOnAction' => 'voteOnAction',
-            'Ajslim\FencingActions\Components\ListActions' => 'listActions',
             'Ajslim\FencingActions\Components\Browse' => 'browse'
         ]; // Remove this line to activate
     }

@@ -63,7 +63,7 @@ class Fencers extends Api
             return $this->makeFencerResponse(Fencer::find($fencerId), ['bouts', 'actions']);
         }
 
-        return $this->makeDataTablesResponse(Fencer::all());
+        return $this->makeDataTablesFencerResponse(Fencer::all());
     }
 
     private function getFencerBouts($fencerId)

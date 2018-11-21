@@ -48,6 +48,8 @@ class Api extends Controller
                 'for' => $calls,
                 'against' => $callsAgainst,
             ],
+            'total_actions_for' => count($fencer->getActionsAttribute()),
+            'total_actions_against' => count($fencer->getActionsAgainstAttribute()),
             'created_at' => $fencer->created_at,
             'updated_at' => $fencer->created_at,
             'children' => $children,
@@ -79,6 +81,48 @@ class Api extends Controller
         ];
 
         return json_encode($response);
+    }
+
+
+    public function makeDataTablesFencerResponse($collection)
+    {
+
+        $draw = (integer) Input::get('draw');
+        $start = Input::get('start');
+        $length = Input::get('length');
+
+        $recordsTotal = count($collection);
+
+        if ($start !== null && $length !== null) {
+            $collection = $collection->slice($start, $length);
+        }
+
+        $records = [];
+        /** @var Fencer $fencer */
+        foreach ($collection as $fencer) {
+            $records[] = [
+                'id' => $fencer->id,
+                'last_name' => $fencer->last_name,
+                'first_name' => $fencer->first_name,
+                'total_actions_for' => count($fencer->getActionsAttribute()),
+                'total_actions_against' => count($fencer->getActionsAgainstAttribute()),
+                'country_code' => $fencer->country_code,
+                'birth' => $fencer->birth,
+                'highest_rank' => $fencer->highest_rank,
+                'primary_weapon' => $fencer->primary_weapon,
+                'gender' => $fencer->gender,
+                'fie_site_number' => $fencer->fie_site_number,
+            ];
+        }
+
+        $response = [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsTotal,
+            'data' => $records,
+        ];
+        return json_encode($response);
+
     }
 
     public function makeDataTablesActionResponse($collection)

@@ -44,7 +44,7 @@
                         title = 'Actions Against';
                     }
 
-                    var $calls = $('<div class="col calls"></div>');
+                    var $calls = $('<div class="col-md calls"></div>');
                     $calls.append('<h5>' + title + '</h5>');
 
                     for (callId in calls) {

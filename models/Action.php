@@ -3,6 +3,7 @@
 use Ajslim\FencingActions\Utility\Utility;
 use Assetic\Filter\PackerFilter;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Model;
 
 /**
@@ -72,6 +73,40 @@ class Action extends Model
     public $attachMany = [];
 
 
+    /**
+     * Generate a unique cache key to cache actions
+     *
+     * @return string
+     */
+    public function cacheKey()
+    {
+        return sprintf(
+            "%s/%s-%s",
+            $this->getTable(),
+            $this->getKey(),
+            $this->updated_at->timestamp
+        );
+    }
+
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getCachedCallsArray()
+    {
+        return Cache::remember($this->cacheKey() . ':callsArray', 15, function () {
+            return $this->getCallsArray();
+        });
+    }
+
+
+    /**
+     * Returns an array of all the votes indexed by priority, then call id
+     *
+     * @return array
+     */
     private function getCallsArray()
     {
         $calls = [
@@ -119,10 +154,15 @@ class Action extends Model
     }
 
 
+    /**
+     * Gets the name of the top vote
+     *
+     * @return string
+     */
     public function getTopVoteNameAttribute()
     {
         $topVote = $this->getTopVoteAttribute();
-        if ($topVote === null) {
+        if ($topVote === false) {
             return '';
         }
 
@@ -140,15 +180,34 @@ class Action extends Model
         return '';
     }
 
+
+    /**
+     * Returns top vote using cache
+     *
+     * @return null|object
+     */
     public function getTopVoteAttribute()
     {
+        return Cache::remember($this->cacheKey() . ':topVote', 15, function () {
+            return $this->getTopVote();
+        });
+    }
+
+
+    /**
+     * Gets the higest vote with priorityId, callId and count
+     *
+     * @return boolean|object
+     */
+    public function getTopVote()
+    {
         if (count($this->getCallVotesAttribute()) === 0) {
-            return null;
+            return false;
         }
 
-        $calls = $this->getCallsArray();
+        $calls = $this->getCachedCallsArray();
         $highestVoteCount = -1;
-        $highestCountVote = 0;
+        $highestCountVote = false;
         foreach ($calls as $priorityId => $priorityCalls) {
             foreach ($priorityCalls as $callId => $count) {
                 if ($count > $highestVoteCount) {
@@ -176,13 +235,26 @@ class Action extends Model
     }
 
 
+
+    /**
+     * Returns the call votes using a cache
+     *
+     * @return Collection
+     */
     public function getAverageDifficultyRatingAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':averageDifficultyRating', 15, function () {
+            return $this->getAverageDifficultyRating();
+        });
+    }
+
+    public function getAverageDifficultyRating()
     {
         $votes = $this->votes()->whereNotNull('difficulty')->get();
 
         $voteCount = count($votes);
         if($voteCount === 0) {
-            return null;
+            return false;
         }
 
         $totalDifficulty = 0;
@@ -193,9 +265,22 @@ class Action extends Model
     }
 
 
+
+    /**
+     * Returns the highest vote count using a cache
+     *
+     * @return integer
+     */
     public function getHighestVoteCountAttribute()
     {
-        $calls = $this->getCallsArray();
+        return Cache::remember($this->cacheKey() . ':getHighestVoteCount', 15, function () {
+            return $this->getHighestVoteCount();
+        });
+    }
+
+    public function getHighestVoteCount()
+    {
+        $calls = $this->getCachedCallsArray();
         $highestVoteCount = -1;
 
         foreach ($calls as $priority => $priorityCalls) {
@@ -214,7 +299,7 @@ class Action extends Model
     {
         $voteCount = count($this->getCallVotesAttribute());
         if ($voteCount === 0) {
-            return null;
+            return false;
         }
 
         $highestVoteCount = $this->getHighestVoteCountAttribute();
@@ -222,12 +307,11 @@ class Action extends Model
     }
 
 
-
     public function getConsensusAttribute()
     {
         $voteCount = count($this->getCallVotesAttribute());
         if ($voteCount === 0) {
-            return null;
+            return false;
         }
 
         $highestVoteCount = $this->getHighestVoteCountAttribute();
@@ -236,11 +320,27 @@ class Action extends Model
     }
 
 
+    /**
+     * Returns the call votes using a cache
+     *
+     * @return Collection
+     */
     public function getCallVotesAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':callVotes', 15, function () {
+            return $this->getCallVotes();
+        });
+    }
+
+    /**
+     * Returns the votes which are part of call
+     *
+     * @return Collection
+     */
+    public function getCallVotes()
     {
         $votes = $this->votes()
             ->get();
-
 
         $returnCollection = new Collection();
 

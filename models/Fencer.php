@@ -1,6 +1,7 @@
 <?php namespace Ajslim\FencingActions\Models;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Model;
 use October\Rain\Database\QueryBuilder;
 
@@ -69,13 +70,42 @@ class Fencer extends Model
     public $attachMany = [];
 
 
+    /**
+     * Generate a unique cache key to cache actions
+     *
+     * @return string
+     */
+    public function cacheKey()
+    {
+        return sprintf(
+            "%s/%s-%s",
+            $this->getTable(),
+            $this->getKey(),
+            $this->updated_at->timestamp
+        );
+    }
+
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getActionsAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':actions', 15, function () {
+            return $this->getActions();
+        });
+    }
+
+
 
     /**
      * Gets all the fencers actions
      *
      * @return Action[]|Collection
      */
-    public function getActionsAttribute()
+    public function getActions()
     {
         $returnCollection = new Collection();
 
@@ -95,7 +125,7 @@ class Fencer extends Model
         foreach ($leftActions as $action) {
             $topVote = $action->getTopVoteAttribute();
 
-            if ($topVote !== null && $topVote->priorityId === Action::LEFT_FENCER_ID) {
+            if ($topVote !== false && $topVote->priorityId === Action::LEFT_FENCER_ID) {
                 $returnCollection->push($action);
             }
         }
@@ -115,7 +145,7 @@ class Fencer extends Model
         foreach ($rightActions as $action) {
             $topVote = $action->getTopVoteAttribute();
 
-            if ($topVote !== null && $topVote->priorityId === Action::RIGHT_FENCER_ID) {
+            if ($topVote !== false && $topVote->priorityId === Action::RIGHT_FENCER_ID) {
                 $returnCollection->push($action);
             }
 

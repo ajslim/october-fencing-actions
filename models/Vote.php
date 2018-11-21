@@ -8,6 +8,7 @@ use Model;
 class Vote extends Model
 {
     protected $connection = 'business';
+    protected $touches = ['action'];
 
     /**
      * @var string The database table used by the model.

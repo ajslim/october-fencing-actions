@@ -2,6 +2,18 @@
     var url = new URL(window.location);
     var resource = url.searchParams.get("u");
     var endpoint = '/api/' + resource;
+    var callNames = {
+        1: 'Attack',
+        2: 'Counter Attack',
+        3: 'Riposte',
+        4: 'Remise',
+        5: 'Line',
+        6: 'Other',
+        7: 'Simultaneous'
+    };
+
+
+
 
     function displayObject(data) {
         var $display = $('#display');
@@ -11,6 +23,16 @@
                 data[key].forEach(function (child) {
                     $display.append('<div><a href="' + window.location + '/' + child + '">' + child + '</a></div>');
                 });
+            } else if (key === 'call_percentages') {
+                var calls = data[key];
+                var callId;
+                var callName;
+
+                for (callId in calls) {
+                    callName = callNames[callId];
+                    callPercent = calls[callId];
+                    $display.append('<div><span>' + callName + '</span> : <span>' + callPercent + '</span></div>');
+                }
             } else {
                 var value = data[key];
                 if (typeof value === 'object') {
@@ -19,7 +41,7 @@
                 var title = key.charAt(0).toUpperCase() + key.slice(1);
                 title = title.replace(/_/g, " ");
 
-                $display.append('<div><span>' + title + '</span> : <span>' + value + '</span>');
+                $display.append('<div><span>' + title + '</span> : <span>' + value + '</span></div>');
             }
         });
     }

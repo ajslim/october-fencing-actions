@@ -19,26 +19,52 @@
         var $display = $('#display');
 
         Object.keys(data).forEach(function (key, index) {
+            var title;
+
             if (key === 'children') {
                 data[key].forEach(function (child) {
                     $display.append('<div><a href="' + window.location + '/' + child + '">' + child + '</a></div>');
                 });
             } else if (key === 'call_percentages') {
-                var calls = data[key];
-                var callId;
-                var callName;
+                var callPercentages = data[key];
+                var forAgainst;
+                var $allCallsWrapper =$('<div class="container-fluid"></div>');
+                var $allCalls = $('<div class="row"></div>')
+                for (forAgainst in callPercentages) {
+                    var calls = callPercentages[forAgainst];
+                    var callId;
+                    var callName;
+                    var callPercent;
+                    var style;
+                    title = 'Actions';
 
-                for (callId in calls) {
-                    callName = callNames[callId];
-                    callPercent = calls[callId];
-                    $display.append('<div><span>' + callName + '</span> : <span>' + callPercent + '</span></div>');
+                    if (forAgainst === 'for') {
+                        title = 'Actions For';
+                    } else if (forAgainst === 'against') {
+                        title = 'Actions Against';
+                    }
+
+                    var $calls = $('<div class="col calls"></div>');
+                    $calls.append('<h5>' + title + '</h5>');
+
+                    for (callId in calls) {
+                        callName = callNames[callId];
+                        callPercent = Math.round(calls[callId] * 100);
+                        style = "width: " + callPercent + "%;";
+                        $calls.append('<div><span>' + callName + '</span> : <span class="graph-bar" style="' + style + '">' + callPercent + '%</span></div>');
+                    }
+
+                    $allCalls.append($calls);
                 }
+
+                $allCallsWrapper.append($allCalls);
+                $display.append($allCallsWrapper);
             } else {
                 var value = data[key];
                 if (typeof value === 'object') {
                     value = JSON.stringify(value);
                 }
-                var title = key.charAt(0).toUpperCase() + key.slice(1);
+                title = key.charAt(0).toUpperCase() + key.slice(1);
                 title = title.replace(/_/g, " ");
 
                 $display.append('<div><span>' + title + '</span> : <span>' + value + '</span></div>');

@@ -69,6 +69,7 @@ class Fencer extends Model
     public $attachOne = [];
     public $attachMany = [];
 
+    public $cacheMinutes = 30;
 
     /**
      * Generate a unique cache key to cache actions
@@ -93,11 +94,10 @@ class Fencer extends Model
      */
     public function getActionsAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':actions', 15, function () {
+        return Cache::remember($this->cacheKey() . ':actions', $this->cacheMinutes, function () {
             return $this->getActions();
         });
     }
-
 
 
     /**
@@ -128,6 +128,10 @@ class Fencer extends Model
             if ($topVote !== false && $topVote->priorityId === Action::LEFT_FENCER_ID) {
                 $returnCollection->push($action);
             }
+
+            if ($topVote !== false && $topVote->callId === Call::SIMULTANEOUS_ID) {
+                $returnCollection->push($action);
+            }
         }
 
         $rightActions = $this
@@ -149,9 +153,101 @@ class Fencer extends Model
                 $returnCollection->push($action);
             }
 
+            if ($topVote !== false && $topVote->callId === Call::SIMULTANEOUS_ID) {
+                $returnCollection->push($action);
+            }
         }
 
         return $returnCollection;
+    }
+
+
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getActionsAgainstAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':actionsAgainst', $this->cacheMinutes, function () {
+            return $this->getActionsAgainst();
+        });
+    }
+
+
+    /**
+     * Gets all the fencers actions
+     *
+     * @return Action[]|Collection
+     */
+    public function getActionsAgainst()
+    {
+        $returnCollection = new Collection();
+
+        $leftActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'left_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+
+        /* @var Action $action */
+        foreach ($leftActions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+
+            if ($topVote !== false && $topVote->priorityId === Action::RIGHT_FENCER_ID) {
+                $returnCollection->push($action);
+            }
+
+            if ($topVote !== false && $topVote->callId === Call::SIMULTANEOUS_ID) {
+                $returnCollection->push($action);
+            }
+        }
+
+        $rightActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'right_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+        /* @var Action $action */
+        foreach ($rightActions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+
+            if ($topVote !== false && $topVote->priorityId === Action::LEFT_FENCER_ID) {
+                $returnCollection->push($action);
+            }
+
+            if ($topVote !== false && $topVote->callId === Call::SIMULTANEOUS_ID) {
+                $returnCollection->push($action);
+            }
+        }
+
+        return $returnCollection;
+    }
+
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getCallPercentagesAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':callPercentages', $this->cacheMinutes, function () {
+            return $this->getCallPercentages();
+        });
     }
 
 
@@ -189,6 +285,52 @@ class Fencer extends Model
         return $calls;
     }
 
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getCallPercentagesAgainstAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':callPercentagesAgainst', $this->cacheMinutes, function () {
+            return $this->getCallPercentagesAgainst();
+        });
+    }
+
+    public function getCallPercentagesAgainst()
+    {
+        $actions = $this->getActionsAgainstAttribute();
+
+        $totalNumberOfActions = count($actions);
+
+        if ($totalNumberOfActions === 0) {
+            return [];
+        }
+
+        $calls = [
+            Call::ATTACK_ID => 0,
+            Call::COUNTER_ATTACK_ID => 0,
+            Call::RIPOSTE_ID => 0,
+            Call::REMISE_ID => 0,
+            Call::LINE_ID => 0,
+            Call::OTHER_ID => 0,
+            Call::SIMULTANEOUS_ID => 0,
+        ];
+
+        foreach ($actions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+            if (isset($calls[$topVote->callId])) {
+                $calls[$topVote->callId] += 1;
+            }
+        }
+
+        foreach ($calls as $callId => $call) {
+            $calls[$callId] = number_format(($call / $totalNumberOfActions), 3);
+        }
+
+        return $calls;
+    }
 
 
 

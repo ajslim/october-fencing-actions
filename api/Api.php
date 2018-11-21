@@ -31,7 +31,8 @@ class Api extends Controller
     public function makeFencerResponse(Fencer $fencer, $children)
     {
 
-        $calls = $fencer->getCallPercentages();
+        $calls = $fencer->getCallPercentagesAttribute();
+        $callsAgainst = $fencer->getCallPercentagesAgainstAttribute();
         $response = [
             'id' => $fencer->id,
             'last_name' => $fencer->last_name,
@@ -43,7 +44,10 @@ class Api extends Controller
             'birth' => $fencer->birth,
             'highest_rank' => $fencer->highest_rank,
             'primary_weapon' => $fencer->primary_weapon,
-            'call_percentages' => $calls,
+            'call_percentages' => [
+                'for' => $calls,
+                'against' => $callsAgainst,
+            ],
             'created_at' => $fencer->created_at,
             'updated_at' => $fencer->created_at,
             'children' => $children,

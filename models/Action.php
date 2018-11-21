@@ -73,6 +73,8 @@ class Action extends Model
     public $attachMany = [];
 
 
+    public $cacheMinutes = 30;
+
     /**
      * Generate a unique cache key to cache actions
      *
@@ -96,7 +98,7 @@ class Action extends Model
      */
     public function getCachedCallsArray()
     {
-        return Cache::remember($this->cacheKey() . ':callsArray', 15, function () {
+        return Cache::remember($this->cacheKey() . ':callsArray', $this->cacheMinutes, function () {
             return $this->getCallsArray();
         });
     }
@@ -188,7 +190,7 @@ class Action extends Model
      */
     public function getTopVoteAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':topVote', 15, function () {
+        return Cache::remember($this->cacheKey() . ':topVote', $this->cacheMinutes, function () {
             return $this->getTopVote();
         });
     }
@@ -243,7 +245,7 @@ class Action extends Model
      */
     public function getAverageDifficultyRatingAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':averageDifficultyRating', 15, function () {
+        return Cache::remember($this->cacheKey() . ':averageDifficultyRating', $this->cacheMinutes, function () {
             return $this->getAverageDifficultyRating();
         });
     }
@@ -273,7 +275,7 @@ class Action extends Model
      */
     public function getHighestVoteCountAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':getHighestVoteCount', 15, function () {
+        return Cache::remember($this->cacheKey() . ':getHighestVoteCount', $this->cacheMinutes, function () {
             return $this->getHighestVoteCount();
         });
     }
@@ -327,7 +329,7 @@ class Action extends Model
      */
     public function getCallVotesAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':callVotes', 15, function () {
+        return Cache::remember($this->cacheKey() . ':callVotes', $this->cacheMinutes, function () {
             return $this->getCallVotes();
         });
     }

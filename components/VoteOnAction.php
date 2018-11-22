@@ -170,14 +170,17 @@ class VoteOnAction extends ComponentBase
 
         /** @var User $user */
         if ($user) {
-            $vote = Vote::updateOrCreate(
+            $vote = Vote::firstOrNew(
                 [
+                    'user_id' => $user->id,
                     'action_id' => $actionId,
-                    'user_id' => $user->id
                 ]
             );
 
-            if ($user->hasPermission(['ajslim.fencingactions.fie'])) {
+            if (
+                $user->hasPermission(['ajslim.fencingactions.fie'])
+                && $user->id !== 1
+            ) {
                 $vote->referee_level = 'fie';
             }
         } else {
@@ -343,7 +346,9 @@ class VoteOnAction extends ComponentBase
         $user = BackendAuth::getUser();
 
         if ($user) {
-            if ($user->hasPermission(['ajslim.fencingactions.fie'])) {
+            if ($user->hasPermission(['ajslim.fencingactions.fie'])
+                && $user->id !== 1
+            ) {
                 $this->page['fie'] = true;
             }
         }

@@ -25,7 +25,7 @@ class Vote extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = ['action_id'];
+    protected $fillable = ['action_id', 'user_id'];
 
     /**
      * @var array Relations

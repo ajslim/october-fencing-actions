@@ -4,6 +4,8 @@ use Ajslim\FencingActions\Models\Action;
 use Ajslim\Fencingactions\Models\Vote;
 use Ajslim\Fencingactions\Models\Call;
 use Ajslim\Fencingactions\Models\VoteComment;
+use Backend\Facades\BackendAuth;
+use Backend\Models\User;
 use Cms\Classes\ComponentBase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -147,7 +149,7 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private function saveVote($actionId)
+    private function saveVote($actionId, $user)
     {
         $post = Input::post();
 
@@ -165,11 +167,26 @@ class VoteOnAction extends ComponentBase
             Session::put('newAction', true);
         }
 
-        $vote = Vote::create(
-            [
-                'action_id' => $actionId
-            ]
-        );
+
+        /** @var User $user */
+        if ($user) {
+            $vote = Vote::updateOrCreate(
+                [
+                    'action_id' => $actionId,
+                    'user_id' => $user->id
+                ]
+            );
+
+            if ($user->hasPermission(['ajslim.fencingactions.fie'])) {
+                $vote->referee_level = 'fie';
+            }
+        } else {
+            $vote = Vote::create(
+                [
+                    'action_id' => $actionId
+                ]
+            );
+        }
 
         if (isset($post['priority']) === true
             && isset($post['call']) === true
@@ -323,6 +340,14 @@ class VoteOnAction extends ComponentBase
 
     public function onRun()
     {
+        $user = BackendAuth::getUser();
+
+        if ($user) {
+            if ($user->hasPermission(['ajslim.fencingactions.fie'])) {
+                $this->page['fie'] = true;
+            }
+        }
+
         $post = Input::post();
         $get = Input::get();
 
@@ -333,7 +358,7 @@ class VoteOnAction extends ComponentBase
         // If vote form was submitted
         if (isset($post['action-id']) === true) {
             $actionId = $post['action-id'];
-            $this->saveVote($actionId);
+            $this->saveVote($actionId, $user);
             return Redirect::to("/?id=$actionId&results=true");
         } else {
             $action = $this->getAction();

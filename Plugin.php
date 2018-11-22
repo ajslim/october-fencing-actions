@@ -82,6 +82,10 @@ class Plugin extends PluginBase
                 'tab' => 'FencingActions',
                 'label' => 'View Permissions'
             ],
+            'ajslim.fencingactions.fie' => [
+                'tab' => 'FencingActions',
+                'label' => 'FIE Referee'
+            ],
         ];
     }
 

@@ -31,6 +31,12 @@ class CreateVotesTable extends Migration
             $table->string('ip_address')
                 ->nullable();
 
+            $table->string('referee_level')
+                ->nullable();
+
+            $table->integer('user_id')
+                ->nullable();
+
             $table->timestamps();
         });
     }

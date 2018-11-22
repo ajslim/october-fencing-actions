@@ -4,6 +4,8 @@ use Model;
 
 /**
  * vote Model
+ *
+ * @mixin \Eloquent
  */
 class Vote extends Model
 {

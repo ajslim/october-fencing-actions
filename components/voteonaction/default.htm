@@ -147,7 +147,11 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Quarte Riposte</a>
+            <a class="navbar-brand" href="/">Quarte Riposte
+                {% if fie is defined %}
+                : FIE
+                {% endif %}
+            </a>
 
             <div class="nav navbar-nav navbar-right">
                 {% if trophy is defined and trophy is not null %}

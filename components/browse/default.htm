@@ -19,6 +19,21 @@
             padding: 10px 0;
             border: 1px solid lightgray;
         }
+
+        .loader {
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin:20px auto;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -61,6 +76,7 @@
 
     <div class="container-fluid">
         <div id="message"></div>
+        <div id="loader"></div>
         <table id="list" class="display dt-responsive no-wrap" width="100%"></table>
         <div id="display"></div>
     </div>

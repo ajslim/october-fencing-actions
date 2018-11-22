@@ -12,9 +12,6 @@
         7: 'Simultaneous'
     };
 
-
-
-
     function displayObject(data) {
         var $display = $('#display');
 
@@ -79,6 +76,7 @@
         var resource = endpointArray[endpointArray.length - 1];
         var columns = [];
         var $list = $('#list');
+
         Object.keys(firstRecord).forEach(function (key, index) {
             var title = key.charAt(0).toUpperCase() + key.slice(1);
             title = title.replace(/_/g, " ");
@@ -120,7 +118,7 @@
 
         var $table = $list.DataTable({
             "columns": columns,
-            "ajax": endpoint,
+            "data": data,
             "responsive": true,
             "dom": 'Bfrtip',
             "buttons": [
@@ -157,12 +155,18 @@
 
     $(document).ready(function () {
 
+        var $loader = $('#loader');
+        $loader.append('<div class="loader"></div>');
+
+
         // Get root data
         $.ajax({
             'url': endpoint,
             'data': {},
             'dataType': 'json',
             'success': function (response) {
+                $loader.html('');
+
                 if (response.data !== undefined) {
                     if (response.data.length === 0) {
                         $('#message').html(
@@ -175,6 +179,10 @@
                 } else {
                     displayObject(response);
                 }
+            },
+            'error': function (jqXHR, textStatus, errorThrown) {
+                $loader.html('');
+                $('#message').html('Something went wrong: ' + textStatus);
             }
         });
     });

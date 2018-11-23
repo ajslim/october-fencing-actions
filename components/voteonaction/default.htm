@@ -136,6 +136,18 @@
         box-shadow: none;
     }
 
+
+    .qrnav.navbar,
+    .qrnav.navbar .container-fluid,
+    .qrnav.navbar .container-fluid .navbar-brand
+    {
+        padding-top:0;
+        padding-bottom:0;
+    }
+
+    .qrnav.navbar {
+        padding-top: 2px;
+    }
 </style>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -145,11 +157,12 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="qrnav navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Quarte Riposte
+            <a class="navbar-brand" href="/">
+                <img src="/plugins/ajslim/fencingactions/assets/quarte-riposte-white.svg" height="50"/>
                 {% if fie is defined %}
-                : FIE
+                FIE
                 {% endif %}
             </a>
 

@@ -32,6 +32,8 @@
                     var callId;
                     var callName;
                     var callPercent;
+                    var differenceFromAverage;
+                    var differenceStyle;
                     var style;
                     title = 'Actions';
 
@@ -40,7 +42,7 @@
                     } else if (forAgainst === 'against') {
                         title = 'Actions Against';
                     } else if (forAgainst === 'average_fencer') {
-                        title = 'Average across all fencers';
+                        continue;
                     }
 
                     var $calls = $('<div class="col-md-6 calls"></div>');
@@ -49,8 +51,27 @@
                     for (callId in calls) {
                         callName = callNames[callId];
                         callPercent = Math.round(calls[callId] * 100);
-                        style = "width: " + callPercent + "%;";
-                        $calls.append('<div><span>' + callName + '</span> : <span class="graph-bar" style="' + style + '">' + callPercent + '%</span></div>');
+                        differenceFromAverage = Math.round((calls[callId] - callPercentages['average_fencer'][callId]) * 100);
+                        differenceStyle = 'color: gray;';
+                        if (differenceFromAverage > 0) {
+                            differenceStyle = 'color: green;';
+                        } else if (differenceFromAverage < 0) {
+                            differenceStyle = 'color: darkblue;';
+                        }
+                        style = "width: " + callPercent + "%; white-space: nowrap;";
+                        $calls.append(
+                            '<div><span>'
+                            + callName
+                            + '</span> : <div class="graph-bar" style="'
+                            + style
+                            + '">'
+                            + callPercent
+                            + '%'
+                            + ' <span style="'
+                            + differenceStyle
+                            +'">('
+                            + differenceFromAverage
+                            + '%)</span></div></div>');
                     }
 
                     $allCalls.append($calls);

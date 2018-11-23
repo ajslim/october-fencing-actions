@@ -79,6 +79,8 @@
 
                 $allCallsWrapper.append($allCalls);
                 $display.append($allCallsWrapper);
+            } else if (key === 'photo_url') {
+                $display.append('<div><img height="80" src="' +  data[key] + '"></div>');
             } else {
                 var value = data[key];
                 if (typeof value === 'object') {

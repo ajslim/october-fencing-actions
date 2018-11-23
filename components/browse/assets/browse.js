@@ -39,9 +39,11 @@
                         title = 'Actions For';
                     } else if (forAgainst === 'against') {
                         title = 'Actions Against';
+                    } else if (forAgainst === 'average_fencer') {
+                        title = 'Average across all fencers';
                     }
 
-                    var $calls = $('<div class="col-md calls"></div>');
+                    var $calls = $('<div class="col-md-6 calls"></div>');
                     $calls.append('<h5>' + title + '</h5>');
 
                     for (callId in calls) {

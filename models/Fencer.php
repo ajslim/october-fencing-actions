@@ -87,15 +87,74 @@ class Fencer extends Model
     }
 
 
+    public function getAllFencersAverageActionsFor()
+    {
+        $returnCollection = new Collection();
+        $allFencers = Fencer::all();
+        foreach ($allFencers as $fencer) {
+            $returnCollection = $returnCollection->merge($fencer->getActionsForAttribute());
+        }
+        return $returnCollection;
+    }
+
     /**
      * Returns the calls array using a cache
      *
      * @return Collection
      */
-    public function getActionsAttribute()
+    public function getAllFencersAverageActionsCallPercentagesAttribute()
+    {
+        // This doesn't use the cache key, and will re run every 30 minutes
+        return Cache::remember('allFencersAverageCallPercentages', 30, function () {
+            return $this->getAllFencersAverageActionsCallPercentages();
+        });
+    }
+
+    public function getAllFencersAverageActionsCallPercentages()
+    {
+        $actions = $this->getAllFencersAverageActionsFor();
+
+        $totalNumberOfActions = count($actions);
+
+        if ($totalNumberOfActions === 0) {
+            return [];
+        }
+
+        $calls = [
+            Call::ATTACK_ID => 0,
+            Call::COUNTER_ATTACK_ID => 0,
+            Call::RIPOSTE_ID => 0,
+            Call::REMISE_ID => 0,
+            Call::LINE_ID => 0,
+            Call::OTHER_ID => 0,
+            Call::SIMULTANEOUS_ID => 0,
+        ];
+
+        foreach ($actions as $action) {
+            $topVote = $action->getTopVoteAttribute();
+            if (isset($calls[$topVote->callId])) {
+                $calls[$topVote->callId] += 1;
+            }
+        }
+
+        foreach ($calls as $callId => $call) {
+            $calls[$callId] = number_format(($call / $totalNumberOfActions), 3);
+        }
+
+        return $calls;
+    }
+
+
+
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getActionsForAttribute()
     {
         return Cache::remember($this->cacheKey() . ':actions', $this->cacheMinutes, function () {
-            return $this->getActions();
+            return $this->getActionsFor();
         });
     }
 
@@ -105,7 +164,7 @@ class Fencer extends Model
      *
      * @return Action[]|Collection
      */
-    public function getActions()
+    public function getActionsFor()
     {
         $returnCollection = new Collection();
 
@@ -253,7 +312,7 @@ class Fencer extends Model
 
     public function getCallPercentages()
     {
-        $actions = $this->getActionsAttribute();
+        $actions = $this->getActionsForAttribute();
 
         $totalNumberOfActions = count($actions);
 

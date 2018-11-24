@@ -104,7 +104,7 @@ class Action extends Model
     public function getVerifiedVoteAttribute()
     {
         return Cache::remember($this->cacheKey() . ':verifiedCall', $this->cacheMinutes, function () {
-            return $this->getVerifiedCall();
+            return $this->getVerifiedVote();
         });
     }
 
@@ -115,7 +115,7 @@ class Action extends Model
      *
      * @return bool|Vote
      */
-    public function getVerifiedCall()
+    public function getVerifiedVote()
     {
         $fieConsensus = $this->getFieConsensusVoteAttribute();
         if ($fieConsensus !== false) {
@@ -198,7 +198,7 @@ class Action extends Model
         $lowest = false;
         foreach ($fieVotes as $fieVote) {
             if ($lowest === false || $fieVote->difficulty < $lowest) {
-                $lowest = $fieVote;
+                $lowest = $fieVote->difficulty;
             }
         }
 

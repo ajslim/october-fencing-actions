@@ -79,60 +79,44 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private static function sqlToActionArray($sql)
+    private function getActions()
     {
-        $actionArray = DB::connection('business')->select($sql);
-        $idArray = array_map(function($element) { return $element->id; }, $actionArray);
-        return Action::find($idArray);
+        return Action::whereDoesntHave('votes', function ($query) {
+            $query->where('vote_comment_id', 2);
+        })->get();
     }
 
-    private function getActionsWithMinimumVotes($minimumVotes)
+
+    private function getDifficultActions()
     {
-        $actionArray = DB::connection('business')->select('
-            SELECT ajslim_fencingactions_actions.id, COUNT(ajslim_fencingactions_votes.id) as VoteCount
-	          FROM ajslim_fencingactions_actions
-		        LEFT OUTER JOIN 
-		            (
-		              SELECT * FROM ajslim_fencingactions_votes
-		              WHERE vote_comment_id = 1
-		            ) 
-		            AS ajslim_fencingactions_votes
-		          ON ajslim_fencingactions_actions.id = ajslim_fencingactions_votes.action_id
-		        GROUP BY ajslim_fencingactions_actions.id
-		        HAVING VoteCount >= ?
-        ', [$minimumVotes]);
-
-        $idArray = [];
-        if (count($actionArray) > 0) {
-            $idArray = array_map(function ($element) {
-                return $element->id;
-            }, $actionArray);
-        }
-        return Action::find($idArray);
+        return Action::all()->filter(function ($action) {
+            /** @var Action $action */
+            return (count($action->votes) > 0 && $action->getConfidenceAttribute() < 0.5);
+        });
     }
-
 
     private function getActionsWithNoVotes()
     {
-        $query = '
-          SELECT id 
-            FROM ajslim_fencingactions_actions actions 
-            WHERE NOT EXISTS (
-              SELECT * 
-                FROM ajslim_fencingactions_votes votes 
-                WHERE votes.action_id = actions.id
-            );
-        ';
-
-        return self::sqlToActionArray($query);
+        return Action::doesnthave('votes')->get();
     }
 
-
-    private function getRandomActionFromCollection(Collection $collection)
+    private function getVerifiedActions()
     {
-        $totalNumberOfActions = count($collection);
-        $actionIndex = rand(1, $totalNumberOfActions) - 1;
-        return $collection->get($actionIndex);
+        $fieActions = Action::whereHas('votes', function ($query) {
+            $query->where('referee_level', 'fie')
+                ->where('vote_comment_id', '!=', 2);
+        })->get();
+
+        $actionsWithVerifierVotes = Action::whereHas('votes', function ($query) {
+            $query->where('referee_level', 'verifier')
+                ->where('vote_comment_id', '!=', 2);
+        })->get();
+
+        $verifiedActions = $actionsWithVerifierVotes->filter(function ($action) {
+            return $action->getVerifiedVoteAttribute() !== false;
+        });
+
+        return $fieActions->merge($verifiedActions);
     }
 
 
@@ -238,30 +222,47 @@ class VoteOnAction extends ComponentBase
         } else if (isset($get['action-id'])) {
             $actionId = $get['action-id'];
             $action = Action::find($actionId);
-        } else if (isset($get['minvotes'])) {
-            $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
-
-            // Just retry once, if they get another non action, they can label it
-            if ($action->getIsNotActionAttribute() === true) {
-                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-            }
+        } else if (isset($get['verified'])) {
+            $action = $this->getVerifiedActions()->random();
+            $this->page['verified'] = true;
+        } else if (isset($get['difficult'])) {
+            $action = $this->getDifficultActions()->random();
+            $this->page['difficult'] = true;
+        } else if (isset($get['fresh'])) {
+            $action = $this->getActionsWithNoVotes()->random();
+            $this->page['fresh'] = true;
         } else {
-            $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+            $fieVoteCount = Session::get('fieVoteCount', 0);
 
-            // Just retry once, if they get another non action, they can label it
-            if ($action->getIsNotActionAttribute() === true) {
-                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+            // Voters must get 2 verified actions right to get non-verified actions
+            // Voters who are not verified will have 2/3 of their actions verified
+            // 'verifier' voters will get 1/4 of their actions as verified
+            // 'verifier' users will get 1/4 of their actions as fresh too
+            if ($fieVoteCount < 3) {
+                $action = $this->getVerifiedActions()->random();
+            } else if ($fieVoteCount < 10) {
+                $random = rand(1, 3);
+                if ($random === 1) {
+                    $action = $this->getActions()->random();
+                } else {
+                    $action = $this->getVerifiedActions()->random();
+                }
+            } else {
+                $random = rand(1, 4);
+                if ($random === 1) {
+                    $action = $this->getVerifiedActions()->random();
+                } else if ($random === 2) {
+                    $action = $this->getActionsWithNoVotes()->random();
+                } else {
+                    $action = $this->getActions()->random();
+                }
             }
         }
 
         if ($action === null) {
-            $this->warnings[] = "No actions found with that many votes";
-            $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
+            $this->warnings[] = "No actions found";
 
-            // Just retry once, if they get another non action, they can label it
-            if ($action->getIsNotActionAttribute() === true) {
-                $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
-            }
+            $action = $this->getRandomActionFromCollection($this->getActions());
         }
 
         $this->action = $action;
@@ -300,6 +301,7 @@ class VoteOnAction extends ComponentBase
     {
         $fieVoteCount = Session::get('fieVoteCount', 0);
         $fieVoteCount += $count;
+
         if ($fieVoteCount < 0) {
             Session::put('fieVoteCount', 0);
         } else if ($fieVoteCount > 15) {
@@ -432,6 +434,7 @@ class VoteOnAction extends ComponentBase
 
         if (Session::get('fieVoteCount', 0) >= 10) {
             $this->referee_level = 'verifier';
+            $this->page['verifier'] = true;
         }
 
         if ($this->user) {

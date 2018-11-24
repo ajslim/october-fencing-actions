@@ -106,14 +106,8 @@
         color: white;
     }
 
-    .minvotes-label {
-        border:0;
-        margin: 0;
-    }
-
-    #minvotes {
+    .action-types input[type=checkbox]{
         display:inline;
-        width: 50px;
     }
 
     @media screen and (min-width: 992px ) {
@@ -162,7 +156,7 @@
             <a class="navbar-brand" href="/">
                 <img src="/plugins/ajslim/fencingactions/assets/quarte-riposte-white.svg" height="50"/>
                 {% if fie is defined %}
-                FIE
+                    FIE
                 {% endif %}
             </a>
 
@@ -457,13 +451,25 @@
     </div>
     <hr>
     <form action="/" method="get">
-        <div class="container-fluid">
+        <div class="container-fluid action-types">
             <div class="row">
+                {% if (fie is defined and fie) or (verifier is defined and verifier) %}
+                    <div class="col">
+                        <label class="fresh-label" for="fresh">
+                            <input type="checkbox" id="fresh" {% if fresh is defined %}checked="checked"{% endif %} name="fresh"/> Fresh
+                        </label>
+                    </div>
+                {% endif %}
                 <div class="col">
-                    <label class="minvotes-label" for="minvotes">
-                        Min-Votes:
-                        <input type="number" id="minvotes" value="{{ minvotes }}" name="minvotes"/>
-                    </label>
+                    {% if fie is defined %}
+                        <label class="difficult-label" for="difficult">
+                            <input type="checkbox" id="difficult" {% if difficult is defined %}checked="checked"{% endif %} name="difficult"/> Difficult
+                        </label>
+                    {% else %}
+                        <label class="verified-label" for="verified">
+                            <input type="checkbox" id="verified" {% if verified is defined %}checked="checked"{% endif %} name="verified"/> Verfied
+                        </label>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <label class="next-action">

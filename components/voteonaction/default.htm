@@ -241,7 +241,7 @@
             {% if voteForm == true %}
             <div class="col-lg-6">
                 <div class="vote-form">
-                    {{ form_open() }}
+                    {{ form_open({url: '?id=' ~ actionId ~ '&results=true'}) }}
                         <input type="hidden" name="action-id" value="{{ actionId }}" />
                         <input type="hidden" name="submit-vote" value="true" />
 

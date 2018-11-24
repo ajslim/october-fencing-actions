@@ -4,6 +4,7 @@ use Ajslim\FencingActions\Models\Action;
 use Ajslim\Fencingactions\Models\Vote;
 use Ajslim\Fencingactions\Models\Call;
 use Ajslim\Fencingactions\Models\VoteComment;
+
 use Backend\Facades\BackendAuth;
 use Backend\Models\User;
 use Cms\Classes\ComponentBase;
@@ -11,10 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
-
 
 class VoteOnAction extends ComponentBase
 {
@@ -220,6 +218,7 @@ class VoteOnAction extends ComponentBase
         $vote->ip_address = $_SERVER['REMOTE_ADDR'];
 
         $vote->save();
+        $this->action->refresh();
     }
 
 
@@ -270,13 +269,6 @@ class VoteOnAction extends ComponentBase
 
         $this->page['votes'] = $votes;
 
-        $voteComments = VoteComment::all();
-        $voteCommentsArray = [];
-        foreach ($voteComments as $voteComment) {
-            $voteCommentsArray[$voteComment->id] = $voteComment->name;
-        }
-
-        $this->page['voteComments'] = $voteCommentsArray;
     }
 
 
@@ -346,6 +338,7 @@ class VoteOnAction extends ComponentBase
     private function showResults()
     {
         $this->addMotivationalMessage();
+        $this->addVotesToPage();
         $this->page['voteForm'] = false;
         $this->page['results'] = true;
         $verifiedCall = $this->action->getVerifiedCallAttribute();
@@ -369,6 +362,8 @@ class VoteOnAction extends ComponentBase
 
     private function addGenericPageVariables()
     {
+        $get = Input::get();
+
         if ($this->user) {
             if ($this->user->hasPermission(['ajslim.fencingactions.fie'])
                 && $this->user->id !== 1
@@ -377,8 +372,19 @@ class VoteOnAction extends ComponentBase
             }
         }
 
+        if (isset($get['minvotes'])) {
+            $this->page['minvotes'] = $get['minvotes'];
+        }
+
+        $voteComments = VoteComment::all();
+        $voteCommentsArray = [];
+        foreach ($voteComments as $voteComment) {
+            $voteCommentsArray[$voteComment->id] = $voteComment->name;
+        }
+
+        $this->page['voteComments'] = $voteCommentsArray;
+
         $this->page['trophy'] = Session::get('newActionTrophy');
-        $this->addVotesToPage();
         $this->addBoutAndActionDetailsToPage();
     }
 
@@ -391,15 +397,10 @@ class VoteOnAction extends ComponentBase
         $post = Input::post();
         $get = Input::get();
 
-        if (isset($get['minvotes'])) {
-            $this->page['minvotes'] = $get['minvotes'];
-        }
-
         // If vote form was submitted
         if (isset($post['submit-vote']) === true) {
             $this->saveVote();
-            $actionId = $this->action->id;
-            return Redirect::to("/?id=$actionId&results=true");
+            $this->showResults();
         } else {
             // If results page
             if (isset($get['results'])) {

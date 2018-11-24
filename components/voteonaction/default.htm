@@ -35,7 +35,7 @@
         display: block;
     }
 
-    input[type='radio'], input[type='submit'] {
+    input[type='radio'], input[type='submit'], input[type='checkbox'] {
         display: none;
     }
 
@@ -451,19 +451,22 @@
             <div class="row">
                 {% if (fie is defined and fie) or (verifier is defined and verifier) %}
                     <div class="col">
+                        <input type="checkbox" id="fresh" {% if fresh is defined %}checked="checked"{% endif %} name="fresh"/>
                         <label class="fresh-label" for="fresh">
-                            <input type="checkbox" id="fresh" {% if fresh is defined %}checked="checked"{% endif %} name="fresh"/> Fresh
+                            Fresh
                         </label>
                     </div>
                 {% endif %}
                 <div class="col">
                     {% if fie is defined %}
+                        <input type="checkbox" id="difficult" {% if difficult is defined %}checked="checked"{% endif %} name="difficult"/>
                         <label class="difficult-label" for="difficult">
-                            <input type="checkbox" id="difficult" {% if difficult is defined %}checked="checked"{% endif %} name="difficult"/> Difficult
+                            Difficult
                         </label>
                     {% else %}
-                        <label class="onlyverified-label" for="verified">
-                            <input type="checkbox" id="onlyverified" {% if onlyverified is defined %}checked="checked"{% endif %} name="onlyverified"/> Verfied
+                        <input type="checkbox" id="onlyverified" {% if onlyverified is defined %}checked="checked"{% endif %} name="onlyverified"/>
+                        <label class="onlyverified-label" for="onlyverified">
+                            Verified
                         </label>
                     {% endif %}
                 </div>

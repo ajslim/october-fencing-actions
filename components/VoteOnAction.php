@@ -222,9 +222,9 @@ class VoteOnAction extends ComponentBase
         } else if (isset($get['action-id'])) {
             $actionId = $get['action-id'];
             $action = Action::find($actionId);
-        } else if (isset($get['verified'])) {
+        } else if (isset($get['onlyverified'])) {
             $action = $this->getVerifiedActions()->random();
-            $this->page['verified'] = true;
+            $this->page['onlyverified'] = true;
         } else if (isset($get['difficult'])) {
             $action = $this->getDifficultActions()->random();
             $this->page['difficult'] = true;

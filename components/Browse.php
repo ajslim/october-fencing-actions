@@ -4,6 +4,7 @@ use Ajslim\FencingActions\Models\Action;
 use Ajslim\Fencingactions\Models\Vote;
 use Ajslim\Fencingactions\Models\Call;
 use Ajslim\Fencingactions\Models\VoteComment;
+use Backend\Facades\BackendAuth;
 use Cms\Classes\ComponentBase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,11 @@ class Browse extends ComponentBase
 
     public function onRun()
     {
+        $user = BackendAuth::getUser();
+        if ($user) {
+            $this->page['userId'] = $user->id;
+        }
+
     }
 
 

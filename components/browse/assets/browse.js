@@ -1,6 +1,10 @@
 (function browse() {
     var url = new URL(window.location);
     var resource = url.searchParams.get("u");
+    if (resource === 'myactions' && typeof userId !== 'undefined') {
+        resource = 'useractions/' + userId;
+    }
+
     var endpoint = '/api/' + resource;
     var callNames = {
         1: 'Attack',

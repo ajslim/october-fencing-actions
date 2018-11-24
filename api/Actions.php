@@ -34,4 +34,17 @@ class Actions extends Api
 
         return $this->makeDataTablesActionResponse(Action::all());
     }
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
+    public function userActions(
+        $userId
+    ) {
+        return $this->makeDataTablesActionResponse(Action::whereHas('votes', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get());
+    }
 }

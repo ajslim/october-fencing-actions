@@ -25,5 +25,13 @@ Route::group(
                 'uses' =>'Ajslim\FencingActions\Api\Actions@index',
             ]
         );
+
+        Route::get(
+            'useractions/{userId}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Actions@userActions',
+            ]
+        );
+
     }
 );

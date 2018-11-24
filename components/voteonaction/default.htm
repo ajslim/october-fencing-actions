@@ -180,22 +180,34 @@
         </div>
     </nav>
 
-
-
-    {% if warning is defined and warning is not null %}
-        <div class="container-fluid">
-            <div class="alert alert-danger" role="alert">
-                {{ warning }}
+    {% if infoMessages is defined and warnings is not null %}
+        {% for message in infoMessages %}
+            <div class="container-fluid">
+                <div class="alert alert-info" role="alert">
+                    {{ message|raw }}
+                </div>
             </div>
-        </div>
+        {% endfor %}
     {% endif %}
 
-    {% if message is defined and message is not null %}
-        <div class="container-fluid">
-            <div class="alert alert-success" role="alert">
-                {{ message|raw }}
+    {% if warnings is defined and warnings is not null %}
+        {% for warning in warnings %}
+            <div class="container-fluid">
+                <div class="alert alert-danger" role="alert">
+                    {{ warning|raw }}
+                </div>
             </div>
-        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if messages is defined and messages is not null %}
+        {% for message in messages %}
+            <div class="container-fluid">
+                <div class="alert alert-success" role="alert">
+                    {{ message|raw }}
+                </div>
+            </div>
+        {% endfor %}
     {% endif %}
 
 
@@ -239,208 +251,207 @@
             </div>
 
             {% if voteForm == true %}
-            <div class="col-lg-6">
-                <div class="vote-form">
-                    {{ form_open({url: '?id=' ~ actionId ~ '&results=true'}) }}
-                        <input type="hidden" name="action-id" value="{{ actionId }}" />
-                        <input type="hidden" name="submit-vote" value="true" />
+                <div class="col-lg-6">
+                    <div class="vote-form">
+                        {{ form_open({ url: '?id=' ~ actionId ~ '&results=true' }) }}
+                            <input type="hidden" name="action-id" value="{{ actionId }}" />
+                            <input type="hidden" name="submit-vote" value="true" />
 
-                        <h6 class="text-muted">Action For</h6>
-                        <div class="row">
-                            <div class="col text-center">
-                                <input id="priority-left" name="priority" type="radio" value="1">
-                                <label for="priority-left" class="test">
-                                    Left
-                                </label>
-                            </div>
-                            <div class="col text-center">
-                                <input id="priority-none" name="priority" type="radio" value="0"  checked="checked">
-                                <label for="priority-none" class="test">
-                                    - neither -
-                                </label>
-                            </div>
-                            <div class="col text-center">
-                                <input id="priority-right" name="priority" type="radio" value="2">
-                                <label for="priority-right">
-                                    Right
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="calls">
-                            <h6 class="text-muted">Call</h6>
+                            <h6 class="text-muted">Action For</h6>
                             <div class="row">
                                 <div class="col text-center">
-                                    <input id="call-attack" name="call" type="radio" value="1">
-                                    <label for="call-attack">
-                                        Attack
+                                    <input id="priority-left" name="priority" type="radio" value="1">
+                                    <label for="priority-left" class="test">
+                                        Left
                                     </label>
                                 </div>
                                 <div class="col text-center">
-                                    <input id="call-counter-attack" name="call" type="radio" value="2">
-                                    <label for="call-counter-attack">
-                                        Counter-Attack
+                                    <input id="priority-none" name="priority" type="radio" value="0"  checked="checked">
+                                    <label for="priority-none" class="test">
+                                        - neither -
+                                    </label>
+                                </div>
+                                <div class="col text-center">
+                                    <input id="priority-right" name="priority" type="radio" value="2">
+                                    <label for="priority-right">
+                                        Right
                                     </label>
                                 </div>
                             </div>
+
+                            <div class="calls">
+                                <h6 class="text-muted">Call</h6>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <input id="call-attack" name="call" type="radio" value="1">
+                                        <label for="call-attack">
+                                            Attack
+                                        </label>
+                                    </div>
+                                    <div class="col text-center">
+                                        <input id="call-counter-attack" name="call" type="radio" value="2">
+                                        <label for="call-counter-attack">
+                                            Counter-Attack
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <input id="call-riposte" name="call" type="radio" value="3">
+                                        <label for="call-riposte">
+                                            Riposte
+                                        </label>
+                                    </div>
+                                    <div class="col text-center">
+                                        <input id="call-remise" name="call" type="radio" value="4">
+                                        <label for="call-remise">
+                                            Remise
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <input id="call-line" name="call" type="radio" value="5">
+                                        <label for="call-line">
+                                            Line
+                                        </label>
+                                    </div>
+                                    <div class="col text-center">
+                                        <input id="call-other" name="call" type="radio" value="6">
+                                        <label for="call-other">
+                                            Unknown / Other
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <input id="call-simultaneous" name="call" type="radio" value="7">
+                                        <label for="call-simultaneous">
+                                            Simultaneous / Together
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="cards">
+                                <h6 class="text-muted">Card For</h6>
+                                <select id="card-for" name="card-for">
+                                    <option value="0">No Card</option>
+                                    <option value="1">Card For left</option>
+                                    <option value="2">Card For Right</option>
+                                </select>
+                            </div>
+
+                            <hr>
+
+                            <h6 class="text-muted">Difficulty / Certainty</h6>
+
                             <div class="row">
                                 <div class="col text-center">
-                                    <input id="call-riposte" name="call" type="radio" value="3">
-                                    <label for="call-riposte">
-                                        Riposte
+                                    <input id="difficulty-easy" name="difficulty" type="radio" value="1">
+                                    <label for="difficulty-easy" class="test">
+                                        Easy
+                                    </label>
+
+                                </div>
+                                <div class="col text-center">
+                                    <input id="difficulty-medium" name="difficulty" type="radio" value="2">
+                                    <label for="difficulty-medium">
+                                        Medium
                                     </label>
                                 </div>
                                 <div class="col text-center">
-                                    <input id="call-remise" name="call" type="radio" value="4">
-                                    <label for="call-remise">
-                                        Remise
+                                    <input id="difficulty-hard" name="difficulty" type="radio" value="3">
+                                    <label for="difficulty-hard">
+                                        Hard
                                     </label>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    <input id="call-line" name="call" type="radio" value="5">
-                                    <label for="call-line">
-                                        Line
-                                    </label>
-                                </div>
-                                <div class="col text-center">
-                                    <input id="call-other" name="call" type="radio" value="6">
-                                    <label for="call-other">
-                                        Unknown / Other
-                                    </label>
-                                </div>
+
+
+                            <h6 class="text-muted">Other</h6>
+                            <div class="other">
+                                {{ form_select(
+                                    'vote-comment',
+                                    voteComments
+                                ) }}
                             </div>
-                            <div class="row">
-                                <div class="col text-center">
-                                    <input id="call-simultaneous" name="call" type="radio" value="7">
-                                    <label for="call-simultaneous">
-                                        Simultaneous / Together
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
 
-                        <hr>
-
-                        <div class="cards">
-                            <h6 class="text-muted">Card For</h6>
-                            <select id="card-for" name="card-for">
-                                <option value="0">No Card</option>
-                                <option value="1">Card For left</option>
-                                <option value="2">Card For Right</option>
-                            </select>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="text-muted">Difficulty / Certainty</h6>
-
-                        <div class="row">
-                            <div class="col text-center">
-                                <input id="difficulty-easy" name="difficulty" type="radio" value="1">
-                                <label for="difficulty-easy" class="test">
-                                    Easy
-                                </label>
-
-                            </div>
-                            <div class="col text-center">
-                                <input id="difficulty-medium" name="difficulty" type="radio" value="2">
-                                <label for="difficulty-medium">
-                                    Medium
-                                </label>
-                            </div>
-                            <div class="col text-center">
-                                <input id="difficulty-hard" name="difficulty" type="radio" value="3">
-                                <label for="difficulty-hard">
-                                    Hard
-                                </label>
-                            </div>
-                        </div>
-
-
-                        <h6 class="text-muted">Other</h6>
-                        <div class="other">
-                            {{ form_select(
-                                'vote-comment',
-                                voteComments
-                            ) }}
-                        </div>
-
-                        <label class="submit">
-                            Submit
-                            {{ form_submit() }}
-                        </label>
-                    {{ form_close() }}
+                            <label class="submit">
+                                Submit
+                                {{ form_submit() }}
+                            </label>
+                        {{ form_close() }}
+                    </div>
                 </div>
-            </div>
             {% else %}
 
-            <div class="col-lg-6">
-                <h6 class="text-muted">Votes so far ({{ votes.total }})</h6>
-                <div class="row">
-                    <div class="col">
-                        <b>Left</b>
-                        {% for call, vote in votes.left %}
-                            <div>
-                                {{ call|capitalize }} : {{ vote }}
-                            </div>
-                            {% if votes.total > 0 %}
-                                <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    <div class="col">
-                        <b>Right</b>
-                        {% for call, vote in votes.right %}
-                            <div>
-                                {{ call|capitalize }} : {{ vote }}
-                            </div>
-                            {% if votes.total > 0 %}
-                                <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <b>Neither</b>
-
-                        <div>
-                            Simultaneous : {{ votes.simultaneous }}
+                <div class="col-lg-6">
+                    <h6 class="text-muted">Votes so far ({{ votes.total }})</h6>
+                    <div class="row">
+                        <div class="col">
+                            <b>Left</b>
+                            {% for call, vote in votes.left %}
+                                <div>
+                                    {{ call|capitalize }} : {{ vote }}
+                                </div>
+                                {% if votes.total > 0 %}
+                                    <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
-
-                        {% if votes.total > 0 %}
-                            <div class="graph-bar" style="width: {{ (votes.simultaneous / votes.total) * 100 }}%;">{{ ((votes.simultaneous  / votes.total) * 100)|round }}%</div>
-                        {% endif %}
-
+                        <div class="col">
+                            <b>Right</b>
+                            {% for call, vote in votes.right %}
+                                <div>
+                                    {{ call|capitalize }} : {{ vote }}
+                                </div>
+                                {% if votes.total > 0 %}
+                                    <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="col">
+
+                    <div class="row">
+                        <div class="col">
+                            <b>Neither</b>
+
+                            <div>
+                                Simultaneous : {{ votes.simultaneous }}
+                            </div>
+
+                            {% if votes.total > 0 %}
+                                <div class="graph-bar" style="width: {{ (votes.simultaneous / votes.total) * 100 }}%;">{{ ((votes.simultaneous  / votes.total) * 100)|round }}%</div>
+                            {% endif %}
+
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="text-muted">Cards</h6>
+                    <div class="row">
+                        <div class="col">
+                            Card Left: {{ votes.cardLeft }}
+                            {% if votes.total > 0 %}
+                                <div class="graph-bar" style="width: {{ (votes.cardLeft / votes.total) * 100 }}%;">{{ ((votes.cardLeft / votes.total) * 100)|round }}%</div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            Card Right: {{ votes.cardRight }}
+                            {% if votes.total > 0 %}
+                                <div class="graph-bar" style="width: {{ (votes.cardRight / votes.total) * 100 }}%;">{{ ((votes.cardRight / votes.total) * 100)|round }}%</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-
-                <hr>
-
-                <h6 class="text-muted">Cards</h6>
-                <div class="row">
-                    <div class="col">
-                        Card Left: {{ votes.cardLeft }}
-                        {% if votes.total > 0 %}
-                            <div class="graph-bar" style="width: {{ (votes.cardLeft / votes.total) * 100 }}%;">{{ ((votes.cardLeft / votes.total) * 100)|round }}%</div>
-                        {% endif %}
-                    </div>
-                    <div class="col">
-                        Card Right: {{ votes.cardRight }}
-                        {% if votes.total > 0 %}
-                            <div class="graph-bar" style="width: {{ (votes.cardRight / votes.total) * 100 }}%;">{{ ((votes.cardRight / votes.total) * 100)|round }}%</div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
-
 
 
     </div>

@@ -43,4 +43,52 @@ class Vote extends Model
     public $morphMany = [];
     public $attachOne = [];
     public $attachMany = [];
+
+
+    public function isSameCall(Vote $vote)
+    {
+        return (
+            $this->priority === $vote->priority
+            && $this->call_id === $vote->call_id
+            && $this->card_for === $vote->card_for
+        );
+    }
+
+    public function toString()
+    {
+        if ($this->vote_comment_id === 2) {
+            return 'Not an action';
+        }
+
+        if ($this->card_for === Action::LEFT_FENCER_ID) {
+            return 'Card for the left fencer';
+        }
+
+        if ($this->card_for === Action::RIGHT_FENCER_ID) {
+            return 'Card for the right fencer';
+        }
+
+        if ($this->priority === Action::LEFT_FENCER_ID) {
+            if ($this->call_id !== null) {
+                $call = Call::find($this->call_id);
+                return $call->name . ' from the the Left';
+            }
+        }
+
+        if ($this->priority === Action::RIGHT_FENCER_ID) {
+            if ($this->call_id !== null) {
+                $call = Call::find($this->call_id);
+                return $call->name . ' from the the Right';
+            }
+        }
+
+        if ($this->priority === Action::NEITHER_FENCER_ID) {
+            if ($this->call_id !== null) {
+                $call = Call::find($this->call_id);
+                return $call->name;
+            }
+        }
+
+        return '';
+    }
 }

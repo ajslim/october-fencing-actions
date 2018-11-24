@@ -26,6 +26,10 @@ class Action extends Model
     public const LEFT_FENCER_ID = 1;
     public const RIGHT_FENCER_ID = 2;
 
+    private $verifiedConfidenceThreshold = .80;
+    private $numberOfVerifiers = 2;
+
+
     /**
      * @var string The database table used by the model.
      */
@@ -92,7 +96,12 @@ class Action extends Model
     }
 
 
-    public function getVerifiedCallAttribute()
+    /**
+     * Returns the verified vote, or false
+     *
+     * @return boolean | Vote
+     */
+    public function getVerifiedVoteAttribute()
     {
         return Cache::remember($this->cacheKey() . ':verifiedCall', $this->cacheMinutes, function () {
             return $this->getVerifiedCall();
@@ -100,6 +109,12 @@ class Action extends Model
     }
 
 
+    /**
+     * A call can be verified by an FIE ref, or by having a number of verifiers agree with
+     * the majority with a certain confidence value
+     *
+     * @return bool|Vote
+     */
     public function getVerifiedCall()
     {
         $fieConsensus = $this->getFieConsensusVoteAttribute();
@@ -108,8 +123,8 @@ class Action extends Model
         }
 
         $verifierVotes = $this->getVerifierVotes();
-        if ($this->getConfidenceAttribute() > 0.85
-            && $verifierVotes->count() >= 2) {
+        if ($this->getConfidenceAttribute() > $this->verifiedConfidenceThreshold
+            && $verifierVotes->count() >= $this->numberOfVerifiers) {
             return $verifierVotes->first();
         }
 
@@ -138,6 +153,7 @@ class Action extends Model
         $fieVotes = $this
             ->votes()
             ->where('referee_level', 'fie')
+            ->where('vote_comment_id', '!=', 2)
             ->get();
 
         if (count($fieVotes) === 0) {
@@ -156,6 +172,37 @@ class Action extends Model
         }
 
         return $lastVote;
+    }
+
+
+    public function getFieDifficultyFloorAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':getFieDifficultyFloor', $this->cacheMinutes, function () {
+            return $this->getFieDifficultyFloor();
+        });
+    }
+
+
+    public function getFieDifficultyFloor()
+    {
+        $fieVotes = $this
+            ->votes()
+            ->where('referee_level', 'fie')
+            ->where('vote_comment_id', '!=', 2)
+            ->get();
+
+        if (count($fieVotes) === 0) {
+            return false;
+        }
+
+        $lowest = false;
+        foreach ($fieVotes as $fieVote) {
+            if ($lowest === false || $fieVote->difficulty < $lowest) {
+                $lowest = $fieVote;
+            }
+        }
+
+        return $lowest;
     }
 
 

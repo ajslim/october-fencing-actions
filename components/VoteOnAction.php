@@ -18,9 +18,20 @@ class VoteOnAction extends ComponentBase
 {
     /** @var User $user */
     private $user = null;
+    private $isFieUser = false;
+    private $referee_level = null;
 
     /** @var Action $action */
     private $action = null;
+
+    /** @var Vote $vote */
+    private $vote = null;
+
+    private $messages = [];
+    private $warnings = [];
+    private $infoMessages = [];
+
+    private $isNewAction = false;
 
     public function componentDetails()
     {
@@ -141,13 +152,6 @@ class VoteOnAction extends ComponentBase
             $vote->card_for = null;
             $vote->call_id = null;
             $vote->priority = null;
-
-            if (
-                $this->user->hasPermission(['ajslim.fencingactions.fie'])
-                && $this->user->id !== 1
-            ) {
-                $vote->referee_level = 'fie';
-            }
         } else {
             $vote = Vote::create(
                 [
@@ -174,7 +178,7 @@ class VoteOnAction extends ComponentBase
             $newActionVoteCount = Session::get('newActionVoteCount', 0);
             $newActionVoteCount += 1;
             Session::put('newActionVoteCount', $newActionVoteCount);
-            Session::put('newAction', true);
+            $this->isNewAction = true;
         }
     }
 
@@ -188,36 +192,37 @@ class VoteOnAction extends ComponentBase
 
         if (isset($post['priority']) === true
             && isset($post['call']) === true
-            && $post['priority'] !== '0'
-        ) {
-            $vote->call_id = $post['call'];
-            $vote->priority = $post['priority'];
-        }
+            && (
+                $post['priority'] !== '0'
+                || $post['call'] === '7'
+            )
 
-        if (isset($post['priority']) === true
-            && isset($post['call']) === true
-            && $post['priority'] === '0'
-            && $post['call'] === '7'
         ) {
-            $vote->call_id = $post['call'];
-            $vote->priority = $post['priority'];
+            $vote->call_id = intval($post['call']);
+            $vote->priority = intval($post['priority']);
         }
 
         if (isset($post['card-for']) === true && $post['card-for'] !== '0') {
-            $vote->card_for = $post['card-for'];
+            $vote->card_for = intval($post['card-for']);
         }
 
         if (isset($post['difficulty']) === true) {
-            $vote->difficulty = $post['difficulty'];
+            $vote->difficulty = intval($post['difficulty']);
         }
         if (isset($post['vote-comment']) === true) {
-            $vote->vote_comment_id = $post['vote-comment'];
+            $vote->vote_comment_id = intval($post['vote-comment']);
         }
 
         // Log the ip address of the vote, just in case some craziness happens
         $vote->ip_address = $_SERVER['REMOTE_ADDR'];
+        $vote->referee_level = $this->referee_level;
 
         $vote->save();
+
+        $this->vote = $vote;
+
+        // ensures clean models
+        $this->vote->refresh();
         $this->action->refresh();
     }
 
@@ -250,7 +255,7 @@ class VoteOnAction extends ComponentBase
         }
 
         if ($action === null) {
-            $this->page['warning'] = "No actions found with that many votes";
+            $this->warnings[] = "No actions found with that many votes";
             $action = $this->getRandomActionFromCollection($this->getActionsWithNoVotes());
 
             // Just retry once, if they get another non action, they can label it
@@ -291,6 +296,64 @@ class VoteOnAction extends ComponentBase
     }
 
 
+    private function addToFieVoteCount($count)
+    {
+        $fieVoteCount = Session::get('fieVoteCount', 0);
+        $fieVoteCount += $count;
+        if ($fieVoteCount < 0) {
+            Session::put('fieVoteCount', 0);
+        } else if ($fieVoteCount > 15) {
+            Session::put('fieVoteCount', 15);
+        } else {
+            Session::put('fieVoteCount', $fieVoteCount);
+        }
+
+    }
+
+
+    private function checkCorrect()
+    {
+        if ($this->isFieUser) {
+            // Fie users are correct by definition
+            return;
+        }
+
+        $verifiedVote = $this->action->getVerifiedVoteAttribute();
+
+        if ($verifiedVote !== false) {
+
+            if ($verifiedVote->isSameCall($this->vote)) {
+                $correctVerifiedVoteCount = Session::get('correctVerifiedVoteCount', 0);
+                Session::put('correctVerifiedVoteCount', $correctVerifiedVoteCount + 1);
+
+                $this->messages[] = 'Correct! This action has been verified and you got it right!';
+            } else {
+                $this->warnings[] = 'Incorrect! This action has been verified and the correct call was: ' . $verifiedVote->toString();
+            }
+
+            $fieConsensus = $this->action->getFieConsensusVoteAttribute();
+            $fieDifficultyFloor = $this->action->getFieDifficultyFloorAttribute();
+            if ($fieConsensus !== false && $fieDifficultyFloor !== false) {
+                if ($verifiedVote->isSameCall($this->vote)) {
+                    $this->addToFieVoteCount(1);
+                } else {
+                    // If they get an easy one wrong, knock off 10
+                    if ($fieDifficultyFloor === 1) {
+                        $this->addToFieVoteCount(-10);
+                    }
+
+                    // If they get a medium one wrong, knock them back 3
+                    if ($fieDifficultyFloor === 2) {
+                        $this->addToFieVoteCount(-3);
+                    }
+                }
+            }
+        } else {
+            $this->infoMessages[] = 'This action has not been verified yet';
+        }
+    }
+
+
     private function addMotivationalMessage()
     {
         $newAction = Session::pull('newAction', false);
@@ -323,13 +386,13 @@ class VoteOnAction extends ComponentBase
                 $message = "You've refereed $newActionVoteCount new actions! Keep it up!";
             }
 
-            $this->page['message'] = $message;
+            $this->messages[] = $message;
         } else {
             $voteCount = Session::get('voteCount', 0);
 
             if (in_array($voteCount, [5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200])) {
                 $message = "You've refereed $voteCount actions! Keep it up!";
-                $this->page['message'] = $message;
+                $this->messages[] = $message;
             }
         }
     }
@@ -337,11 +400,14 @@ class VoteOnAction extends ComponentBase
 
     private function showResults()
     {
-        $this->addMotivationalMessage();
+        if ($this->vote !== null) {
+            $this->checkCorrect();
+            $this->addMotivationalMessage();
+        }
         $this->addVotesToPage();
         $this->page['voteForm'] = false;
         $this->page['results'] = true;
-        $verifiedCall = $this->action->getVerifiedCallAttribute();
+        $verifiedCall = $this->action->getVerifiedVoteAttribute();
         if ($verifiedCall !== false) {
             $this->page['verified'] = $verifiedCall->call_id;
         }
@@ -355,22 +421,33 @@ class VoteOnAction extends ComponentBase
         if ($this->user
             && count($this->action->votes()->where('user_id', $this->user->id)->get()) > 0
         ) {
-            $this->page['message'] = "You've refereed this action already";
+            $this->infoMessages[] = "You've refereed this action already";
         }
     }
 
 
-    private function addGenericPageVariables()
+    private function getUserDetails()
     {
-        $get = Input::get();
+        $this->user = BackendAuth::getUser();
+
+        if (Session::get('fieVoteCount', 0) >= 10) {
+            $this->referee_level = 'verifier';
+        }
 
         if ($this->user) {
             if ($this->user->hasPermission(['ajslim.fencingactions.fie'])
                 && $this->user->id !== 1
             ) {
+                $this->isFieUser = true;
                 $this->page['fie'] = true;
+                $this->referee_level = 'fie';
             }
         }
+    }
+
+    private function addGenericPageVariables()
+    {
+        $get = Input::get();
 
         if (isset($get['minvotes'])) {
             $this->page['minvotes'] = $get['minvotes'];
@@ -386,13 +463,18 @@ class VoteOnAction extends ComponentBase
 
         $this->page['trophy'] = Session::get('newActionTrophy');
         $this->addBoutAndActionDetailsToPage();
+        $this->page['messages'] = $this->messages;
+        $this->page['warnings'] = $this->warnings;
+        $this->page['infoMessages'] = $this->infoMessages;
     }
 
 
     public function onRun()
     {
-        $this->user = BackendAuth::getUser();
+
         $this->getAction();
+
+        $this->getUserDetails();
 
         $post = Input::post();
         $get = Input::get();

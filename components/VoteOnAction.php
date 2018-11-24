@@ -247,14 +247,14 @@ class VoteOnAction extends ComponentBase
             if ($fieVoteCount <= $this->beginnerThreshold) {
                 $action = $this->getVerifiedActions()->random();
             } else if ($fieVoteCount <  $this->maxFieVoteCount) {
-                $random = rand(1, 2);
+                $random = rand(1, 3);
                 if ($random === 1) {
-                    $action = $this->getActions()->random();
-                } else {
                     $action = $this->getVerifiedActions()->random();
+                } else {
+                    $action = $this->getActions()->random();
                 }
             } else {
-                $random = rand(1, 4);
+                $random = rand(1, 5);
                 if ($random === 1) {
                     $action = $this->getVerifiedActions()->random();
                 } else if ($random === 2) {

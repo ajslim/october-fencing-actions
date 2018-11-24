@@ -13,10 +13,17 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
 
 
 class VoteOnAction extends ComponentBase
 {
+    /** @var User $user */
+    private $user = null;
+
+    /** @var Action $action */
+    private $action = null;
+
     public function componentDetails()
     {
         return [
@@ -26,69 +33,40 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private static function getVoteCount($actionId, $callId, $priority)
+    private function getVoteArrayForAction()
     {
-        return Vote::where('action_id', $actionId)
-            ->where('call_id', $callId)
-            ->where('priority', $priority)
-            ->whereNull('card_for')
-            ->count();
-    }
+        $action = $this->action;
 
-    private static function getVotesForAction($actionId)
-    {
-        $votes = [];
-        $attackCount = self::getVoteCount($actionId, Call::ATTACK_ID, Action::LEFT_FENCER_ID);
-        $counterAttackCount = self::getVoteCount($actionId, Call::COUNTER_ATTACK_ID, Action::LEFT_FENCER_ID);
-        $riposteCount = self::getVoteCount($actionId, Call::RIPOSTE_ID, Action::LEFT_FENCER_ID);
-        $remiseCount = self::getVoteCount($actionId, Call::REMISE_ID, Action::LEFT_FENCER_ID);
-        $lineCount = self::getVoteCount($actionId, Call::LINE_ID, Action::LEFT_FENCER_ID);
-        $otherCount = self::getVoteCount($actionId, Call::OTHER_ID, Action::LEFT_FENCER_ID);
+        $voteArray = [];
 
-        $votes['left'] = [
-            'attack' => $attackCount,
-            'counter-attack' => $counterAttackCount,
-            'riposte' => $riposteCount,
-            'remise' => $remiseCount,
-            'line' => $lineCount,
-            'other' => $otherCount,
+        $leftRightNeitherNames = [
+            Action::LEFT_FENCER_ID => 'left',
+            Action::RIGHT_FENCER_ID => 'right',
+            Action::NEITHER_FENCER_ID => 'neither'
         ];
 
-        $attackCount = self::getVoteCount($actionId, Call::ATTACK_ID, Action::RIGHT_FENCER_ID);
-        $counterAttackCount = self::getVoteCount($actionId, Call::COUNTER_ATTACK_ID, Action::RIGHT_FENCER_ID);
-        $riposteCount = self::getVoteCount($actionId, Call::RIPOSTE_ID, Action::RIGHT_FENCER_ID);
-        $remiseCount = self::getVoteCount($actionId, Call::REMISE_ID, Action::RIGHT_FENCER_ID);
-        $lineCount = self::getVoteCount($actionId, Call::LINE_ID, Action::RIGHT_FENCER_ID);
-        $otherCount = self::getVoteCount($actionId, Call::OTHER_ID, Action::RIGHT_FENCER_ID);
+        $callsArray = $action->getCachedCallsArray();
+        foreach ($callsArray as $leftRightNeitherId => $leftRightNeither) {
 
-        $votes['right'] = [
-            'attack' => $attackCount,
-            'counter-attack' => $counterAttackCount,
-            'riposte' => $riposteCount,
-            'remise' => $remiseCount,
-            'line' => $lineCount,
-            'other' => $otherCount,
-        ];
+            $voteArray[$leftRightNeitherNames[$leftRightNeitherId]] = [];
+            foreach ($leftRightNeither as $callId => $callCount) {
+                $call = Call::find($callId);
 
-        $votes['simultaneous'] = self::getVoteCount($actionId, Call::SIMULTANEOUS_ID, Action::NEITHER_FENCER_ID);
+                if ($call !== null) {
+                    $voteArray[$leftRightNeitherNames[$leftRightNeitherId]][$call->name] = $callCount;
+                }
+            }
+        }
+        $voteArray['simultaneous'] = $callsArray[Action::NEITHER_FENCER_ID][Call::SIMULTANEOUS_ID];
 
-        $cardLeft = Vote::where('action_id', $actionId)->where('card_for', Action::LEFT_FENCER_ID)->count();
-        $votes['cardLeft'] = $cardLeft;
+        $voteArray['cardLeft'] = $callsArray[Action::LEFT_FENCER_ID][Call::CARD_ID];
+        $voteArray['cardRight'] = $callsArray[Action::RIGHT_FENCER_ID][Call::CARD_ID];
 
-        $cardRight = Vote::where('action_id', $actionId)->where('card_for', Action::RIGHT_FENCER_ID)->count();
-        $votes['cardRight'] = $cardRight;
+        $voteArray['totalPriority'] = $action->votes()->whereNotNull('priority')->count();
+        $voteArray['totalCards'] = $action->votes()->whereNotNull('card_for')->count();
+        $voteArray['total'] = $action->getCallVotesAttribute()->count();
 
-        $totalPriority = Vote::where('action_id', $actionId)->whereNotNull('priority')->count();
-        $votes['totalPriority'] = $totalPriority;
-
-        $totalCards = Vote::where('action_id', $actionId)->whereNotNull('card_for')->count();
-        $votes['totalCards'] = $totalCards;
-
-        $action = Action::find($actionId);
-        $total = count($action->getCallVotesAttribute());
-        $votes['total'] = $total;
-
-        return $votes;
+        return $voteArray;
     }
 
 
@@ -149,11 +127,45 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private function saveVote($actionId, $user)
+    private function getNewOrExistingVote()
     {
-        $post = Input::post();
+        $actionId = $this->action->id;
 
-        $action = Action::find($actionId);
+        if ($this->user !== null) {
+            $vote = Vote::firstOrNew(
+                [
+                    'user_id' => $this->user->id,
+                    'action_id' => $actionId,
+                ]
+            );
+
+            // reset the vote
+            $vote->card_for = null;
+            $vote->call_id = null;
+            $vote->priority = null;
+
+            if (
+                $this->user->hasPermission(['ajslim.fencingactions.fie'])
+                && $this->user->id !== 1
+            ) {
+                $vote->referee_level = 'fie';
+            }
+        } else {
+            $vote = Vote::create(
+                [
+                    'action_id' => $actionId
+                ]
+            );
+        }
+
+        return $vote;
+    }
+
+
+    private function updateSessionVoteCount()
+    {
+        $action = $this->action;
+
         $votes = $action->getCallVotesAttribute();
 
         $voteCount = Session::get('voteCount', 0);
@@ -166,30 +178,15 @@ class VoteOnAction extends ComponentBase
             Session::put('newActionVoteCount', $newActionVoteCount);
             Session::put('newAction', true);
         }
+    }
 
 
-        /** @var User $user */
-        if ($user) {
-            $vote = Vote::firstOrNew(
-                [
-                    'user_id' => $user->id,
-                    'action_id' => $actionId,
-                ]
-            );
+    private function saveVote()
+    {
+        $post = Input::post();
 
-            if (
-                $user->hasPermission(['ajslim.fencingactions.fie'])
-                && $user->id !== 1
-            ) {
-                $vote->referee_level = 'fie';
-            }
-        } else {
-            $vote = Vote::create(
-                [
-                    'action_id' => $actionId
-                ]
-            );
-        }
+        $this->updateSessionVoteCount();
+        $vote = $this->getNewOrExistingVote();
 
         if (isset($post['priority']) === true
             && isset($post['call']) === true
@@ -234,6 +231,9 @@ class VoteOnAction extends ComponentBase
         if (isset($get['id'])) {
             $actionId = $get['id'];
             $action = Action::find($actionId);
+        } else if (isset($get['action-id'])) {
+            $actionId = $get['action-id'];
+            $action = Action::find($actionId);
         } else if (isset($get['minvotes'])) {
             $action = $this->getRandomActionFromCollection($this->getActionsWithMinimumVotes($get['minvotes']));
 
@@ -260,13 +260,13 @@ class VoteOnAction extends ComponentBase
             }
         }
 
-        return $action;
+        $this->action = $action;
     }
 
 
-    private function addVotesToPage($actionId)
+    private function addVotesToPage()
     {
-        $votes = self::getVotesForAction($actionId);
+        $votes = $this->getVoteArrayForAction();
 
         $this->page['votes'] = $votes;
 
@@ -280,8 +280,10 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private function addBoutAndActionDetailsToPage(Action $action)
+    private function addBoutAndActionDetailsToPage()
     {
+        $action = $this->action;
+
         $this->page['actionId'] = $action->id;
         $this->page['videoUrl'] = $action->video_url;
 
@@ -341,17 +343,50 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    public function onRun()
+    private function showResults()
     {
-        $user = BackendAuth::getUser();
+        $this->addMotivationalMessage();
+        $this->page['voteForm'] = false;
+        $this->page['results'] = true;
+        $verifiedCall = $this->action->getVerifiedCallAttribute();
+        if ($verifiedCall !== false) {
+            $this->page['verified'] = $verifiedCall->call_id;
+        }
+    }
 
-        if ($user) {
-            if ($user->hasPermission(['ajslim.fencingactions.fie'])
-                && $user->id !== 1
+
+    private function showVotePage()
+    {
+        $this->page['voteForm'] = true;
+
+        if ($this->user
+            && count($this->action->votes()->where('user_id', $this->user->id)->get()) > 0
+        ) {
+            $this->page['message'] = "You've refereed this action already";
+        }
+    }
+
+
+    private function addGenericPageVariables()
+    {
+        if ($this->user) {
+            if ($this->user->hasPermission(['ajslim.fencingactions.fie'])
+                && $this->user->id !== 1
             ) {
                 $this->page['fie'] = true;
             }
         }
+
+        $this->page['trophy'] = Session::get('newActionTrophy');
+        $this->addVotesToPage();
+        $this->addBoutAndActionDetailsToPage();
+    }
+
+
+    public function onRun()
+    {
+        $this->user = BackendAuth::getUser();
+        $this->getAction();
 
         $post = Input::post();
         $get = Input::get();
@@ -361,32 +396,20 @@ class VoteOnAction extends ComponentBase
         }
 
         // If vote form was submitted
-        if (isset($post['action-id']) === true) {
-            $actionId = $post['action-id'];
-            $this->saveVote($actionId, $user);
+        if (isset($post['submit-vote']) === true) {
+            $this->saveVote();
+            $actionId = $this->action->id;
             return Redirect::to("/?id=$actionId&results=true");
         } else {
-            $action = $this->getAction();
-            $actionId = $action->id;
-
+            // If results page
             if (isset($get['results'])) {
-                $this->addMotivationalMessage();
-                $this->page['voteForm'] = false;
-                $this->page['results'] = true;
+                $this->showResults();
             } else {
-                $this->page['voteForm'] = true;
-
-                if ($user
-                    && count($action->votes()->where('user_id', $user->id)->get()) > 0
-                ) {
-                    $this->page['message'] = "You've refereed this action already";
-                }
+                $this->showVotePage();
             }
         }
 
-        $this->page['trophy'] = Session::get('newActionTrophy');
-        $this->addVotesToPage($actionId);
-        $this->addBoutAndActionDetailsToPage($action);
+        $this->addGenericPageVariables();
     }
 
 

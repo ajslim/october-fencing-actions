@@ -2,6 +2,7 @@
 
 use Ajslim\FencingActions\Utility\Utility;
 use Assetic\Filter\PackerFilter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Model;
@@ -15,7 +16,7 @@ use Model;
  * @propery integer right_fencer_id
  * @propery Bout bout
  * @propery Collection votes
- * @method votes
+ * @method Builder votes
  */
 class Action extends Model
 {
@@ -91,6 +92,73 @@ class Action extends Model
     }
 
 
+    public function getVerifiedCallAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':verifiedCall', $this->cacheMinutes, function () {
+            return $this->getVerifiedCall();
+        });
+    }
+
+
+    public function getVerifiedCall()
+    {
+        $fieConsensus = $this->getFieConsensusVoteAttribute();
+        if ($fieConsensus !== false) {
+            return $fieConsensus;
+        }
+
+        $verifierVotes = $this->getVerifierVotes();
+        if ($this->getConfidenceAttribute() > 0.85
+            && $verifierVotes->count() >= 2) {
+            return $verifierVotes->first();
+        }
+
+        return false;
+    }
+
+
+    public function getVerifierVotes()
+    {
+        return $this->votes()
+            ->where('referee_level', 'verifier')
+            ->get();
+    }
+
+
+    public function getFieConsensusVoteAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':fieConsensus', $this->cacheMinutes, function () {
+            return $this->getFieConsensusVote();
+        });
+    }
+
+
+    public function getFieConsensusVote()
+    {
+        $fieVotes = $this
+            ->votes()
+            ->where('referee_level', 'fie')
+            ->get();
+
+        if (count($fieVotes) === 0) {
+            return false;
+        }
+
+        $lastVote = null;
+        foreach ($fieVotes as $fieVote) {
+            if ($lastVote !== null
+                && ($fieVote->priority !== $lastVote->priority
+                    || $fieVote->card_for !== $lastVote->card_for
+                    || $fieVote->call_id !== $lastVote->call_id)) {
+                    return false;
+            }
+            $lastVote = $fieVote;
+        }
+
+        return $lastVote;
+    }
+
+
     /**
      * Returns the calls array using a cache
      *
@@ -144,9 +212,11 @@ class Action extends Model
             ]
 
         ];
+
+
         foreach ($this->getCallVotesAttribute() as $vote) {
-            if ($vote->call !== null) {
-                $calls[$vote->priority][$vote->call->id] += 1;
+            if ($vote->call_id !== null) {
+                $calls[$vote->priority][$vote->call_id] += 1;
             }
             if ($vote->card_for !== null) {
                 $calls[$vote->card_for][Call::CARD_ID] += 1;
@@ -347,7 +417,7 @@ class Action extends Model
         $returnCollection = new Collection();
 
         foreach ($votes as $vote) {
-            if ($vote->call !== null
+            if ($vote->call_id !== null
                 || $vote->card_for !== null
             ) {
                 $returnCollection->push($vote);

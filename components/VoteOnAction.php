@@ -33,6 +33,12 @@ class VoteOnAction extends ComponentBase
 
     private $isNewAction = false;
 
+    private $maxFieVoteCount = 20;
+    private $verifierThreshold = 10;
+    private $beginnerThreshold = 2;
+    private $easyWrongPunishment = 10;
+    private $mediumWrongPunishment = 3;
+
     public function componentDetails()
     {
         return [
@@ -238,10 +244,10 @@ class VoteOnAction extends ComponentBase
             // Voters who are not verified will have 2/3 of their actions verified
             // 'verifier' voters will get 1/4 of their actions as verified
             // 'verifier' users will get 1/4 of their actions as fresh too
-            if ($fieVoteCount < 3) {
+            if ($fieVoteCount <= $this->beginnerThreshold) {
                 $action = $this->getVerifiedActions()->random();
-            } else if ($fieVoteCount < 10) {
-                $random = rand(1, 3);
+            } else if ($fieVoteCount <  $this->maxFieVoteCount) {
+                $random = rand(1, 2);
                 if ($random === 1) {
                     $action = $this->getActions()->random();
                 } else {
@@ -304,8 +310,8 @@ class VoteOnAction extends ComponentBase
 
         if ($fieVoteCount < 0) {
             Session::put('fieVoteCount', 0);
-        } else if ($fieVoteCount > 15) {
-            Session::put('fieVoteCount', 15);
+        } else if ($fieVoteCount > $this->maxFieVoteCount) {
+            Session::put('fieVoteCount', $this->maxFieVoteCount);
         } else {
             Session::put('fieVoteCount', $fieVoteCount);
         }
@@ -341,12 +347,12 @@ class VoteOnAction extends ComponentBase
                 } else {
                     // If they get an easy one wrong, knock off 10
                     if ($fieDifficultyFloor === 1) {
-                        $this->addToFieVoteCount(-10);
+                        $this->addToFieVoteCount(-1 * $this->easyWrongPunishment);
                     }
 
                     // If they get a medium one wrong, knock them back 3
                     if ($fieDifficultyFloor === 2) {
-                        $this->addToFieVoteCount(-3);
+                        $this->addToFieVoteCount(-1 * $this->mediumWrongPunishment);
                     }
                 }
             }
@@ -432,7 +438,7 @@ class VoteOnAction extends ComponentBase
     {
         $this->user = BackendAuth::getUser();
 
-        if (Session::get('fieVoteCount', 0) >= 10) {
+        if (Session::get('fieVoteCount', 0) >= $this->verifierThreshold) {
             $this->referee_level = 'verifier';
             $this->page['verifier'] = true;
         }

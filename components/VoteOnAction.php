@@ -375,6 +375,12 @@ class VoteOnAction extends ComponentBase
                 $this->page['results'] = true;
             } else {
                 $this->page['voteForm'] = true;
+
+                if ($user
+                    && count($action->votes()->where('user_id', $user->id)->get()) > 0
+                ) {
+                    $this->page['message'] = "You've refereed this action already";
+                }
             }
         }
 

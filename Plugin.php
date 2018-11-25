@@ -99,7 +99,7 @@ class Plugin extends PluginBase
         return [
             'fencingactions' => [
                 'label'       => 'FencingActions',
-                'url'         => Backend::url('ajslim/fencingactions/actions'),
+                'url'         => Backend::url('ajslim/fencingactions/loginredirect'),
                 'icon'        => 'icon-bolt',
                 'permissions' => ['ajslim.fencingactions.*'],
                 'order'       => 500,

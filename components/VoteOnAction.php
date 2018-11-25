@@ -237,6 +237,13 @@ class VoteOnAction extends ComponentBase
         } else if (isset($get['fresh'])) {
             $action = $this->getActionsWithNoVotes()->random();
             $this->page['fresh'] = true;
+        } else if ($this->isFieUser) {
+            $random = rand(1, 3);
+            if ($random === 1) {
+                $action = $this->getActionsWithNoVotes()->random();
+            } else {
+                $action = $this->getActions()->random();
+            }
         } else {
             $fieVoteCount = Session::get('fieVoteCount', 0);
 

@@ -1,0 +1,162 @@
+label
+{
+    display: block;
+    width: 100%;
+    height: 60px;
+    line-height: 40px;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+:checked + label,
+.calls :checked + label,
+.cards :checked + label,
+.difficulty :checked + label
+{
+    background: lightblue;
+    border: 2px solid black;
+}
+
+.calls label {
+    background: lightgoldenrodyellow;
+}
+
+.cards label {
+    background: lightcoral;
+
+}
+
+input {
+    display: block;
+}
+
+input[type='radio'], input[type='submit'], input[type='checkbox'] {
+    display: none;
+}
+
+.submit {
+    background: mediumseagreen;
+    color: white;
+    border: 1px solid gray;
+}
+
+.vote h6 {
+    margin-top: 30px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.other {
+    margin-bottom: 30px;
+}
+
+select {
+    border-radius: 5px;
+    width: 100%;
+    height: 50px;
+}
+
+.graph-bar {
+    background: lightblue;
+    height: 28px;
+    display: block;
+    text-align: center;
+}
+
+video {
+    width: 100%;
+    max-height: 500px;
+}
+
+a.speedButton
+{
+    display: block;
+    width: 100%;
+    height: 40px;
+    line-height: 20px;
+    margin: 0;
+    margin-bottom: 3px;
+    padding: 10px;
+    border: 1px solid gray;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+
+#changeSpeedLabel {
+    text-align: center;
+}
+
+.bout-data {
+    margin-bottom: 3px;
+}
+
+nav {
+    background-color: #6b0000;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.tabs {
+    margin-bottom: 15px;
+}
+
+a.nav-tab {
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    color: #ff9999;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #993333;
+    background: #996666;
+    text-align: center;
+}
+
+a.nav-tab.active {
+    background: #6b0000;
+    color: white;
+}
+
+a.nav-tab:hover {
+    text-decoration: none;
+    color: white;
+}
+
+@media screen and (min-width: 992px ) {
+    label {
+        height: 40px;
+        line-height:20px;
+    }
+}
+
+.next-action,
+.submit
+{
+    cursor: pointer;
+    box-shadow: lightgray 4px 4px 4px 4px;
+}
+
+.next-action:active,
+.submit:active
+{
+    box-shadow: none;
+}
+
+
+.qrnav.navbar,
+.qrnav.navbar .container-fluid,
+.qrnav.navbar .container-fluid .navbar-brand
+{
+    padding-top:0;
+    padding-bottom:0;
+}
+
+.qrnav.navbar {
+    padding-top: 2px;
+}

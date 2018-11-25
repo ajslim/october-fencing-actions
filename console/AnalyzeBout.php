@@ -43,6 +43,7 @@ class AnalyzeBout extends Command
     private $forceProfile = null;
     private $start = null;
     private $end = null;
+    private $keepThumbs = false;
 
     // Frame counts for analysis
     private $doubleLightCount = 0;
@@ -470,6 +471,10 @@ class AnalyzeBout extends Command
         if ($this->option('make-light-images') !== null) {
             $this->makeLightImagesOption = true;
         }
+
+        if ($this->option('keep-thumbs') !== null) {
+            $this->keepThumbs = true;
+        }
     }
 
 
@@ -663,6 +668,10 @@ class AnalyzeBout extends Command
             echo "Red Light Count: $this->singleRedCount\n";
             echo "Green Light Count: $this->singleGreenCount\n";
             echo "BOth: $this->doubleLightCount\n";
+        }
+
+        if ($this->keepThumbs !== true) {
+            $this->removeThumbs();
         }
     }
 

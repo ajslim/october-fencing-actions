@@ -3,9 +3,12 @@
 use Ajslim\FencingActions\Models\Action;
 use Ajslim\FencingActions\Models\Bout;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 
 class CreateActionsForBouts extends Command
 {
+    private $force = false;
+
     /**
      * @var string The console command name.
      */
@@ -23,17 +26,28 @@ class CreateActionsForBouts extends Command
      */
     public function handle()
     {
+        if ($this->option('force') !== null) {
+            $this->force = true;
+        }
+
+
         $bouts = Bout::whereNotNull('video_url')->get();
 
 
         $totalBouts = 0;
         foreach ($bouts as $bout) {
+
             $totalBouts += 1;
 
             echo "Total bouts: " . $totalBouts . "\n";
             if ($totalBouts > 80) {
                 echo "Stopping at 80 bouts - get a bigger server \n";
                 break;
+            }
+
+            if ($bout->actions()->count() > 0 && $this->force !== true) {
+                echo $bout->cache_name . " already has actions \n";
+                continue;
             }
 
             echo "Creating actions for " . $bout->cache_name . "\n";
@@ -96,6 +110,8 @@ class CreateActionsForBouts extends Command
      */
     protected function getOptions()
     {
-        return [];
+        return [
+            ['force', null, InputOption::VALUE_OPTIONAL, 'create actions even if bout has actions', null],
+        ];
     }
 }

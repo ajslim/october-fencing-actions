@@ -33,5 +33,11 @@ Route::group(
             ]
         );
 
+        Route::get(
+            'bouts/{boutId?}/{boutChild?}/{actionId?}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Bouts@index',
+            ]
+        );
     }
 );

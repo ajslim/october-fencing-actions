@@ -97,7 +97,7 @@ class VoteOnAction extends ComponentBase
     {
         return Action::all()->filter(function ($action) {
             /** @var Action $action */
-            return (count($action->votes) > 0 && $action->getConfidenceAttribute() < 0.5);
+            return (count($action->votes) > 3 && $action->getConfidenceAttribute() < 0.5);
         });
     }
 
@@ -237,7 +237,7 @@ class VoteOnAction extends ComponentBase
         } else if (isset($get['fresh'])) {
             $action = $this->getActionsWithNoVotes()->random();
             $this->page['fresh'] = true;
-        } else if ($this->isFieUser) {
+        } else if ($this->isFieUser === true) {
             $random = rand(1, 3);
             if ($random === 1) {
                 $action = $this->getActionsWithNoVotes()->random();
@@ -271,11 +271,10 @@ class VoteOnAction extends ComponentBase
                 }
             }
         }
-
         if ($action === null) {
             $this->warnings[] = "No actions found";
 
-            $action = $this->getRandomActionFromCollection($this->getActions());
+            $action = $this->getActions()->random();
         }
 
         $this->action = $action;
@@ -488,9 +487,8 @@ class VoteOnAction extends ComponentBase
     public function onRun()
     {
 
-        $this->getAction();
-
         $this->getUserDetails();
+        $this->getAction();
 
         $post = Input::post();
         $get = Input::get();

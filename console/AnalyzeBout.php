@@ -699,6 +699,7 @@ class AnalyzeBout extends Command
             ['start', null, InputOption::VALUE_OPTIONAL, 'Start Time in seconds', null],
             ['end', null, InputOption::VALUE_OPTIONAL, 'End Time in seconds', null],
             ['make-light-images', null, InputOption::VALUE_OPTIONAL, 'Make light images', null],
+            ['keep-thumbs', null, InputOption::VALUE_OPTIONAL, 'Keep the thumbnails', null],
         ];
     }
 }

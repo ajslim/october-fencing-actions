@@ -60,6 +60,22 @@ class Api extends Controller
 
     }
 
+
+    public function makeCollectionColumns($collection)
+    {
+        $firstRowArray = $collection->first()->toArray();
+        $columns = [];
+        foreach ($firstRowArray as $columnName => $column) {
+            if ($columnName === 'id') {
+                $columns['id'] = 'id';
+            } else {
+                $columns[$columnName] = gettype($column);
+            }
+        }
+        return $columns;
+    }
+
+
     public function makeDataTablesResponse($collection)
     {
         $draw = (integer) Input::get('draw');
@@ -78,6 +94,7 @@ class Api extends Controller
             'draw' => $draw,
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsTotal,
+            'columns' => $this->makeCollectionColumns($records),
             'data' => $records,
         ];
 
@@ -120,11 +137,29 @@ class Api extends Controller
             'draw' => $draw,
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsTotal,
+            'columns' => $this->makeCollectionColumns($records),
             'data' => $records,
         ];
         return json_encode($response);
-
     }
+
+
+    public function makeActionsColumns()
+    {
+        return [
+            'id' => 'id',
+            'thumb' => 'image',
+            'votes' => 'integer',
+            'top_vote' => 'string',
+            'confidence' => 'double',
+            'consensus' => 'double',
+            'difficulty' => 'double',
+            'time' => 'integer',
+            'bout_name' => 'string',
+            'link' => 'link'
+        ];
+    }
+
 
     public function makeDataTablesActionResponse($collection)
     {
@@ -160,6 +195,7 @@ class Api extends Controller
             'draw' => $draw,
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsTotal,
+            'columns' => $this->makeActionsColumns(),
             'data' => $records,
         ];
         return json_encode($response);

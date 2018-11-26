@@ -98,7 +98,7 @@
         });
     }
 
-    function makeBrowseTable(data) {
+    function makeBrowseTable(data, responseColumns) {
         var firstRecord = data[0];
 
         var endpointArray = endpoint.split('/');
@@ -106,12 +106,15 @@
         var columns = [];
         var $list = $('#list');
 
-        Object.keys(firstRecord).forEach(function (key, index) {
+        Object.keys(responseColumns).forEach(function (key) {
+            var type = responseColumns[key];
             var title = key.charAt(0).toUpperCase() + key.slice(1);
             title = title.replace(/_/g, " ");
+
             var column = {
                 'data': key,
-                'title': title
+                'title': title,
+                'dataType': type
             };
 
             column.render = function (data, type, row) {
@@ -125,13 +128,13 @@
                 return '<a href="' + link + '">' + data + '</a>';
             };
 
-            if (key === 'thumb' || key === 'photo_url') {
+            if (type === 'image') {
                 column.render = function (data, type, row) {
                     return '<img width="120" src="' + data + '" />';
                 }
             }
 
-            if (key !== 'thumb' && key !== 'link') {
+            if (type !== 'image' && type !== 'link') {
                 columns.push(column);
             }
         });
@@ -158,8 +161,9 @@
                 [ '10 rows', '25 rows', '50 rows', '100 rows', 'Show all' ]
             ],
             initComplete: function () {
-                this.api().columns().every(function () {
+                this.api().columns().every(function (index) {
                     var column = this;
+                    var type = Object.values(responseColumns)[index+1];
                     var select = $('<select><option value=""></option></select>')
                         .appendTo($(column.footer()))
                         .on('change', function () {
@@ -204,7 +208,7 @@
                             '</div>'
                         );
                     }
-                    makeBrowseTable(response.data);
+                    makeBrowseTable(response.data, response.columns);
                 } else {
                     displayObject(response);
                 }

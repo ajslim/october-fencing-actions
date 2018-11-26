@@ -68,6 +68,23 @@ class CreateActionsTable extends Migration
                     ->references('id')
                     ->on('ajslim_fencingactions_tournaments');
 
+
+                // Cache of calculated values
+                $table->integer('vote_count_cache')
+                    ->nullable();
+
+                $table->string('top_vote_name_cache')
+                    ->nullable();
+
+                $table->float('confidence_cache')
+                    ->nullable();
+
+                $table->float('consensus_cache')
+                    ->nullable();
+
+                $table->float('average_difficulty_cache')
+                    ->nullable();
+
                 $table->timestamps();
             }
         );

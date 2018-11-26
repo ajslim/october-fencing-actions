@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Model;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Action Model
@@ -96,6 +97,17 @@ class Action extends Model
     }
 
 
+    public function updateCacheColumns()
+    {
+        $this->vote_count_cache = $this->getCallVotes()->count();
+        $this->top_vote_name_cache = $this->getTopVoteName();
+        $this->confidence_cache = $this->getConfidence();
+        $this->consensus_cache = $this->getConsensus();
+        $this->average_difficulty_cache = $this->getAverageDifficultyRating();
+        $this->save();
+    }
+
+
     /**
      * Returns the verified vote, or false
      *
@@ -177,7 +189,7 @@ class Action extends Model
 
     public function getFieDifficultyFloorAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':getFieDifficultyFloor', $this->cacheMinutes, function () {
+        return Cache::remember($this->cacheKey() . ':fieDifficultyFloor', $this->cacheMinutes, function () {
             return $this->getFieDifficultyFloor();
         });
     }
@@ -280,6 +292,21 @@ class Action extends Model
      */
     public function getTopVoteNameAttribute()
     {
+        return Cache::remember($this->cacheKey() . ':topVoteName', $this->cacheMinutes, function () {
+            $this->top_vote_name_cache = $this->getTopVoteName();
+            $this->save();
+            return $this->top_vote_name_cache;
+        });
+    }
+
+
+    /**
+     * Gets the name of the top vote
+     *
+     * @return string
+     */
+    public function getTopVoteName()
+    {
         $topVote = $this->getTopVoteAttribute();
         if ($topVote === false) {
             return '';
@@ -358,12 +385,14 @@ class Action extends Model
     /**
      * Returns the call votes using a cache
      *
-     * @return Collection
+     * @return Float
      */
     public function getAverageDifficultyRatingAttribute()
     {
         return Cache::remember($this->cacheKey() . ':averageDifficultyRating', $this->cacheMinutes, function () {
-            return $this->getAverageDifficultyRating();
+            $this->average_difficulty_cache = $this->getAverageDifficultyRating();
+            $this->save();
+            return $this->average_difficulty_cache;
         });
     }
 
@@ -392,7 +421,7 @@ class Action extends Model
      */
     public function getHighestVoteCountAttribute()
     {
-        return Cache::remember($this->cacheKey() . ':getHighestVoteCount', $this->cacheMinutes, function () {
+        return Cache::remember($this->cacheKey() . ':highestVoteCount', $this->cacheMinutes, function () {
             return $this->getHighestVoteCount();
         });
     }
@@ -414,7 +443,21 @@ class Action extends Model
     }
 
 
+    /**
+     * Returns the confidence value
+     *
+     * @return float
+     */
     public function getConfidenceAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':confidence', $this->cacheMinutes, function () {
+            $this->confidence_cache = $this->getConfidence();
+            $this->save();
+            return $this->confidence_cache;
+        });
+    }
+
+    public function getConfidence()
     {
         $voteCount = count($this->getCallVotesAttribute());
         if ($voteCount === 0) {
@@ -426,7 +469,22 @@ class Action extends Model
     }
 
 
+    /**
+     * Returns the confidence value
+     *
+     * @return float
+     */
     public function getConsensusAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':consensus', $this->cacheMinutes, function () {
+            $this->consensus_cache = $this->getConsensus();
+            $this->save();
+            return $this->consensus_cache;
+        });
+    }
+
+
+    public function getConsensus()
     {
         $voteCount = count($this->getCallVotesAttribute());
         if ($voteCount === 0) {
@@ -436,6 +494,22 @@ class Action extends Model
         $highestVoteCount = $this->getHighestVoteCountAttribute();
 
         return $highestVoteCount / $voteCount;
+    }
+
+
+
+    /**
+     * Returns the vote count
+     *
+     * @return Integer
+     */
+    public function getVoteCountAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':voteCount', $this->cacheMinutes, function () {
+            $this->vote_count_cache = count($this->getCallVotes());
+            $this->save();
+            return $this->vote_count_cache;
+        });
     }
 
 

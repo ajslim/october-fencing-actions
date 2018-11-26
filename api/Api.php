@@ -145,11 +145,11 @@ class Api extends Controller
             $records[] = [
                 'id' => $action->id,
                 'thumb' => $action->thumb_url,
-                'votes' => count($action->getCallVotesAttribute()),
-                'top_vote' => $action->getTopVoteNameAttribute(),
-                'confidence' => round($action->getConfidenceAttribute(), 3),
-                'consensus' => round($action->getConsensusAttribute(), 3),
-                'difficulty' => round($action->getAverageDifficultyRatingAttribute(), 3),
+                'votes' => $action->vote_count_cache,
+                'top_vote' => $action->top_vote_name_cache,
+                'confidence' => round($action->confidence_cache, 3),
+                'consensus' => round($action->consensus_cache, 3),
+                'difficulty' => round($action->average_difficulty_cache, 3),
                 'time' => $action->time,
                 'bout_name' => $action->bout->name,
                 'link' => '/?id=' . $action->id . '&results=true'

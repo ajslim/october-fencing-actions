@@ -213,6 +213,7 @@ class VoteOnAction extends ComponentBase
 
         // ensures clean models
         $this->vote->refresh();
+        $this->action->updateCacheColumns();
         $this->action->refresh();
     }
 

@@ -33,10 +33,10 @@ class VoteOnAction extends ComponentBase
 
     private $isNewAction = false;
 
-    private $maxFieVoteCount = 14;
-    private $verifierThreshold = 7;
+    private $maxFieVoteCount = 18;
+    private $verifierThreshold = 8;
     private $beginnerThreshold = 2;
-    private $easyWrongPunishment = 7;
+    private $easyWrongPunishment = 8;
     private $mediumWrongPunishment = 2;
 
     public function componentDetails()

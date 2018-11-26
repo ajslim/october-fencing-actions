@@ -104,7 +104,53 @@ class Action extends Model
         $this->confidence_cache = $this->getConfidence();
         $this->consensus_cache = $this->getConsensus();
         $this->average_difficulty_cache = $this->getAverageDifficultyRating();
+        $this->ordered_calls_cache = $this->getOrderedCallsString();
         $this->save();
+    }
+
+
+    public function getOrderedCallsString()
+    {
+        $orderedCalls = $this->getOrderedCallsArray();
+        $orderedCallsString = '';
+
+        foreach ($orderedCalls as $call) {
+            // If there is any vote count
+            if ($call[2] > 0) {
+                // {priority}:{call_id}:{count},
+                $orderedCallsString .= $call[0] . ':' . $call[1] . ':' . $call[2] . ',';
+            }
+        }
+
+        return $orderedCallsString;
+    }
+
+    public function getOrderedCallsArrayAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':orderedCalls', $this->cacheMinutes, function () {
+            $this->ordered_calls_cache = $this->getOrderedCallsString();
+            $this->save;
+            return $this->getOrderedCallsArray();
+        });
+    }
+
+
+    public function getOrderedCallsArray()
+    {
+        $calls = $this->getCallsArray();
+
+        $orderVotes = [];
+        foreach ($calls as $priorityId => $priorityCalls) {
+            foreach ($priorityCalls as $callId => $callCount) {
+                $orderVotes[] = [$priorityId, $callId, $callCount];
+            }
+        }
+
+        usort($orderVotes, function ($a, $b) {
+            return $b[2] - $a[2];
+        });
+
+        return $orderVotes;
     }
 
 
@@ -307,12 +353,12 @@ class Action extends Model
      */
     public function getTopVoteName()
     {
-        $topVote = $this->getTopVoteAttribute();
+        $topVote = $this->getTopVote();
         if ($topVote === false) {
             return '';
         }
 
-        $callId = $this->getTopVoteAttribute()->callId;
+        $callId = $this->getTopVote()->callId;
         if ($callId === Call::CARD_ID) {
             return "Card";
         }

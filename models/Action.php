@@ -105,7 +105,7 @@ class Action extends Model
         $this->consensus_cache = $this->getConsensus();
         $this->average_difficulty_cache = $this->getAverageDifficultyRating();
         $this->ordered_calls_cache = $this->getOrderedCallsString();
-        $this->is_verified_cache = $this->getIsVerifiedAttribute();
+        $this->is_verified_cache = $this->getIsVerified();
         $this->save();
     }
 
@@ -163,14 +163,26 @@ class Action extends Model
     public function getIsVerifiedAttribute()
     {
         return Cache::remember($this->cacheKey() . ':isVerified', $this->cacheMinutes, function () {
-            $isVerified = false;
-            if ($this->getVerifiedVote() !== false) {
-                $isVerified = true;
-            }
+            $isVerified = $this->getIsVerified();
             $this->is_verified_cache = $isVerified;
             $this->save();
             return $isVerified;
         });
+    }
+
+
+    /**
+     * Returns if verified
+     *
+     * @return boolean
+     */
+    public function getIsVerified()
+    {
+        $isVerified = false;
+        if ($this->getVerifiedVote() !== false) {
+            $isVerified = true;
+        }
+        return $isVerified;
     }
 
 

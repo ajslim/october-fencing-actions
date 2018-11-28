@@ -4,6 +4,19 @@
  */
 
 Route::group(
+    ['prefix' => 'video/'],
+    function () {
+
+        Route::get(
+            '{id}',
+            [
+                'uses' => 'Ajslim\FencingActions\Api\Video@index',
+            ]
+        );
+    }
+);
+
+Route::group(
     ['prefix' => 'api/'],
     function () {
 
@@ -30,6 +43,13 @@ Route::group(
             'useractions/{userId}',
             [
                 'uses' =>'Ajslim\FencingActions\Api\Actions@userActions',
+            ]
+        );
+
+        Route::get(
+            'separatingattacks',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Actions@separatingAttacks',
             ]
         );
     }

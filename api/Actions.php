@@ -47,4 +47,24 @@ class Actions extends Api
             $query->where('user_id', $userId);
         })->get());
     }
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
+    public function separatingAttacks() {
+        return $this->makeDataTablesActionResponse(
+            Action::whereRaw(
+                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
+                    . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0"
+            )->orWhereRaw(
+                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
+                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '0:7:') > 0"
+            )->orWhereRaw(
+                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0 "
+                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '0:7:') > 0"
+            )->get()
+        );
+    }
 }

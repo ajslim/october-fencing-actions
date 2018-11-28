@@ -89,6 +89,9 @@ class CreateActionsTable extends Migration
                 $table->string('ordered_calls_cache')
                     ->nullable();
 
+                $table->boolean('is_verified_cache')
+                    ->nullable();
+
                 $table->timestamps();
             }
         );

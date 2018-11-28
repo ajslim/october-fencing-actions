@@ -105,6 +105,7 @@ class Action extends Model
         $this->consensus_cache = $this->getConsensus();
         $this->average_difficulty_cache = $this->getAverageDifficultyRating();
         $this->ordered_calls_cache = $this->getOrderedCallsString();
+        $this->is_verified_cache = $this->getIsVerifiedAttribute();
         $this->save();
     }
 
@@ -129,7 +130,7 @@ class Action extends Model
     {
         return Cache::remember($this->cacheKey() . ':orderedCalls', $this->cacheMinutes, function () {
             $this->ordered_calls_cache = $this->getOrderedCallsString();
-            $this->save;
+            $this->save();
             return $this->getOrderedCallsArray();
         });
     }
@@ -159,6 +160,25 @@ class Action extends Model
      *
      * @return boolean | Vote
      */
+    public function getIsVerifiedAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':isVerified', $this->cacheMinutes, function () {
+            $isVerified = false;
+            if ($this->getVerifiedVote() !== false) {
+                $isVerified = true;
+            }
+            $this->is_verified_cache = $isVerified;
+            $this->save();
+            return $isVerified;
+        });
+    }
+
+
+    /**
+     * Returns the verified vote, or false
+     *
+     * @return boolean | Vote
+     */
     public function getVerifiedVoteAttribute()
     {
         return Cache::remember($this->cacheKey() . ':verifiedCall', $this->cacheMinutes, function () {
@@ -175,7 +195,7 @@ class Action extends Model
      */
     public function getVerifiedVote()
     {
-        $fieConsensus = $this->getFieConsensusVoteAttribute();
+        $fieConsensus = $this->getFieConsensusVote();
         if ($fieConsensus !== false) {
             return $fieConsensus;
         }

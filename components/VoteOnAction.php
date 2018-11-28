@@ -108,21 +108,7 @@ class VoteOnAction extends ComponentBase
 
     private function getVerifiedActions()
     {
-        $fieActions = Action::whereHas('votes', function ($query) {
-            $query->where('referee_level', 'fie')
-                ->where('vote_comment_id', '!=', 2);
-        })->get();
-
-        $actionsWithVerifierVotes = Action::whereHas('votes', function ($query) {
-            $query->where('referee_level', 'verifier')
-                ->where('vote_comment_id', '!=', 2);
-        })->get();
-
-        $verifiedActions = $actionsWithVerifierVotes->filter(function ($action) {
-            return $action->getVerifiedVoteAttribute() !== false;
-        });
-
-        return $fieActions->merge($verifiedActions);
+        return Action::where('is_verified_cache', '1')->get();
     }
 
 

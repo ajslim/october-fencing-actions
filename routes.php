@@ -45,12 +45,5 @@ Route::group(
                 'uses' =>'Ajslim\FencingActions\Api\Actions@userActions',
             ]
         );
-
-        Route::get(
-            'separatingattacks',
-            [
-                'uses' =>'Ajslim\FencingActions\Api\Actions@separatingAttacks',
-            ]
-        );
     }
 );

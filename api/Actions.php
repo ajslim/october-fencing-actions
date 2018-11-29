@@ -28,6 +28,19 @@ class Actions extends Api
     public function index(
         $actionId = null
     ) {
+
+        if ($actionId === 'separatingattacks') {
+            return $this->separatingAttacks();
+        }
+
+        if ($actionId === 'beatvsparry') {
+            return $this->beatVsParry();
+        }
+
+        if ($actionId === 'possiblecard') {
+            return $this->possibleCard();
+        }
+
         if ($actionId !== null) {
             return $this->displayModel(Action::find($actionId));
         }
@@ -54,6 +67,8 @@ class Actions extends Api
      * @return array
      */
     public function separatingAttacks() {
+
+        // Where the top 2 calls are attack from either side, or simultaneous
         return $this->makeDataTablesActionResponse(
             Action::whereRaw(
                 "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
@@ -64,6 +79,41 @@ class Actions extends Api
             )->orWhereRaw(
                 "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0 "
                 . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '0:7:') > 0"
+            )->get()
+        );
+    }
+
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
+    public function beatVsParry() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::whereRaw(
+                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
+                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:3:') > 0"
+            )->orWhereRaw(
+                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:3:') > 0 "
+                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0"
+            )->get()
+        );
+    }
+
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
+    public function possibleCard() {
+        // Where someone has given a card
+        return $this->makeDataTablesActionResponse(
+            Action::whereRaw(
+                "INSTR(ordered_calls_cache, ':99:') > 0 "
             )->get()
         );
     }

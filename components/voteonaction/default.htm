@@ -265,6 +265,16 @@
             {% else %}
 
                 <div class="col-lg-6">
+                    {% if verifiedString is defined %}
+                    <h6 class="text-muted">Verified</h6>
+                    <div class="row">
+                        <div class="col">
+                            This action has been verified as: {{ verifiedString }}
+                        </div>
+                    </div>
+                    <hr>
+                    {% endif %}
+
                     <h6 class="text-muted">Votes so far ({{ votes.total }})</h6>
                     <div class="row">
                         <div class="col">

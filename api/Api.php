@@ -137,7 +137,19 @@ class Api extends Controller
             'draw' => $draw,
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsTotal,
-            'columns' => $this->makeCollectionColumns($records),
+            'columns' => [
+                'id' => 'id',
+                'last_name' => 'string',
+                'first_name' => 'string',
+                'total_actions_for' => 'integer',
+                'total_actions_against' => 'integer',
+                'country_code' => 'string',
+                'birth' => 'string',
+                'highest_rank' => 'integer',
+                'primary_weapon' => 'string',
+                'gender' => 'string',
+                'fie_site_number' => 'string'
+            ],
             'data' => $records,
         ];
         return json_encode($response);
@@ -152,8 +164,8 @@ class Api extends Controller
             'votes' => 'integer',
             'top_vote' => 'string',
             'is_verified' => 'boolean',
-            'confidence' => 'double',
-            'consensus' => 'double',
+            'confidence' => 'percent',
+            'consensus' => 'percent',
             'difficulty' => 'double',
             'time' => 'integer',
             'bout_name' => 'string',

@@ -132,15 +132,31 @@
                 column.render = function (data, type, row) {
                     return '<img width="120" src="' + data + '" />';
                 }
-            }
-
-            if (type === 'boolean') {
+            } else if (type === 'boolean') {
                 column.render = function (data, type, row) {
-                    if (data) {
-                        return 'Yes';
-                    } else {
-                        return 'No';
+                    var rowData = row;
+                    var link =  '/browse?u=' + resource + '/' + rowData.id;
+
+                    if (rowData.link !== undefined) {
+                        link = rowData.link
                     }
+
+                    if (data) {
+                        return '<a href="' + link + '">Yes</a>';
+                    } else {
+                        return '<a href="' + link + '">No</a>';
+                    }
+                }
+            } else if (type === 'percent') {
+                column.render = function (data, type, row) {
+                    var rowData = row;
+                    var link =  '/browse?u=' + resource + '/' + rowData.id;
+
+                    if (rowData.link !== undefined) {
+                        link = rowData.link
+                    }
+
+                    return '<a href="' + link + '">' + Math.floor(data * 100) + '% </a>';
                 }
             }
 

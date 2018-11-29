@@ -368,7 +368,11 @@
                 </div>
                 <div class="col">
                     <label class="next-action">
-                        Next
+                        {% if voteForm == true %}
+                            Skip
+                        {% else %}
+                            Next
+                        {% endif %}
                         <input type="submit">
                     </label>
                 </div>

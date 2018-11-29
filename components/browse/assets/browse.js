@@ -134,6 +134,16 @@
                 }
             }
 
+            if (type === 'boolean') {
+                column.render = function (data, type, row) {
+                    if (data) {
+                        return 'Yes';
+                    } else {
+                        return 'No';
+                    }
+                }
+            }
+
             if (type !== 'image' && type !== 'link') {
                 columns.push(column);
             }

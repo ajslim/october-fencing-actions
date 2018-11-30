@@ -401,6 +401,8 @@ class VoteOnAction extends ComponentBase
 
     private function showResults()
     {
+        $this->action->updateCacheColumns();
+
         if ($this->vote !== null) {
             $this->checkCorrect();
             $this->addMotivationalMessage();

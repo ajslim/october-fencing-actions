@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="/plugins/ajslim/fencingactions/components/voteonaction/assets/styles.css" crossorigin="anonymous">
 
+
     <script>
         function changeSpeed() {
             var vid = document.getElementById("video");
@@ -24,12 +25,14 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
             <img src="/plugins/ajslim/fencingactions/assets/quarte-riposte-white.svg" height="50"/>
+            Actions
+
             {% if fie is defined %}
-            FIE
+            : FIE
             {% endif %}
 
             {% if verifier is defined %}
-            Verifier
+            : Verifier
             {% endif %}
         </a>
 
@@ -96,31 +99,30 @@
     <div class="row">
         <div class="col-lg-6">
 
+            <div class="row bout-data">
+                <div class="col-12">
+                    <a href="{{ boutVideoUrl }}"><h5 class="text-muted">{{ boutName }}</h5></a>
+                </div>
+            </div>
             <video id="video" controls loop autoplay="true" playsinline="" preload="auto" tabindex="-1">
                 <source src="{{ videoUrl }}" type="video/mp4">
             </video>
 
             <div class="row">
-                <div class="col text-center">
+                <div class="col text-left">
                     <b>{{ leftFencer }}</b>
                 </div>
-                <div class="col text-center">
-                    <b>{{ rightFencer }}</b>
-                </div>
-            </div>
-
-
-            <div class="row bout-data">
-                <div class="col-8">
-                    <a href="{{ boutVideoUrl }}"><h6 class="text-muted">{{ boutName }}</h6></a>
-                </div>
-                <div class="col-4">
+                <div class="col">
                     <input type="checkbox" id="changeSpeed" onclick="changeSpeed()" />
                     <label id="changeSpeedLabel" for="changeSpeed">
                         Slow
                     </label>
                 </div>
+                <div class="col text-right">
+                    <b>{{ rightFencer }}</b>
+                </div>
             </div>
+
         </div>
 
         {% if voteForm == true %}
@@ -130,23 +132,23 @@
                 <input type="hidden" name="action-id" value="{{ actionId }}" />
                 <input type="hidden" name="submit-vote" value="true" />
 
-                <h6 class="text-muted">Action For</h6>
+                <h6 class="text-muted">Call it For</h6>
                 <div class="row">
-                    <div class="col text-center">
+                    <div class="col">
                         <input id="priority-left" name="priority" type="radio" value="1">
-                        <label for="priority-left" class="test">
+                        <label for="priority-left" class="text-center">
                             Left
                         </label>
                     </div>
                     <div class="col text-center">
-                        <input id="priority-none" name="priority" type="radio" value="0"  checked="checked">
-                        <label for="priority-none" class="test">
+                        <input id="priority-none" name="priority" type="radio" value="0">
+                        <label for="priority-none" class="text-center">
                             - neither -
                         </label>
                     </div>
                     <div class="col text-center">
                         <input id="priority-right" name="priority" type="radio" value="2">
-                        <label for="priority-right">
+                        <label for="priority-right" class="text-center">
                             Right
                         </label>
                     </div>
@@ -155,13 +157,13 @@
                 <div class="calls">
                     <h6 class="text-muted">Call</h6>
                     <div class="row">
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-attack" name="call" type="radio" value="1">
                             <label for="call-attack">
                                 <i class="icon-attack"></i>Attack
                             </label>
                         </div>
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-counter-attack" name="call" type="radio" value="2">
                             <label for="call-counter-attack">
                                 <i class="icon-counter"></i>Counter-Attack
@@ -169,13 +171,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-riposte" name="call" type="radio" value="3">
                             <label for="call-riposte">
                                 <i class="icon-riposte"></i>Riposte
                             </label>
                         </div>
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-remise" name="call" type="radio" value="4">
                             <label for="call-remise">
                                 <i class="icon-remise"></i>Remise
@@ -183,13 +185,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-line" name="call" type="radio" value="5">
                             <label for="call-line">
                                 <i class="icon-line"></i>Line
                             </label>
                         </div>
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-other" name="call" type="radio" value="6">
                             <label for="call-other">
                                 <i class="icon-other"></i>Unknown / Other
@@ -197,11 +199,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col text-center">
+                        <div class="col">
                             <input id="call-simultaneous" name="call" type="radio" value="7">
                             <label for="call-simultaneous">
-                                <i class="icon-simultaenous"></i>Simultaneous / Together
+                                <i class="icon-simultaneous"></i>Simultaneous / Together
                             </label>
+                        </div>
+                        <div class="col">
                         </div>
                     </div>
                 </div>
@@ -278,7 +282,7 @@
                     <b>Left</b>
                     {% for call, vote in votes.left %}
                     <div>
-                        {{ call|capitalize }} : {{ vote }}
+                        <i class="icon-{{call|split(' ')[0]|lower}}"></i>{{ call|capitalize }} : {{ vote }}
                     </div>
                     {% if votes.total > 0 %}
                     <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
@@ -288,12 +292,14 @@
                 <div class="col">
                     <b>Right</b>
                     {% for call, vote in votes.right %}
-                    <div>
-                        {{ call|capitalize }} : {{ vote }}
-                    </div>
-                    {% if votes.total > 0 %}
-                    <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
-                    {% endif %}
+
+
+                        <div>
+                            <i class="icon-{{call|split(' ')[0]|lower}}"></i>{{ call|capitalize }} : {{ vote }}
+                        </div>
+                        {% if votes.total > 0 %}
+                            <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -303,7 +309,7 @@
                     <b>Neither</b>
 
                     <div>
-                        Simultaneous : {{ votes.simultaneous }}
+                        <i class="icon-simultaneous"></i>Simultaneous : {{ votes.simultaneous }}
                     </div>
 
                     {% if votes.total > 0 %}

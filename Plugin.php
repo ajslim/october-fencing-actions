@@ -1,6 +1,7 @@
 <?php namespace Ajslim\FencingActions;
 
 use Backend;
+use System\Classes\CombineAssets;
 use System\Classes\PluginBase;
 
 /**
@@ -41,6 +42,12 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.CreateActionsForBouts', 'Ajslim\FencingActions\Console\CreateActionsForBouts');
         $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
         $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
+
+        CombineAssets::registerCallback(
+            function ($combiner) {
+                $combiner->registerBundle('~/plugins/ajslim/fencingactions/components/voteonaction/assets/styles.less');
+            }
+        );
     }
 
     /**

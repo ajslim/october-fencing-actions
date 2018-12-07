@@ -476,7 +476,6 @@ class VoteOnAction extends ComponentBase
 
     public function onRun()
     {
-
         $this->getUserDetails();
         $this->getAction();
 

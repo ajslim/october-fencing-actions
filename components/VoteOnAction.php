@@ -225,9 +225,11 @@ class VoteOnAction extends ComponentBase
             $action = $this->getActionsWithNoVotes()->random();
             $this->page['fresh'] = true;
         } else if ($this->isFieUser === true) {
-            $random = rand(1, 3);
-            if ($random === 1) {
+            $random = rand(1, 5);
+            if ($random < 3) {
                 $action = $this->getActionsWithNoVotes()->random();
+            } else if ($random < 5) {
+                $action = $this->getDifficultActions()->random();
             } else {
                 $action = $this->getActions()->random();
             }

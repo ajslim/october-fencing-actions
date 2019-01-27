@@ -2,6 +2,7 @@
 
 use DateTime;
 use Model;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Bout Model
@@ -55,6 +56,38 @@ class Bout extends Model
     public $morphMany = [];
     public $attachOne = [];
     public $attachMany = [];
+
+
+    public $cacheMinutes = 30;
+
+    /**
+     * Generate a unique cache key to cache actions
+     *
+     * @return string
+     */
+    public function cacheKey()
+    {
+        return sprintf(
+            "%s/%s-%s",
+            $this->getTable(),
+            $this->getKey(),
+            $this->updated_at->timestamp
+        );
+    }
+
+
+    /**
+     * Returns the number of actions
+     *
+     * @return integer
+     */
+    public function getActionCountAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':actionCount', $this->cacheMinutes, function () {
+            $actionCount = count($this->actions);
+            return $actionCount;
+        });
+    }
 
 
     /**

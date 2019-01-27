@@ -61,6 +61,25 @@ class Api extends Controller
     }
 
 
+    public function makeBoutResponse(Bout $bout, $children)
+    {
+        $response = [
+            'id' => $bout->id,
+            'cache_name' => $bout->cache_name,
+            'video_url' => $bout->video_url,
+            'left_score' => $bout->left_score,
+            'right_score' => $bout->right_score,
+            'action_count' => $bout->actionCount,
+            'created_at' => $bout->created_at,
+            'updated_at' => $bout->created_at,
+            'children' => $children,
+        ];
+
+        return json_encode($response);
+
+    }
+
+
     public function makeCollectionColumns($collection)
     {
         $firstRowArray = $collection->first()->toArray();
@@ -87,7 +106,7 @@ class Api extends Controller
         if ($start !== null && $length !== null) {
             $records = array_values($collection->slice($start, $length)->all());
         } else {
-            $records = $collection->toArray();
+            $records = $collection;
         }
 
         $response = [
@@ -98,6 +117,50 @@ class Api extends Controller
             'data' => $records,
         ];
 
+        return json_encode($response);
+    }
+
+
+    public function makeDataTablesBoutResponse($collection)
+    {
+        $draw = (integer) Input::get('draw');
+        $start = Input::get('start');
+        $length = Input::get('length');
+
+        $recordsTotal = count($collection);
+
+        if ($start !== null && $length !== null) {
+            $collection = $collection->slice($start, $length);
+        }
+
+
+        $records = [];
+        /** @var Bout $bout */
+        foreach ($collection as $bout) {
+            $records[] = [
+                'id' => $bout->id,
+                'cache_name' => $bout->cache_name,
+                'video_url' => $bout->video_url,
+                'left_score' => $bout->left_score,
+                'right_score' => $bout->right_score,
+                'action_count' => $bout->actionCount,
+            ];
+        }
+
+        $response = [
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsTotal,
+            'columns' => [
+                'id' => 'id',
+                'cache_name' => 'string',
+                'video_url' => 'link',
+                'left_score' => 'integer',
+                'right_score' => 'integer',
+                'action_count' => 'integer',
+            ],
+            'data' => $records,
+        ];
         return json_encode($response);
     }
 

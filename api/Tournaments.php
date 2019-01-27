@@ -40,11 +40,11 @@ class Tournaments extends Api
         }
 
         if ($boutId !== null) {
-            return $this->displayModel(Bout::find($boutId), ['actions']);
+            return $this->makeBoutResponse(Bout::find($boutId), ['actions']);
         }
 
         if ($tournamentChild === 'bouts' && $tournamentId !== null) {
-            return $this->makeDataTablesResponse(Tournament::find($tournamentId)->bouts);
+            return $this->makeDataTablesBoutResponse(Tournament::find($tournamentId)->bouts);
         }
 
         if ($tournamentChild === 'actions' && $tournamentId !== null) {

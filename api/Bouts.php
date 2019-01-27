@@ -38,9 +38,9 @@ class Bouts extends Api
         }
 
         if ($boutId !== null) {
-            return $this->displayModel(Bout::find($boutId), ['actions']);
+            return $this->makeBoutResponse(Bout::find($boutId), ['actions']);
         }
 
-        return $this->makeDataTablesResponse(Bout::all());
+        return $this->makeDataTablesBoutResponse(Bout::all());
     }
 }

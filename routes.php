@@ -33,12 +33,17 @@ Route::group(
             ]
         );
         Route::get(
+            'bouts/{boutId?}/{boutChild?}/{actionId?}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Bouts@index',
+            ]
+        );
+        Route::get(
             'actions/{actionId?}',
             [
                 'uses' =>'Ajslim\FencingActions\Api\Actions@index',
             ]
         );
-
         Route::get(
             'useractions/{userId}',
             [

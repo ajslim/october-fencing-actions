@@ -1,0 +1,29 @@
+{
+  "name": "ffe",
+  "type": 2,
+  "imageDimensions": [
+    640,
+    360
+  ],
+  "overlayCrop": [
+    4,
+    14,
+    191,
+    327
+  ],
+  "redLightCrop": [
+    12,
+    2,
+    302,
+    328
+  ],
+  "greenLightCrop": [
+    12,
+    2,
+    328,
+    328
+  ],
+  "redLightThreshold": 0.015,
+  "greenLightThreshold": 0.015,
+  "overlayThreshold": 0.07
+}

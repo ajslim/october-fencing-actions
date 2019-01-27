@@ -195,8 +195,8 @@ class SearchYoutubeUrlsForTournament extends Command
                 $url = 'https://www.youtube.com/watch?v=' . $result['id']['videoId'];
                 echo $url . "\n";
 
-//                $bout->video_url = $url;
-//                $bout->save();
+                $bout->video_url = $url;
+                $bout->save();
 
                 $boutFound = true;
                 break;
@@ -246,10 +246,10 @@ class SearchYoutubeUrlsForTournament extends Command
 
 
         $this->acceptableUploaders = [
-//            'Fencing Vision',
-//            'USAFencing',
-//            'FIE Fencing Channel',
-//            'Great Foil Fencing',
+            'Fencing Vision',
+            'USAFencing',
+            'FIE Fencing Channel',
+            'Great Foil Fencing',
             'Fédération Française d\'Escrime',
         ];
 

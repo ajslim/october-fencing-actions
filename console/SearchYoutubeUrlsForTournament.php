@@ -44,6 +44,19 @@ class SearchYoutubeUrlsForTournament extends Command
     }
 
 
+    private function makeYoutubeApiSearchUrlByName($year, $tournamentName, $fencer1, $fencer2) {
+
+        return 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=fencing+$year+'
+            . urlencode($tournamentName)
+            . '+'
+            . urlencode($fencer1)
+            . '+'
+            . urlencode($fencer2)
+            . '&key='
+            . ApiKey::$KEY;
+    }
+
+
     private function searchYoutubePage($bout)
     {
 
@@ -124,10 +137,28 @@ class SearchYoutubeUrlsForTournament extends Command
     private function searchYoutubeApi($bout)
     {
 
+        $boutFound = false;
         $tournament = $bout->tournament;
 
         // Place might be 'Anaheim, California' we only want the first part
         $place = explode(',', $tournament->place)[0];
+
+        // Search by place and year
+        $results = $this->searchApiByPlace($bout, $tournament, $place);
+        $boutFound = $this->checkResultsAndSave($results['items'], $tournament, $bout, $place);
+
+        // If not successful, then search by tournament name and year (e.g. CIP 2019)
+        if ($boutFound === false) {
+            $results = $this->searchApiByTournamentName($bout, $tournament);
+            $boutFound = $this->checkResultsAndSave($results['items'], $tournament, $bout, $place);
+        }
+    }
+
+
+    private function searchApiByPlace($bout, $tournament, $place)
+    {
+
+
 
         $url = $this->makeYoutubeApiSearchUrl(
             $tournament->year,
@@ -136,32 +167,64 @@ class SearchYoutubeUrlsForTournament extends Command
             $bout->right_fencer->last_name
         );
 
-        $results = json_decode(file_get_contents($url), true);
+        return json_decode(file_get_contents($url), true);
+    }
 
-        foreach ($results['items'] as $result) {
+
+    private function searchApiByTournamentName($bout, $tournament)
+    {
+        $url = $this->makeYoutubeApiSearchUrlByName(
+            $tournament->year,
+            $tournament->name,
+            $bout->left_fencer->last_name,
+            $bout->right_fencer->last_name
+        );
+
+        return $results = json_decode(file_get_contents($url), true);
+    }
+
+    private function checkResultsAndSave($results, $tournament, $bout, $place)
+    {
+        $boutFound = false;
+        foreach ($results as $result) {
 
             $uploader = $result['snippet']['channelTitle'];
             $title =  $result['snippet']['title'];
 
-            $words = strtolower($title);
-
-            $isAcceptableUploader = in_array($uploader, $this->acceptableUploaders);
-
-            if ($isAcceptableUploader === true
-                && strpos($words, $tournament->year) !== false
-                && strpos($words, strtolower($place)) !== false
-                && strpos($words, strtolower($bout->left_fencer->last_name)) !== false
-                && strpos($words, strtolower($bout->right_fencer->last_name)) !== false
-            ) {
+            if ($this->isCorrectBout($uploader, $title, $tournament, $bout, $place)) {
                 $url = 'https://www.youtube.com/watch?v=' . $result['id']['videoId'];
                 echo $url . "\n";
 
-                $bout->video_url = $url;
-                $bout->save();
+//                $bout->video_url = $url;
+//                $bout->save();
 
+                $boutFound = true;
                 break;
             }
         }
+        return $boutFound;
+    }
+
+
+    private function isCorrectBout($uploader, $title, $tournament, $bout, $place)
+    {
+        $words = strtolower($title);
+
+        $isAcceptableUploader = in_array($uploader, $this->acceptableUploaders);
+
+        $byPlace = $isAcceptableUploader === true
+            && strpos($words, $tournament->year) !== false
+            && strpos($words, strtolower($place)) !== false
+            && strpos($words, strtolower($bout->left_fencer->last_name)) !== false
+            && strpos($words, strtolower($bout->right_fencer->last_name)) !== false;
+
+        $byName = $isAcceptableUploader === true
+            && strpos($words, $tournament->year) !== false
+            && strpos($words, strtolower($tournament->name)) !== false
+            && strpos($words, strtolower($bout->left_fencer->last_name)) !== false
+            && strpos($words, strtolower($bout->right_fencer->last_name)) !== false;
+
+        return $byPlace || $byName;
     }
 
 
@@ -183,10 +246,11 @@ class SearchYoutubeUrlsForTournament extends Command
 
 
         $this->acceptableUploaders = [
-            'Fencing Vision',
-            'USAFencing',
-            'FIE Fencing Channel',
-            'Great Foil Fencing',
+//            'Fencing Vision',
+//            'USAFencing',
+//            'FIE Fencing Channel',
+//            'Great Foil Fencing',
+            'Fédération Française d\'Escrime',
         ];
 
         foreach ($bouts as $bout) {

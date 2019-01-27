@@ -160,13 +160,13 @@
                         <div class="col">
                             <input id="call-attack" name="call" type="radio" value="1">
                             <label for="call-attack">
-                                <i class="icon-attack"></i>Attack
+                                Attack
                             </label>
                         </div>
                         <div class="col">
                             <input id="call-counter-attack" name="call" type="radio" value="2">
                             <label for="call-counter-attack">
-                                <i class="icon-counter"></i>Counter-Attack
+                                Counter-Attack
                             </label>
                         </div>
                     </div>
@@ -174,13 +174,13 @@
                         <div class="col">
                             <input id="call-riposte" name="call" type="radio" value="3">
                             <label for="call-riposte">
-                                <i class="icon-riposte"></i>Riposte
+                                Riposte
                             </label>
                         </div>
                         <div class="col">
                             <input id="call-remise" name="call" type="radio" value="4">
                             <label for="call-remise">
-                                <i class="icon-remise"></i>Remise
+                                Remise
                             </label>
                         </div>
                     </div>
@@ -188,13 +188,13 @@
                         <div class="col">
                             <input id="call-line" name="call" type="radio" value="5">
                             <label for="call-line">
-                                <i class="icon-line"></i>Line
+                                Line
                             </label>
                         </div>
                         <div class="col">
                             <input id="call-other" name="call" type="radio" value="6">
                             <label for="call-other">
-                                <i class="icon-other"></i>Unknown / Other
+                                Unknown / Other
                             </label>
                         </div>
                     </div>
@@ -202,7 +202,7 @@
                         <div class="col">
                             <input id="call-simultaneous" name="call" type="radio" value="7">
                             <label for="call-simultaneous">
-                                <i class="icon-simultaneous"></i>Simultaneous / Together
+                                Simultaneous
                             </label>
                         </div>
                         <div class="col">
@@ -282,7 +282,7 @@
                     <b>Left</b>
                     {% for call, vote in votes.left %}
                     <div>
-                        <i class="icon-{{call|split(' ')[0]|lower}}"></i>{{ call|capitalize }} : {{ vote }}
+                        {{ call|capitalize }} : {{ vote }}
                     </div>
                     {% if votes.total > 0 %}
                     <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
@@ -295,7 +295,7 @@
 
 
                         <div>
-                            <i class="icon-{{call|split(' ')[0]|lower}}"></i>{{ call|capitalize }} : {{ vote }}
+                            {{ call|capitalize }} : {{ vote }}
                         </div>
                         {% if votes.total > 0 %}
                             <div class="graph-bar" style="width: {{ (vote / votes.total) * 100 }}%;">{{ ((vote / votes.total) * 100)|round }}%</div>
@@ -309,7 +309,7 @@
                     <b>Neither</b>
 
                     <div>
-                        <i class="icon-simultaneous"></i>Simultaneous : {{ votes.simultaneous }}
+                        Simultaneous : {{ votes.simultaneous }}
                     </div>
 
                     {% if votes.total > 0 %}

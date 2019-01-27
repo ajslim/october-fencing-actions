@@ -117,4 +117,69 @@ class Actions extends Api
             )->get()
         );
     }
+
+
+    /**
+     * The easy verified actions
+     *
+     * @return array
+     */
+    public function verifiedEasy() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '>=', .80)
+            ->where('is_verified', true)
+            ->get()
+        );
+    }
+
+    /**
+     * The unverified Easy actions
+     *
+     * @return array
+     */
+    public function unverifiedEasy() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '>=', .80)
+                ->where('is_verified', false)
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified Medium actions
+     *
+     * @return array
+     */
+    public function verifiedMedium() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '<', .80)
+                ->where('confidence_cache', '>=', .50)
+                ->where('vote_count_cache', '>=', 3)
+                ->where('is_verified', false)
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function verifiedHard() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '<', .50)
+                ->where('is_verified', false)
+                ->get()
+        );
+    }
 }

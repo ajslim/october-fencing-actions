@@ -41,6 +41,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.AnalyzeBout', 'Ajslim\FencingActions\Console\AnalyzeBout');
         $this->registerConsoleCommand('ajslim.ProfileTool', 'Ajslim\FencingActions\Console\ProfileTool');
         $this->registerConsoleCommand('ajslim.CreateActionsForBouts', 'Ajslim\FencingActions\Console\CreateActionsForBouts');
+        $this->registerConsoleCommand('ajslim.CreateActionsForBout', 'Ajslim\FencingActions\Console\CreateActionsForBout');
         $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
         $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
 

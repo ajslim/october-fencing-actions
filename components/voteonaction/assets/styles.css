@@ -1,247 +1,29 @@
-body {
-    background: #eeeee9;
-}
-
-input[type='radio'] + label,
-input[type='submit'] + label,
-input[type='checkbox'] + label,
-label.submit,
-label.next-action
-{
-    display: block;
-    width: 100%;
-    height: 42px;
-    line-height: 20px;
-    margin: 0;
-    padding: 10px;
-    border-radius: 2px;
-    border: 1px solid gray;
-    margin-bottom: 5px;
-    cursor: pointer;
-    text-align: left;
-    background: white;
-    box-shadow: lightgray 2px 2px 2px 2px;
-}
-
-input[type='radio']:checked + label,
-input[type='checkbox']:checked + label,
-.calls :checked + label,
-.cards :checked + label,
-.difficulty :checked + label
-{
-    background: #76badc;
-    color: black;
-    border-bottom-color: white;
-    border-right-color: white;
-    box-shadow: none;
-}
-
-
-.cards label {
-    background: lightcoral;
-
-}
-
-input {
-    display: block;
-}
-
-input[type='radio'], input[type='submit'], input[type='checkbox'] {
-    display: none;
-}
-
-label.submit {
-    background: mediumseagreen;
-    color: white;
-    border: 1px solid gray;
-}
-
-.vote h6 {
-    margin-top: 30px;
-    margin-bottom: 5px;
-    width: 100%;
-}
-
-.other {
-    margin-bottom: 30px;
-}
-
-select {
-    border-radius: 5px;
-    width: 100%;
-    height: 50px;
-}
-
-.graph-bar {
-    background: lightblue;
-    height: 28px;
-    display: block;
-    text-align: center;
-}
-
-video {
-    width: 100%;
-    max-height: 500px;
-}
-
-a.speedButton
-{
-    display: block;
-    width: 100%;
-    height: 40px;
-    line-height: 20px;
-    margin: 0;
-    margin-bottom: 3px;
-    padding: 10px;
-    border: 1px solid gray;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-}
-
-#changeSpeedLabel {
-    text-align: center;
-}
-
-.bout-data {
-    margin-bottom: 3px;
-}
-
-nav {
-    background-color: #6b0000;
-    color: white;
-    margin-bottom: 15px;
-}
-
-.tabs {
-    margin-bottom: 15px;
-}
-
-a.nav-tab {
-    display: block;
-    height: 40px;
-    line-height: 40px;
-    width: 100%;
-    color: #ff9999;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #993333;
-    background: #996666;
-    text-align: center;
-}
-
-a.nav-tab.active {
-    background: #6b0000;
-    color: white;
-}
-
-a.nav-tab:hover {
-    text-decoration: none;
-    color: white;
-}
-
-label.next-action,
-label.submit
-{
-    cursor: pointer;
-    box-shadow: lightgray 4px 4px 4px 4px;
-}
-
-label.next-action:active,
-label.submit:active
-{
-    box-shadow: none;
-}
-
-
-.qrnav.navbar,
-.qrnav.navbar .container-fluid,
-.qrnav.navbar .container-fluid .navbar-brand
-{
-    padding-top:0;
-    padding-bottom:0;
-}
-
-.qrnav.navbar {
-    padding-top: 2px;
-}
-
-.icon-attack::before {
-    vertical-align: top;
-    line-height: .5em;
-    font-size: 1.8em;
-    font-style: normal;
-    content:"→";
-    padding-right: .1em;
-    display: inline-block;
-}
-
-.icon-counter::before {
-    vertical-align: top;
-    line-height: 1.2em;
-    font-size: 1.2em;
-    font-style: normal;
-    content:"⇆";
-    padding-right: .3em;
-    padding-left: .3em;
-    display:inline-block;
-}
-
-.icon-riposte::before {
-    vertical-align: top;
-    line-height: .3em;
-    font-size: 1.8em;
-    font-style: normal;
-    content:"⦬";
-
-    padding-right: .15em;
-    padding-left: .15em;
-    display: inline-block;
-}
-
-.icon-remise::before {
-    vertical-align: top;
-    line-height: 1em;
-    font-size: 1.2em;
-    font-style: normal;
-    content:"↠";
-    padding-right: .3em;
-    padding-left: .3em;
-    display: inline-block;
-}
-
-.icon-line::before {
-    vertical-align: top;
-    line-height: 1em;
-    font-size: 1.2em;
-    font-style: normal;
-    font-weight: normal;
-    content:"—";
-    padding-right: .2em;
-    padding-left: .2em;
-    display: inline-block;
-}
-
-.icon-other::before {
-    vertical-align: top;
-    line-height: 1.2em;
-    font-size: 1.2em;
-    font-style: normal;
-    font-weight: bold;
-    content:"?";
-    padding-right: .5em;
-    padding-left: .5em;
-    display: inline-block;
-}
-
-.icon-simultaenous::before {
-    vertical-align: top;
-    line-height: .7em;
-    font-size: 1.5em;
-    font-style: normal;
-    font-weight: bold;
-    content:"↔";
-    padding-right: .1em;
-    padding-left: .1em;
-    display: inline-block;
-}
+body{background:#eeeee9}
+nav{background-color:#6b0000;color:white;margin-bottom:15px}
+.qrnav.navbar,.qrnav.navbar .container-fluid,.qrnav.navbar .container-fluid .navbar-brand{padding-top:0;padding-bottom:0}
+.qrnav.navbar{padding-top:2px}
+.tabs{margin-bottom:15px}
+.tabs a.nav-tab{display:block;height:40px;line-height:40px;width:100%;color:#ff9999;padding:0;margin:0;border:1px solid #993333;background:#996666;text-align:center}
+.tabs a.nav-tab.active{background:#6b0000;color:white}
+.tabs a.nav-tab:hover{text-decoration:none;color:white}
+video{width:100%;max-height:500px}
+#changeSpeedLabel{border-top-left-radius:0;border-top-right-radius:0;border-top:0;text-align:center;height:35px;line-height:10px}
+input[type='checkbox']:checked + #changeSpeedLabel{background:lightgoldenrodyellow}
+input[type='radio'] + label,input[type='submit'] + label,input[type='checkbox'] + label,label.submit,label.next-action{display:block;width:100%;height:42px;line-height:20px;margin:0 0 5px 0;padding:10px;border-radius:2px;border:1px solid gray;cursor:pointer;text-align:left;background:white;box-shadow:lightgray 2px 2px 2px 2px}
+input[type='radio']:checked + label,input[type='checkbox']:checked + label,.calls :checked + label,.cards :checked + label,.difficulty :checked + label{background:#76badc;color:black;border-bottom-color:white;border-right-color:white;box-shadow:none}
+input[type='radio'],input[type='submit'],input[type='checkbox']{display:none}
+label.submit{background:mediumseagreen;color:white;border:1px solid gray}
+label.next-action,label.submit{cursor:pointer;box-shadow:lightgray 4px 4px 4px 4px}
+label.next-action:active,label.submit:active{box-shadow:none}
+h6{margin-top:20px;margin-bottom:5px;width:100%}
+select{border-radius:5px;width:100%;height:50px;margin-bottom:5px}
+.results{background:white}
+.graph-bar{background:lightblue;height:28px;display:block;text-align:center}
+.icon{display:inline-block;vertical-align:top}
+.icon-attack::before{display:inline-block;vertical-align:top;line-height:.5em;font-size:1.8em;font-style:normal;content:"→";padding-right:.1em}
+.icon-counter::before{display:inline-block;vertical-align:top;line-height:1.2em;font-size:1.2em;font-style:normal;content:"⇆";padding-right:.3em;padding-left:.3em}
+.icon-riposte::before{display:inline-block;vertical-align:top;line-height:.3em;font-size:1.8em;font-style:normal;content:"⦬";padding-right:.15em;padding-left:.15em}
+.icon-remise::before{display:inline-block;vertical-align:top;line-height:1em;font-size:1.2em;font-style:normal;content:"↠";padding-right:.3em;padding-left:.3em}
+.icon-line::before{display:inline-block;vertical-align:top;line-height:1em;font-size:1.2em;font-style:normal;font-weight:normal;content:"—";padding-right:.2em;padding-left:.2em}
+.icon-other::before,.icon-unknown::before{display:inline-block;vertical-align:top;line-height:1.2em;font-size:1.2em;font-style:normal;font-weight:bold;content:"?";padding-right:.5em;padding-left:.5em}
+.icon-simultaneous::before{display:inline-block;vertical-align:top;line-height:.7em;font-size:1.5em;font-style:normal;font-weight:bold;content:"↔";padding-right:.1em;padding-left:.1em}

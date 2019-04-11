@@ -667,7 +667,7 @@ class AnalyzeBout extends Command
             echo "Ignoring off targets\n";
             echo "Red Light Count: $this->singleRedCount\n";
             echo "Green Light Count: $this->singleGreenCount\n";
-            echo "BOth: $this->doubleLightCount\n";
+            echo "Both: $this->doubleLightCount\n";
         }
 
         if ($this->keepThumbs !== true) {

@@ -41,6 +41,10 @@ class Actions extends Api
             return $this->possibleCard();
         }
 
+        if ($actionId === 'easy') {
+            return $this->allEasy();
+        }
+
         if ($actionId !== null) {
             return $this->displayModel(Action::find($actionId));
         }
@@ -140,8 +144,6 @@ class Actions extends Api
      * @return array
      */
     public function unverifiedEasy() {
-
-        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '>=', .80)
                 ->where('is_verified', false)
@@ -149,6 +151,18 @@ class Actions extends Api
         );
     }
 
+
+    /**
+     * The all Easy actions
+     *
+     * @return array
+     */
+    public function allEasy() {
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '>=', .80)
+                ->get()
+        );
+    }
 
     /**
      * The verified Medium actions

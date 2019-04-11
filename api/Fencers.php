@@ -45,7 +45,6 @@ class Fencers extends Api
         }
 
         if ($fencerChild === 'bouts' && $fencerId !== null) {
-
             return $this->makeDataTablesResponse($this->getFencerBouts($fencerId));
         }
 
@@ -58,6 +57,18 @@ class Fencers extends Api
 
             return $this->makeDataTablesActionResponse($actions);
         }
+
+        if ($fencerChild === 'actions-for' && $fencerId !== null) {
+            $bouts = $this->getFencerBouts($fencerId);
+            $actions = new Collection();
+            foreach ($bouts as $bout) {
+                $actions = $actions->merge($bout->actions);
+            }
+
+            return $this->makeDataTablesActionResponse($actions);
+        }
+
+
 
         if ($fencerId !== null) {
             return $this->makeFencerResponse(Fencer::find($fencerId), ['bouts', 'actions']);

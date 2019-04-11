@@ -101,6 +101,20 @@ class VoteOnAction extends ComponentBase
         });
     }
 
+
+    private function getDifficultUnverifiedActions()
+    {
+        return Action::all()->filter(function ($action) {
+            /** @var Action $action */
+            return (
+                count($action->votes) > 3
+                && $action->getConfidenceAttribute() < 0.5
+                && $action->getIsVerifiedAttribute() !== true
+            );
+        });
+    }
+
+
     private function getActionsWithNoVotes()
     {
         return Action::doesnthave('votes')->get();
@@ -229,7 +243,7 @@ class VoteOnAction extends ComponentBase
             if ($random < 3) {
                 $action = $this->getActionsWithNoVotes()->random();
             } else if ($random < 5) {
-                $action = $this->getDifficultActions()->random();
+                $action = $this->getDifficultUnverifiedActions()->random();
             } else {
                 $action = $this->getActions()->random();
             }

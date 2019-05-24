@@ -101,13 +101,14 @@ class JsonUpdateFencersFromFie extends Command
             $yearString = strval($year);
 
             echo "$yearString - $weapon - $gender \n";
+
             $currentPageNumber = 1;
 
 
             $page = $this->getFencersPage($weapon, $gender, $yearString, $currentPageNumber);
             while (isset($page->allAthletes) !== false) {
                 foreach ($page->allAthletes as $fencer) {
-
+                    echo "\n";
                     $rank = $fencer->rank;
                     echo $rank . " - ";
 
@@ -124,17 +125,16 @@ class JsonUpdateFencersFromFie extends Command
                     $countryCode = $fencer->country;
                     echo $countryCode . " - ";
 
-                    $birth = DateTime::createFromFormat('y-m-d', $fencer->date);
+                    $birth = DateTime::createFromFormat('Y-m-d', $fencer->date);
                     if (!$birth) {
                         // Fuck you SANGOWAWA BABATUNDE OLUFEMI, have a birthday like a normal person
                         continue;
                     }
 
                     echo $birth->format('Y-m-d');
-                    echo "\n";
 
                     $fencer = Fencer::updateOrCreate(
-                            ['fie_site_number' => $fieSiteNumber],
+                        ['fie_site_number' => $fieSiteNumber],
                         [
                             'last_name' => $lastName,
                             'first_name' => $firstName,
@@ -143,8 +143,11 @@ class JsonUpdateFencersFromFie extends Command
                             'gender' => $gender, // Determined by list at top of function
                         ]
                     );
+
                     // Update the rank as we go
                     if (!$fencer->highest_rank || $rank < $fencer->highest_rank) {
+                        echo " - highest rank changed: " . $rank;
+
                         $fencer->highest_rank = $rank;
 
                         // Their primary weapon is their best ranked weapon

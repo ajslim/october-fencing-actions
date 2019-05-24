@@ -32,6 +32,7 @@ class Plugin extends PluginBase
     public function register()
     {
         $this->registerConsoleCommand('ajslim.UpdateFencersFromFie', 'Ajslim\FencingActions\Console\UpdateFencersFromFie');
+        $this->registerConsoleCommand('ajslim.JsonUpdateFencersFromFie', 'Ajslim\FencingActions\Console\JsonUpdateFencersFromFie');
         $this->registerConsoleCommand('ajslim.getAjslimGfycats', 'Ajslim\FencingActions\Console\getAjslimGfycats');
         $this->registerConsoleCommand('ajslim.UpdateTournamentsFromFie', 'Ajslim\FencingActions\Console\UpdateTournamentsFromFie');
         $this->registerConsoleCommand('ajslim.UpdateBoutsFromFie', 'Ajslim\FencingActions\Console\UpdateBoutsFromFie');
@@ -44,6 +45,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.CreateActionsForBout', 'Ajslim\FencingActions\Console\CreateActionsForBout');
         $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
         $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
+        $this->registerConsoleCommand('ajslim.getrules', 'Ajslim\FencingActions\Console\GetRules');
 
         CombineAssets::registerCallback(
             function ($combiner) {

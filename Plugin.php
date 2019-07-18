@@ -35,6 +35,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.JsonUpdateFencersFromFie', 'Ajslim\FencingActions\Console\JsonUpdateFencersFromFie');
         $this->registerConsoleCommand('ajslim.getAjslimGfycats', 'Ajslim\FencingActions\Console\getAjslimGfycats');
         $this->registerConsoleCommand('ajslim.UpdateTournamentsFromFie', 'Ajslim\FencingActions\Console\UpdateTournamentsFromFie');
+        $this->registerConsoleCommand('ajslim.JsonUpdateTournamentsFromFie', 'Ajslim\FencingActions\Console\JsonUpdateTournamentsFromFie');
         $this->registerConsoleCommand('ajslim.UpdateBoutsFromFie', 'Ajslim\FencingActions\Console\UpdateBoutsFromFie');
         $this->registerConsoleCommand('ajslim.JsonUpdateBoutsFromFie', 'Ajslim\FencingActions\Console\JsonUpdateBoutsFromFie');
         $this->registerConsoleCommand('ajslim.CacheBoutNames', 'Ajslim\FencingActions\Console\CacheBoutNames');

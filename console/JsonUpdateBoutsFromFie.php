@@ -148,25 +148,17 @@ class JsonUpdateBoutsFromFie extends Command
         foreach ($fencers as $fencerIndex => $fencer) {
             $json = $this->getBoutsJson($fencer->fie_site_number, 2019);
 
-
-
             $this->info($fencerIndex . '/' . $totalFencers . ' - ' . $fencer->fie_site_number);
 
             $bouts = $json->opponents;
 
-
             // Bouts
             foreach ($bouts as $bout) {
 
-                ;
-
                 // A bit untrue but tournament is uniquely defined as a place and a year
-                $tournament = Tournament::where('fie_id', '=', $bout->competition->fie_id)
-                    ->where('year', '=', $bout->competition->season)
+                $tournament = Tournament::where('fie_id', '=', $bout->competitionId)
+                    ->where('year', '=', $bout->season)
                     ->first();
-
-
-
 
                 $leftFencerName = $bout->fencer1->name;
                 $bothNames = $this->getFirstAndLastName($leftFencerName);
@@ -179,31 +171,29 @@ class JsonUpdateBoutsFromFie extends Command
                 $rightLastName = $bothNames[1];
 
                 $leftScore = $bout->fencer1->score;
-                $rightScore = trim($historyScores->item($index)->childNodes->item(2)->nodeValue);
+                $rightScore = $bout->fencer2->score;
 
-
-                $leftFencer = Fencer::where("first_name", "=", $leftFirstName)
-                    ->where("last_name", "=", $leftLastName)
+                $leftFencer = Fencer::where("fie_site_number", "=", $bout->fencer1->id)
                     ->first();
 
-                $rightFencer = Fencer::where("first_name", "=", $rightFirstName)
-                    ->where("last_name", "=", $rightLastName)
+                $rightFencer = Fencer::where("fie_site_number", "=", $bout->fencer2->id)
                     ->first();
-
-                $this->displayTemporaryTextBlock(
-                    [
-                        $eventFullName,
-                        "$eventName: $eventPlace: $eventWeapon:$eventCategory:$eventType",
-                        $eventDate->format('Y-m-d'),
-                        "$leftFirstName, $leftLastName: $leftScore",
-                        "$rightFirstName, $rightLastName: $rightScore",
-                    ]
-                );
 
                 if ($tournament !== null
                     && $leftFencer !== null
                     && $rightFencer !== null
                 ) {
+                    $this->displayTemporaryTextBlock(
+                        [
+                            $tournament->name,
+                            "$tournament->name: $tournament->place: $tournament->weapon:$tournament->category:$tournament->type",
+                            $tournament->start_date,
+                            "$leftFirstName, $leftLastName: $leftScore",
+                            "$rightFirstName, $rightLastName: $rightScore",
+                        ]
+                    );
+                    $this->clearTemporaryTextBlock();
+
                     // Check to see that the reversed bout was not saved
                     // since you can't tell which side a fencer is on
                     // on the FIE site
@@ -237,8 +227,9 @@ class JsonUpdateBoutsFromFie extends Command
 
                         $bout->save();
                     }
+
                 }
-                $this->clearTemporaryTextBlock();
+
             }
         }
     }

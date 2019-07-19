@@ -106,7 +106,25 @@ class Action extends Model
         $this->average_difficulty_cache = $this->getAverageDifficultyRating();
         $this->ordered_calls_cache = $this->getOrderedCallsString();
         $this->is_verified_cache = $this->getIsVerified();
+        $this->verified_call_id_cache = $this->getVerifiedCallId();
+
+        $this->left_fencer_id_cache = $this->bout->left_fencer_id;
+        $this->right_fencer_id_cache = $this->bout->right_fencer_id;
+        $this->tournament_id_cache = $this->bout->tournament_id;
+
         $this->save();
+    }
+
+
+    public function getVerifiedCallId()
+    {
+        /** @var Vote $verifiedVote */
+        $verifiedVote = $this->getVerifiedVote();
+        if ($verifiedVote !== false) {
+            return $verifiedVote->call_id;
+        }
+
+        return null;
     }
 
 
@@ -244,6 +262,7 @@ class Action extends Model
             ->votes()
             ->where('referee_level', 'fie')
             ->where('vote_comment_id', '!=', 2)
+            ->where('call_id', '!=', null)
             ->get();
 
         if (count($fieVotes) === 0) {

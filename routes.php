@@ -50,5 +50,12 @@ Route::group(
                 'uses' =>'Ajslim\FencingActions\Api\Actions@userActions',
             ]
         );
+        Route::get(
+            'test',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\Test@index',
+            ]
+        );
+
     }
 );

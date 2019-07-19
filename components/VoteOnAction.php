@@ -5,6 +5,7 @@ use Ajslim\Fencingactions\Models\Vote;
 use Ajslim\Fencingactions\Models\Call;
 use Ajslim\Fencingactions\Models\VoteComment;
 
+use Ajslim\FencingActions\Repositories\ActionRepository;
 use Backend\Facades\BackendAuth;
 use Backend\Models\User;
 use Cms\Classes\ComponentBase;
@@ -87,42 +88,30 @@ class VoteOnAction extends ComponentBase
 
     private function getActions()
     {
-        return Action::whereDoesntHave('votes', function ($query) {
-            $query->where('vote_comment_id', 2);
-        })->get();
+        return ActionRepository::getActions();
     }
 
 
     private function getDifficultActions()
     {
-        return Action::all()->filter(function ($action) {
-            /** @var Action $action */
-            return (count($action->votes) > 3 && $action->getConfidenceAttribute() < 0.5);
-        });
+        return ActionRepository::getDifficultActions();
     }
 
 
     private function getDifficultUnverifiedActions()
     {
-        return Action::all()->filter(function ($action) {
-            /** @var Action $action */
-            return (
-                count($action->votes) > 3
-                && $action->getConfidenceAttribute() < 0.5
-                && $action->getIsVerifiedAttribute() !== true
-            );
-        });
+        return ActionRepository::getDifficultUnverifiedActions();
     }
 
 
     private function getActionsWithNoVotes()
     {
-        return Action::doesnthave('votes')->get();
+        return ActionRepository::getActionsWithNoVotes();
     }
 
     private function getVerifiedActions()
     {
-        return Action::where('is_verified_cache', '1')->get();
+        return ActionRepository::getVerifiedActions();
     }
 
 
@@ -230,22 +219,22 @@ class VoteOnAction extends ComponentBase
             $actionId = $get['action-id'];
             $action = Action::find($actionId);
         } else if (isset($get['onlyverified'])) {
-            $action = $this->getVerifiedActions()->random();
+            $action = $this->getVerifiedActions()->first();
             $this->page['onlyverified'] = true;
         } else if (isset($get['difficult'])) {
-            $action = $this->getDifficultActions()->random();
+            $action = $this->getDifficultActions()->first();
             $this->page['difficult'] = true;
         } else if (isset($get['fresh'])) {
-            $action = $this->getActionsWithNoVotes()->random();
+            $action = $this->getActionsWithNoVotes()->first();
             $this->page['fresh'] = true;
         } else if ($this->isFieUser === true) {
             $random = rand(1, 5);
             if ($random < 3) {
-                $action = $this->getActionsWithNoVotes()->random();
+                $action = $this->getActionsWithNoVotes()->first();
             } else if ($random < 5) {
-                $action = $this->getDifficultUnverifiedActions()->random();
+                $action = $this->getDifficultUnverifiedActions()->first();
             } else {
-                $action = $this->getActions()->random();
+                $action = $this->getActions()->first();
             }
         } else {
             $fieVoteCount = Session::get('fieVoteCount', 0);
@@ -255,29 +244,29 @@ class VoteOnAction extends ComponentBase
             // 'verifier' voters will get 1/4 of their actions as verified
             // 'verifier' users will get 1/4 of their actions as fresh too
             if ($fieVoteCount <= $this->beginnerThreshold) {
-                $action = $this->getVerifiedActions()->random();
+                $action = $this->getVerifiedActions()->first();
             } else if ($fieVoteCount <  $this->maxFieVoteCount) {
                 $random = rand(1, 3);
                 if ($random === 1) {
-                    $action = $this->getVerifiedActions()->random();
+                    $action = $this->getVerifiedActions()->first();
                 } else {
-                    $action = $this->getActions()->random();
+                    $action = $this->getActions()->first();
                 }
             } else {
                 $random = rand(1, 5);
                 if ($random === 1) {
-                    $action = $this->getVerifiedActions()->random();
+                    $action = $this->getVerifiedActions()->first();
                 } else if ($random === 2) {
-                    $action = $this->getActionsWithNoVotes()->random();
+                    $action = $this->getActionsWithNoVotes()->first();
                 } else {
-                    $action = $this->getActions()->random();
+                    $action = $this->getActions()->first();
                 }
             }
         }
         if ($action === null) {
             $this->warnings[] = "No actions found";
 
-            $action = $this->getActions()->random();
+            $action = $this->getActions()->first();
         }
 
         $this->action = $action;

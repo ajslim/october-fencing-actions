@@ -32,6 +32,8 @@ class SearchYoutubeUrlsForTournament extends Command
     }
 
     private function makeYoutubeApiSearchUrl($year, $place, $fencer1, $fencer2) {
+        $fencer1 = str_replace('-', '', $fencer1);
+        $fencer2 = str_replace('-', '', $fencer2);
 
         return 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=fencing+$year+'
             . urlencode($place)
@@ -45,6 +47,8 @@ class SearchYoutubeUrlsForTournament extends Command
 
 
     private function makeYoutubeApiSearchUrlByName($year, $tournamentName, $fencer1, $fencer2) {
+        $fencer1 = str_replace('-', '', $fencer1);
+        $fencer2 = str_replace('-', '', $fencer2);
 
         return 'https://www.googleapis.com/youtube/v3/search?part=snippet&q=fencing+$year+'
             . urlencode($tournamentName)
@@ -136,7 +140,6 @@ class SearchYoutubeUrlsForTournament extends Command
 
     private function searchYoutubeApi($bout)
     {
-
         $boutFound = false;
         $tournament = $bout->tournament;
 
@@ -157,9 +160,6 @@ class SearchYoutubeUrlsForTournament extends Command
 
     private function searchApiByPlace($bout, $tournament, $place)
     {
-
-
-
         $url = $this->makeYoutubeApiSearchUrl(
             $tournament->year,
             $place,

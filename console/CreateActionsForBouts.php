@@ -36,7 +36,7 @@ class CreateActionsForBouts extends Command
             $totalBouts += 1;
 
             echo "Total bouts: " . $totalBouts . "\n";
-            if ($totalBouts > 300) {
+            if ($totalBouts > 400) {
                 echo "Stopping at 300 bouts - get a bigger server \n";
                 break;
             }

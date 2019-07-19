@@ -145,6 +145,55 @@ class Fencer extends Model
     }
 
 
+    /**
+     * Returns the calls array using a cache
+     *
+     * @return Collection
+     */
+    public function getActionsAttribute()
+    {
+        return Cache::remember($this->cacheKey() . ':allactions', $this->cacheMinutes, function () {
+            return $this->getActions();
+        });
+    }
+
+
+    /**
+     * Gets all the fencers actions
+     *
+     * @return Action[]|Collection
+     */
+    public function getActions()
+    {
+        $returnCollection = new Collection();
+
+        $leftActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'left_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+        $rightActions = $this
+            ->hasManyThrough(
+                'Ajslim\Fencingactions\Models\Action',
+                'Ajslim\Fencingactions\Models\Bout',
+                'right_fencer_id',
+                'bout_id',
+                'id',
+                'id'
+            )
+            ->get();
+
+        $returnCollection = $rightActions->merge($leftActions);
+
+        return $returnCollection;
+    }
+
 
     /**
      * Returns the calls array using a cache
@@ -219,7 +268,6 @@ class Fencer extends Model
 
         return $returnCollection;
     }
-
 
 
     /**

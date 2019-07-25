@@ -53,9 +53,14 @@ Route::group(
         Route::get(
             'test',
             [
-                'uses' =>'Ajslim\FencingActions\Api\Test@index',
+                'uses' =>'Ajslim\FencingActions\Api\TestApi@index',
             ]
         );
-
+        Route::post(
+            'test',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\TestApi@checkTest',
+            ]
+        );
     }
 );

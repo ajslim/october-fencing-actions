@@ -5,6 +5,10 @@ use Model;
 /**
  * vote Model
  *
+ * @property integer call_id
+ * @property integer priority
+ * @property integer call_id
+ *
  * @mixin \Eloquent
  */
 class Vote extends Model

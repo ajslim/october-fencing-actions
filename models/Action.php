@@ -425,6 +425,30 @@ class Action extends Model
 
 
     /**
+     * Returns the verified vote
+     */
+    public function getVerifiedOrTopCall()
+    {
+        /** @var Vote $verifiedVote */
+        $verifiedVote = $this->getVerifiedVote();
+        if ($verifiedVote !== false) {
+            return (object) [
+                'priorityId' => $verifiedVote->priority,
+                'callId' => $verifiedVote->call_id,
+            ];
+        }
+
+        $topVote = $this->getTopVote();
+        if ($topVote !== false) {
+            return $topVote;
+        }
+
+        return false;
+    }
+
+
+
+    /**
      * Returns top vote using cache
      *
      * @return null|object

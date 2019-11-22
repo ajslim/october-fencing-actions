@@ -94,15 +94,15 @@ class Fencer extends Model
      */
     public function getAllFencersAverageActionsCallPercentagesAttribute()
     {
-        // This doesn't use the cache key, and will re run every 30 minutes
-        return Cache::remember('allFencersAverageCallPercentages', 30, function () {
+        // This doesn't use the cache key, and will re run every 200 minutes
+        return Cache::remember('allFencersAverageCallPercentages', 200, function () {
             return $this->getAllFencersAverageActionsCallPercentages();
         });
     }
 
     public function getAllFencersAverageActionsCallPercentages()
     {
-        $actions = Action::all();
+        $actions = Action::where('vote_count_cache', '>', 0)->get();
 
         $totalNumberOfActions = count($actions);
 

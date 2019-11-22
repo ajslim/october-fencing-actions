@@ -28,16 +28,17 @@ class JsonUpdateTournamentsFromFie extends Command
      *
      * @param $fencerId
      * @param $season
-     * @return stdClass
+     *
+     * @return stdClass | null
      */
-    public function getTournamentsJson($weaponId, $genderId, $category, $pageNumber): stdClass
+    public function getTournamentsJson($weaponId, $genderId, $category, $pageNumber)
     {
         $tournamentsRequest = [
             'status' => 'passed',
             'weapon' => [$weaponId],
             'gender' => [$genderId],
             'type' => ['i'],
-            'season' => -1,
+            'season' => '-1',
             'level' => 's',
             'competitionCategory' => $category,
             'fromDate' => '',
@@ -56,6 +57,7 @@ class JsonUpdateTournamentsFromFie extends Command
         $rankingFirstPage = curl_exec($ch);
         curl_close($ch);
         $result = json_decode("" . $rankingFirstPage);
+
         return $result;
     }
 
@@ -81,10 +83,17 @@ class JsonUpdateTournamentsFromFie extends Command
         ];
 
         foreach ($categories as $category) {
-            echo $category . "\n";
+            echo $category;
 
             $pageNumber = 1;
             $apiResponse = $this->getTournamentsJson($weapon, $gender, $category, $pageNumber);
+
+            if ($apiResponse === null) {
+                echo ' not found' . "\n";
+                continue;
+            }
+
+            echo "\n";
 
             $numberOfPages = ceil($apiResponse->totalFound / $apiResponse->pageSize);
 

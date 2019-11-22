@@ -150,6 +150,10 @@ class JsonUpdateBoutsFromFie extends Command
 
             $this->info($fencerIndex . '/' . $totalFencers . ' - ' . $fencer->fie_site_number);
 
+            if (isset($json->opponents) !== true) {
+                continue;
+            }
+
             $bouts = $json->opponents;
 
             // Bouts

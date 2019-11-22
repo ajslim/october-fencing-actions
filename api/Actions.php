@@ -45,6 +45,10 @@ class Actions extends Api
             return $this->allEasy();
         }
 
+        if ($actionId === 'withtopvote') {
+            return $this->withTopVote();
+        }
+
         if ($actionId !== null) {
             return $this->displayModel(Action::find($actionId));
         }
@@ -193,6 +197,22 @@ class Actions extends Api
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '<', .50)
                 ->where('is_verified', false)
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function withTopVote() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('top_vote_name_cache', '!=', '')
+                ->where('top_vote_name_cache', '!=', null)
                 ->get()
         );
     }

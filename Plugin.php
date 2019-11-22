@@ -1,6 +1,8 @@
 <?php namespace Ajslim\FencingActions;
 
 use Backend;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use System\Classes\CombineAssets;
 use System\Classes\PluginBase;
 
@@ -48,6 +50,7 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.SearchYoutubeUrlsForTournament', 'Ajslim\FencingActions\Console\SearchYoutubeUrlsForTournament');
         $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
         $this->registerConsoleCommand('ajslim.getrules', 'Ajslim\FencingActions\Console\GetRules');
+        $this->registerConsoleCommand('ajslim.updateactionscache', 'Ajslim\FencingActions\Console\UpdateActionsCache');
 
         CombineAssets::registerCallback(
             function ($combiner) {
@@ -65,6 +68,21 @@ class Plugin extends PluginBase
     {
 
     }
+
+
+
+    /**
+     * Register schedule method
+     *
+     * @param Schedule $schedule The schedule
+     *
+     * @return void
+     */
+    public function registerSchedule($schedule)
+    {
+
+    }
+
 
     /**
      * Registers any front-end components implemented in this plugin.

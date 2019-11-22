@@ -87,16 +87,6 @@ class Fencer extends Model
     }
 
 
-    public function getAllFencersAverageActionsFor()
-    {
-        $returnCollection = new Collection();
-        $allFencers = Fencer::all();
-        foreach ($allFencers as $fencer) {
-            $returnCollection = $returnCollection->merge($fencer->getActionsForAttribute());
-        }
-        return $returnCollection;
-    }
-
     /**
      * Returns the calls array using a cache
      *
@@ -112,7 +102,7 @@ class Fencer extends Model
 
     public function getAllFencersAverageActionsCallPercentages()
     {
-        $actions = $this->getAllFencersAverageActionsFor();
+        $actions = Action::all();
 
         $totalNumberOfActions = count($actions);
 

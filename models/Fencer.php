@@ -41,6 +41,7 @@ class Fencer extends Model
         'fie_site_number',
         'fie_number',
         'birth',
+        'hand',
         'country_code',
         'gender'
     ];

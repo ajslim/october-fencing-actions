@@ -98,11 +98,17 @@
         });
     }
 
-    function makeBrowseTable(data, responseColumns) {
+    function makeBrowseTable(data, responseColumns, apilink) {
         var firstRecord = data[0];
 
         var endpointArray = endpoint.split('/');
+
         var resource = endpointArray[endpointArray.length - 1];
+        if (apilink === undefined) {
+            resource = endpointArray[endpointArray.length - 1];
+        } else {
+            resource = apilink;
+        }
         var columns = [];
         var $list = $('#list');
 
@@ -234,7 +240,8 @@
                             '</div>'
                         );
                     }
-                    makeBrowseTable(response.data, response.columns);
+
+                    makeBrowseTable(response.data, response.columns, response.link);
                 } else {
                     displayObject(response);
                 }

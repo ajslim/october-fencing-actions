@@ -106,7 +106,7 @@ class JsonUpdateFencersFromFie extends Command
 
 
             $page = $this->getFencersPage($weapon, $gender, $yearString, $currentPageNumber);
-            while (isset($page->allAthletes) !== false) {
+            while (isset($page->allAthletes) !== false && count($page->allAthletes) > 0) {
                 foreach ($page->allAthletes as $fencer) {
                     echo "\n";
                     $rank = $fencer->rank;
@@ -131,6 +131,10 @@ class JsonUpdateFencersFromFie extends Command
                         continue;
                     }
 
+                    $hand = $fencer->hand;
+
+                    echo $hand . " - ";
+
                     echo $birth->format('Y-m-d');
 
                     $fencer = Fencer::updateOrCreate(
@@ -141,6 +145,7 @@ class JsonUpdateFencersFromFie extends Command
                             'country_code' => $countryCode,
                             'birth' => $birth,
                             'gender' => $gender, // Determined by list at top of function
+                            'hand' => $hand
                         ]
                     );
 

@@ -51,6 +51,20 @@ Route::group(
             ]
         );
         Route::get(
+            'byone/{fencerId?}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\ByOne@index',
+            ]
+        );
+
+        Route::get(
+            'byonede/{fencerId?}',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\ByOne@indexDe',
+            ]
+        );
+
+        Route::get(
             'test',
             [
                 'uses' =>'Ajslim\FencingActions\Api\TestApi@index',

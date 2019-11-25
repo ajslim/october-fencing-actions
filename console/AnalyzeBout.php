@@ -151,6 +151,11 @@ class AnalyzeBout extends Command
 
         $boutDetails = json_decode(exec( "youtube-dl -j \"$this->url\""));
 
+        if (isset($boutDetails->duration) !== true) {
+            echo 'Bout has no duration' . "\n";
+            return false;
+        }
+
         if ($boutDetails->duration > 5400) {
             echo "bout more than 1:300 - too long \n";
             return false;

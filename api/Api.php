@@ -44,6 +44,7 @@ class Api extends Controller
             'birth' => $fencer->birth,
             'highest_rank' => $fencer->highest_rank,
             'primary_weapon' => $fencer->primary_weapon,
+            'hand' => $fencer->hand,
             'call_percentages' => [
                 'for' => $calls,
                 'against' => $callsAgainst,
@@ -122,7 +123,7 @@ class Api extends Controller
     }
 
 
-    public function makeDataTablesBoutResponse($collection)
+    public function makeDataTablesBoutResponse($collection, $link = null)
     {
         $draw = (integer) Input::get('draw');
         $start = Input::get('start');
@@ -162,6 +163,11 @@ class Api extends Controller
             ],
             'data' => $records,
         ];
+
+        if ($link !== null) {
+            $response['link'] = $link;
+        }
+
         return json_encode($response);
     }
 
@@ -192,6 +198,7 @@ class Api extends Controller
                 'highest_rank' => $fencer->highest_rank,
                 'primary_weapon' => $fencer->primary_weapon,
                 'gender' => $fencer->gender,
+                'hand' => $fencer->hand,
                 'fie_site_number' => $fencer->fie_site_number,
             ];
         }
@@ -210,6 +217,7 @@ class Api extends Controller
                 'highest_rank' => 'integer',
                 'primary_weapon' => 'string',
                 'gender' => 'string',
+                'hand' => 'string',
                 'fie_site_number' => 'string'
             ],
             'data' => $records,

@@ -45,7 +45,7 @@ class Fencers extends Api
         }
 
         if ($fencerChild === 'bouts' && $fencerId !== null) {
-            return $this->makeDataTablesResponse($this->getFencerBouts($fencerId));
+            return $this->makeDataTablesBoutResponse($this->getFencerBouts($fencerId));
         }
 
         if ($fencerChild === 'actions' && $fencerId !== null) {
@@ -74,7 +74,7 @@ class Fencers extends Api
             return $this->makeFencerResponse(Fencer::find($fencerId), ['bouts', 'actions']);
         }
 
-        return $this->makeDataTablesFencerResponse(Fencer::all());
+        return $this->makeDataTablesFencerResponse(Fencer::where('primary_weapon', 'f')->get());
     }
 
     private function getFencerBouts($fencerId)

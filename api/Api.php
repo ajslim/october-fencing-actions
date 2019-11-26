@@ -145,6 +145,8 @@ class Api extends Controller
                 'video_url' => $bout->video_url,
                 'left_score' => $bout->left_score,
                 'right_score' => $bout->right_score,
+                'winning_fencer' => $bout->winner->last_name,
+                'losing_fencer' => $bout->loser->last_name,
                 'action_count' => $bout->actionCount,
             ];
         }
@@ -159,6 +161,8 @@ class Api extends Controller
                 'video_url' => 'link',
                 'left_score' => 'integer',
                 'right_score' => 'integer',
+                'winning_fencer' => 'string',
+                'losing_fencer' => 'string',
                 'action_count' => 'integer',
             ],
             'data' => $records,

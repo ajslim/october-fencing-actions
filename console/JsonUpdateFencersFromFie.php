@@ -106,6 +106,7 @@ class JsonUpdateFencersFromFie extends Command
 
 
             $page = $this->getFencersPage($weapon, $gender, $yearString, $currentPageNumber);
+
             while (isset($page->allAthletes) !== false && count($page->allAthletes) > 0) {
                 foreach ($page->allAthletes as $fencer) {
                     echo "\n";
@@ -135,8 +136,28 @@ class JsonUpdateFencersFromFie extends Command
 
                     echo $hand . " - ";
 
+                    $height = $fencer->height;
+
+                    echo $height . " - ";
+
+                    $fieNumber = null;
+                    if (isset($fencer->licenseNumber) === true) {
+                        $fieNumber = $fencer->licenseNumber;
+                    }
+                    echo $fieNumber . " - ";
+
                     echo $birth->format('Y-m-d');
 
+                    $primaryWeapon = null;
+                    if (isset($fencer->weapon) === true) {
+                        $primaryWeapon = strtolower($fencer->weapon);
+                    }
+                    echo $primaryWeapon . " - ";
+
+                    if ($primaryWeapon !== 'f') {
+                        echo 'Not saving non-foilists' . "\n";
+                        continue;
+                    }
                     $fencer = Fencer::updateOrCreate(
                         ['fie_site_number' => $fieSiteNumber],
                         [
@@ -145,7 +166,10 @@ class JsonUpdateFencersFromFie extends Command
                             'country_code' => $countryCode,
                             'birth' => $birth,
                             'gender' => $gender, // Determined by list at top of function
-                            'hand' => $hand
+                            'hand' => $hand,
+                            'height' => $height,
+                            'fie_number' => $fieNumber,
+                            'primary_weapon' => $primaryWeapon,
                         ]
                     );
 

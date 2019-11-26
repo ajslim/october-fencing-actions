@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Cache;
 class Bout extends Model
 {
     protected $connection = 'business';
-    
+
     /**
      * @var string The database table used by the model.
      */
@@ -88,6 +88,35 @@ class Bout extends Model
             return $actionCount;
         });
     }
+
+
+    /**
+     * Returns the number of actions
+     *
+     * @return Fencer
+     */
+    public function getWinnerAttribute()
+    {
+        if ($this->left_score > $this->right_score) {
+            return $this->left_fencer;
+        }
+        return $this->right_fencer;
+    }
+
+
+    /**
+     * Returns the number of actions
+     *
+     * @return Fencer
+     */
+    public function getLoserAttribute()
+    {
+        if ($this->left_score < $this->right_score) {
+            return $this->left_fencer;
+        }
+        return $this->right_fencer;
+    }
+
 
 
     /**

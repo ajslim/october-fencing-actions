@@ -50,6 +50,21 @@ Route::group(
                 'uses' =>'Ajslim\FencingActions\Api\Actions@userActions',
             ]
         );
+
+        Route::get(
+            'lefthand',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\LeftHand@index',
+            ]
+        );
+
+        Route::get(
+            'lefthandde',
+            [
+                'uses' =>'Ajslim\FencingActions\Api\LeftHand@indexDe',
+            ]
+        );
+
         Route::get(
             'byone/{fencerId?}',
             [

@@ -120,7 +120,7 @@ class ByOne extends Api
                 'total_by_one' => 'integer',
                 'by_one_win_percent' => 'percent',
                 'total_bouts' => 'integer',
-                'by_one_percent' => 'integer',
+                'by_one_percent' => 'percent',
             ],
             'data' => $results,
         ];
@@ -208,7 +208,7 @@ class ByOne extends Api
                 'total_by_one' => 'integer',
                 'by_one_win_percent' => 'percent',
                 'total_bouts' => 'integer',
-                'by_one_percent' => 'integer',
+                'by_one_percent' => 'percent',
             ],
             'data' => $results,
         ];

@@ -41,6 +41,10 @@ class Actions extends Api
             return $this->possibleCard();
         }
 
+        if ($actionId === 'possibleline') {
+            return $this->possibleLine();
+        }
+
         if ($actionId === 'easy') {
             return $this->allEasy();
         }
@@ -50,7 +54,7 @@ class Actions extends Api
         }
 
         if ($actionId !== null) {
-            return $this->displayModel(Action::find($actionId));
+            return $this->makeActionResponse(Action::find($actionId));
         }
 
         return $this->makeDataTablesActionResponse(Action::all());
@@ -97,16 +101,12 @@ class Actions extends Api
      *
      * @return array
      */
-    public function beatVsParry() {
+    public function possibleLine() {
 
-        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        // Where someone has given a point in line
         return $this->makeDataTablesActionResponse(
             Action::whereRaw(
-                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
-                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:3:') > 0"
-            )->orWhereRaw(
-                "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:3:') > 0 "
-                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0"
+                "INSTR(ordered_calls_cache, ':5:') > 0 "
             )->get()
         );
     }

@@ -28,6 +28,20 @@ class Api extends Controller
         return json_encode($array);
     }
 
+    public function makeActionResponse(Action $action, $children = null)
+    {
+        $array = $action->toArray();
+        if ($children !== null) {
+            $array['children'] = $children;
+        }
+
+        $array['left_fencer_display_name'] = $action->getLeftnameAttribute();
+        $array['right_fencer_display_name'] = $action->getRightnameAttribute();
+        $array['tournament_name'] = $action->bout->tournament->year . ' ' . $action->bout->tournament->name;
+
+        return json_encode($array);
+    }
+
     public function makeFencerResponse(Fencer $fencer, $children)
     {
 

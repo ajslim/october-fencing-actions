@@ -49,42 +49,12 @@ class VoteOnAction extends ComponentBase
     }
 
 
-    private function getVoteArrayForAction()
+    public function getVoteArrayForAction()
     {
         $action = $this->action;
 
-        $voteArray = [];
-
-        $leftRightNeitherNames = [
-            Action::LEFT_FENCER_ID => 'left',
-            Action::RIGHT_FENCER_ID => 'right',
-            Action::NEITHER_FENCER_ID => 'neither'
-        ];
-
-        $callsArray = $action->getCachedCallsArray();
-        foreach ($callsArray as $leftRightNeitherId => $leftRightNeither) {
-
-            $voteArray[$leftRightNeitherNames[$leftRightNeitherId]] = [];
-            foreach ($leftRightNeither as $callId => $callCount) {
-                $call = Call::find($callId);
-
-                if ($call !== null) {
-                    $voteArray[$leftRightNeitherNames[$leftRightNeitherId]][$call->name] = $callCount;
-                }
-            }
-        }
-        $voteArray['simultaneous'] = $callsArray[Action::NEITHER_FENCER_ID][Call::SIMULTANEOUS_ID];
-
-        $voteArray['cardLeft'] = $callsArray[Action::LEFT_FENCER_ID][Call::CARD_ID];
-        $voteArray['cardRight'] = $callsArray[Action::RIGHT_FENCER_ID][Call::CARD_ID];
-
-        $voteArray['totalPriority'] = $action->votes()->whereNotNull('priority')->count();
-        $voteArray['totalCards'] = $action->votes()->whereNotNull('card_for')->count();
-        $voteArray['total'] = $action->getCallVotesAttribute()->count();
-
-        return $voteArray;
+        return $action->getVoteArray();
     }
-
 
     private function getActions()
     {

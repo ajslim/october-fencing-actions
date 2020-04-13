@@ -15,8 +15,7 @@ class CreateActionsTable extends Migration
     public function up()
     {
         Schema::connection('business')->create(
-            'ajslim_fencingactions_actions',
-            function (Blueprint $table) {
+            'ajslim_fencingactions_actions', function (Blueprint $table) {
                 $table->engine = 'InnoDB';
                 $table->increments('id');
                 $table->string('video_url', 300)
@@ -84,12 +83,6 @@ class CreateActionsTable extends Migration
                     ->nullable();
 
                 $table->float('average_difficulty_cache')
-                    ->nullable();
-
-                $table->string('ordered_calls_cache')
-                    ->nullable();
-
-                $table->boolean('is_verified_cache')
                     ->nullable();
 
                 $table->timestamps();

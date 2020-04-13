@@ -12,10 +12,12 @@ use Ajslim\FencingActions\Models\Call;
 use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\Fencingactions\Models\Test;
 use Ajslim\Fencingactions\Models\Tournament;
+use Ajslim\Fencingactions\Models\Vote;
 use Ajslim\FencingActions\Repositories\ActionRepository;
 use Backend\Classes\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 
 /**
  * Api Controller
@@ -49,6 +51,9 @@ class TestApi extends Api
 
             $questions[] = [
                 'video_url' => $action->getVideoAttribute(),
+                'left_fencer_name' => $action->getLeftnameAttribute(),
+                'right_fencer_name' => $action->getRightnameAttribute(),
+                'tournament' => $action->getRightnameAttribute(),
                 'thumb_url' => $action->thumb_url,
             ];
         }
@@ -75,33 +80,56 @@ class TestApi extends Api
      */
     public function checkTest() {
 
-        $testId = Input::get('testId');
+
+
+        $content = json_decode(Request::getContent());
+        $testId = $content->testId;
+        $submittedActions = $content->actions;
 
         $test = Test::find($testId);
         $ids = explode(',', $test->action_ids);
 
-        $submittedAnswers = Input::get('answers');
+
         $actions = Action::whereIn('id', $ids)->orderByRaw('FIELD (id, ' . implode(',', $ids) . ')')->get();
+
 
         $submitted = $test->submitted;
 
-        $response = [];
+
+        $reponseActions = [];
+        $easyCorrectCount = 0;
+        $mediumCorrectCount = 0;
+        $difficultCorrectCount = 0;
         foreach($actions as $index => $action) {
-            $submittedAnswer = $submittedAnswers[$index];
+            $submittedAction = $submittedActions[$index];
+            $submittedVote = $submittedAction->vote;
             $correctCall = $action->getVerifiedOrTopCall();
 
             if ($correctCall !== false) {
+                $submittedCallString = $submittedVote->priority . ":" . $submittedVote->call_id;
                 $correctCallString = $correctCall->priorityId . ":" . $correctCall->callId;
-                $correct = ($submittedAnswer === $correctCallString);
+                $correct = ($submittedCallString === $correctCallString);
+
+                if ($action->isEasyVerified()) {
+                    $easyCorrectCount += 1;
+                } elseif ($action->isMediumVerified()) {
+                    $mediumCorrectCount += 1;
+                } elseif ($action->isDifficultVerified()) {
+                    $difficultCorrectCount += 1;
+                }
             } else {
-                $correct = true;
+                $correct = 'Undetermined';
             }
 
-            $response[] = [
+            echo $index;
+            var_dump($correct);
+
+            $reponseActions[] = [
                 'id' => $action->id,
                 'video_url' => $action->getVideoAttribute(),
                 'thumb_url' => $action->thumb_url,
                 'correct' => $correct,
+                'voteArray' => $action->getVoteArray()
             ];
         }
 
@@ -109,7 +137,10 @@ class TestApi extends Api
         $test->save();
 
         return response(
-            $response
+            [
+                'testId' => $testId,
+                'actions' => $reponseActions,
+            ]
         )->withHeaders([
             'Content-Type' => 'text/json; charset=utf-8'
         ]);

@@ -35,8 +35,8 @@ class Api extends Controller
             $array['children'] = $children;
         }
 
-        $array['left_fencer_display_name'] = $action->getLeftnameAttribute();
-        $array['right_fencer_display_name'] = $action->getRightnameAttribute();
+        $array['left_fencer_name'] = $action->getLeftnameAttribute();
+        $array['right_fencer_name'] = $action->getRightnameAttribute();
         $array['tournament_name'] = $action->bout->tournament->year . ' ' . $action->bout->tournament->name;
 
         return json_encode($array);

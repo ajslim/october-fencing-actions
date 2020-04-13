@@ -17,6 +17,9 @@ use phpDocumentor\Reflection\Types\Integer;
  * @propery integer right_fencer_id
  * @propery Bout bout
  * @propery Collection votes
+ * @propery float confidence_cache
+ * @propery boolean is_verified_cache
+ * @propery integer vote_count_cache
  * @method Builder votes
  */
 class Action extends Model
@@ -100,6 +103,9 @@ class Action extends Model
     public function updateCacheColumns()
     {
         $this->vote_count_cache = $this->getCallVotes()->count();
+        $this->left_vote_count_cache = $this->votes()->where('priority', 1)->count();
+        $this->right_vote_count_cache = $this->votes()->where('priority', 2)->count();
+
         $this->top_vote_name_cache = $this->getTopVoteName();
         $this->confidence_cache = $this->getConfidence();
         $this->consensus_cache = $this->getConsensus();
@@ -829,5 +835,73 @@ class Action extends Model
             $this->right_fencer_id = $temp;
             $this->save();
         }
+    }
+
+
+    public function isEasyVerified()
+    {
+        if ($this->confidence_cache > 0.8 && $this->getIsVerified() === true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isMediumVerified()
+    {
+        if ($this->confidence_cache > 0.7
+            && $this->getIsVerified() === true
+            && $this->consensus_cache < 1
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isDifficultVerified()
+    {
+        if ($this->confidence_cache < 0.5
+            && $this->getIsVerified() === true
+            && $this->vote_count_cache > 3
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getVoteArray()
+    {
+        $voteArray = [];
+
+        $leftRightNeitherNames = [
+            Action::LEFT_FENCER_ID => 'left',
+            Action::RIGHT_FENCER_ID => 'right',
+            Action::NEITHER_FENCER_ID => 'neither'
+        ];
+
+        $callsArray = $this->getCachedCallsArray();
+        foreach ($callsArray as $leftRightNeitherId => $leftRightNeither) {
+
+            $voteArray[$leftRightNeitherNames[$leftRightNeitherId]] = [];
+            foreach ($leftRightNeither as $callId => $callCount) {
+                $call = Call::find($callId);
+
+                if ($call !== null) {
+                    $voteArray[$leftRightNeitherNames[$leftRightNeitherId]][$call->name] = $callCount;
+                }
+            }
+        }
+        $voteArray['simultaneous'] = $callsArray[Action::NEITHER_FENCER_ID][Call::SIMULTANEOUS_ID];
+
+        $voteArray['cardLeft'] = $callsArray[Action::LEFT_FENCER_ID][Call::CARD_ID];
+        $voteArray['cardRight'] = $callsArray[Action::RIGHT_FENCER_ID][Call::CARD_ID];
+
+        $voteArray['totalPriority'] = $this->votes()->whereNotNull('priority')->count();
+        $voteArray['totalCards'] = $this->votes()->whereNotNull('card_for')->count();
+        $voteArray['total'] = $this->getCallVotesAttribute()->count();
+
+        return $voteArray;
     }
 }

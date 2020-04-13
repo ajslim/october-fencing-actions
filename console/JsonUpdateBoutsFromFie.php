@@ -142,11 +142,9 @@ class JsonUpdateBoutsFromFie extends Command
             $fencers = Fencer::where('gender', '=', $gender)->get();
         }
 
-
-
         $totalFencers = count($fencers);
         foreach ($fencers as $fencerIndex => $fencer) {
-            $json = $this->getBoutsJson($fencer->fie_site_number, 2019);
+            $json = $this->getBoutsJson($fencer->fie_site_number, 2018);
 
             $this->info($fencerIndex . '/' . $totalFencers . ' - ' . $fencer->fie_site_number);
 

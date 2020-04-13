@@ -1,8 +1,17 @@
 <?php namespace Ajslim\FencingActions\Console;
 
 use Ajslim\FencingActions\Models\Action;
+use Ajslim\FencingActions\Models\Bout;
+use Ajslim\FencingActions\Models\Fencer;
+use Ajslim\Fencingactions\Models\Tournament;
+use DateTime;
+use DOMDocument;
+use DOMXPath;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use October\Rain\Network\Http;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 class UpdateActionsCache extends Command
 {
@@ -24,7 +33,7 @@ class UpdateActionsCache extends Command
     public function handle()
     {
 
-        $actions = Action::all()->random(3000);
+        $actions = Action::all();
         Log::info('Caching random 3000 action details');
         foreach ($actions as $action) {
             echo $action->id . ",";

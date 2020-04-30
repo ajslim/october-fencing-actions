@@ -84,6 +84,10 @@ class VoteOnAction extends ComponentBase
         return ActionRepository::getVerifiedActions();
     }
 
+    private function getEasyVerifiedActions()
+    {
+        return ActionRepository::getEasyVerifiedActions();
+    }
 
     private function getNewOrExistingVote()
     {
@@ -214,7 +218,7 @@ class VoteOnAction extends ComponentBase
             // 'verifier' voters will get 1/4 of their actions as verified
             // 'verifier' users will get 1/4 of their actions as fresh too
             if ($fieVoteCount <= $this->beginnerThreshold) {
-                $action = $this->getVerifiedActions()->first();
+                $action = $this->getEasyVerifiedActions()->first();
             } else if ($fieVoteCount <  $this->maxFieVoteCount) {
                 $random = rand(1, 3);
                 if ($random === 1) {

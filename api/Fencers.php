@@ -23,7 +23,7 @@ class Fencers extends Api
     /**
      * The index controller
      *
-     * @return array
+     * @return mixed
      */
     public function index(
         $fencerId = null,

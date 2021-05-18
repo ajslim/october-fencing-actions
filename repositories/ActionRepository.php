@@ -33,6 +33,14 @@ class ActionRepository {
             ->inRandomOrder();
     }
 
+    public static function getActionsWithFewVotes()
+    {
+        return Action::where('vote_count_cache', '<', 3)
+            ->orWhere('vote_count_cache', '=', null)
+            ->where('is_verified_cache', '!=', '1')
+            ->inRandomOrder();
+    }
+
 
     public static function getEasyVerifiedActions()
     {
@@ -43,8 +51,8 @@ class ActionRepository {
 
     public static function getMediumVerifiedActions()
     {
-        return Action::where('confidence_cache', '>', '0.7')
-            ->where('consensus_cache', '<', '1')
+        return Action::where('confidence_cache', '>', '0.6')
+            ->where('confidence_cache', '<', '0.8')
             ->where('is_verified_cache', '=', '1')->inRandomOrder();
     }
 

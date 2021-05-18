@@ -52,6 +52,10 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.Refresh', 'Ajslim\FencingActions\Console\Refresh');
         $this->registerConsoleCommand('ajslim.getrules', 'Ajslim\FencingActions\Console\GetRules');
         $this->registerConsoleCommand('ajslim.updateactionscache', 'Ajslim\FencingActions\Console\UpdateActionsCache');
+        $this->registerConsoleCommand('ajslim.addlightstoactions', 'Ajslim\FencingActions\Console\AddLightsToActions');
+        $this->registerConsoleCommand('ajslim.addcameratoactions', 'Ajslim\FencingActions\Console\AddCameraMovementToActions');
+        $this->registerConsoleCommand('ajslim.analyzeaction', 'Ajslim\FencingActions\Console\AnalyzeAction');
+        $this->registerConsoleCommand('ajslim.getfencervelocities', 'Ajslim\FencingActions\Console\GetFencerVelocities');
 
         CombineAssets::registerCallback(
             function ($combiner) {
@@ -95,7 +99,8 @@ class Plugin extends PluginBase
     {
         return [
             'Ajslim\FencingActions\Components\VoteOnAction' => 'voteOnAction',
-            'Ajslim\FencingActions\Components\Browse' => 'browse'
+            'Ajslim\FencingActions\Components\Browse' => 'browse',
+            'Ajslim\FencingActions\Components\MinutoScore' => 'minutoScore',
         ]; // Remove this line to activate
     }
 

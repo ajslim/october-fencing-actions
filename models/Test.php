@@ -28,7 +28,7 @@ class Test extends Model
     /**
      * @var array Fillable fields
      */
-    protected $fillable = ['action_ids', 'submitted'];
+    protected $fillable = ['action_ids', 'submitted', 'easy_count', 'medium_count', 'difficult_count'];
 
     /**
      * @var array Relations

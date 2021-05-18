@@ -49,6 +49,26 @@ class Actions extends Api
             return $this->allEasy();
         }
 
+        if ($actionId === 'riposte') {
+            return $this->getAction('Riposte');
+        }
+
+        if ($actionId === 'attack') {
+            return $this->getAction('Attack');
+        }
+
+        if ($actionId === 'counterattack') {
+            return $this->getAction('Counter Attack');
+        }
+
+        if ($actionId === 'line') {
+            return $this->getAction('Line');
+        }
+
+        if ($actionId === 'remise') {
+            return $this->getAction('Remise');
+        }
+
         if ($actionId === 'withtopvote') {
             return $this->withTopVote();
         }
@@ -143,6 +163,19 @@ class Actions extends Api
             Action::whereRaw(
                 "INSTR(ordered_calls_cache, ':99:') > 0 "
             )->get()
+        );
+    }
+
+    /**
+     * A random riposte
+     *
+     * @return array
+     */
+    public function getAction($actionName) {
+        return $this->makeDataTablesActionResponse(
+            Action::where('confidence_cache', '>=', .80)
+                ->where('top_vote_name_cache', '=', $actionName)
+                ->get()
         );
     }
 

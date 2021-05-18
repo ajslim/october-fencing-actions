@@ -30,7 +30,38 @@ class CreateActionsForBouts extends Command
             $this->force = true;
         }
 
-        $bouts = Bout::whereNotNull('video_url')->get();
+        $boutsQuery = Bout::whereNotNull('video_url');
+
+        if ($this->option('tournamentId') !== null) {
+            $boutsQuery->where('tournament_id', $this->option('tournamentId'));
+        }
+
+        $bouts = $boutsQuery->get();
+
+        if ($this->option('deletePreviousVideoFolders') !== null) {
+            $totalBouts = 0;
+            foreach ($bouts as $bout) {
+                $totalBouts += 1;
+
+                echo "Total bouts: " . $totalBouts . "\n";
+
+                $videoFolderName = getcwd() . '/storage/bout/' . substr($bout->video_url, 32) . "\n";
+
+                echo 'deleting ' . $videoFolderName . "\n";
+
+                system("rm -rf " . $videoFolderName, $result);
+
+                echo $result . "\n";
+
+                $actions = $bout->actions;
+
+                foreach($actions as $action) {
+                    $action->delete();
+                }
+            }
+            return;
+        }
+
         $totalBouts = 0;
         foreach ($bouts as $bout) {
             $totalBouts += 1;
@@ -62,6 +93,8 @@ class CreateActionsForBouts extends Command
     {
         return [
             ['force', null, InputOption::VALUE_OPTIONAL, 'create actions even if bout has actions', null],
+            ['tournamentId', null, InputOption::VALUE_OPTIONAL, 'only create actions for bouts in certain tournament', null],
+            ['deletePreviousVideoFolders', null, InputOption::VALUE_OPTIONAL, 'only create actions for bouts in certain tournament', null],
         ];
     }
 }

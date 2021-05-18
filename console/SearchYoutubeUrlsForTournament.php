@@ -251,6 +251,7 @@ class SearchYoutubeUrlsForTournament extends Command
             'FIE Fencing Channel',
             'Great Foil Fencing',
             'Fédération Française d\'Escrime',
+            'CyrusofChaos',
         ];
 
         foreach ($bouts as $bout) {

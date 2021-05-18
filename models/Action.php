@@ -33,6 +33,12 @@ class Action extends Model
     private $verifiedConfidenceThreshold = .80;
     private $numberOfVerifiers = 2;
 
+    private $testPassConfidenceThreshold = .80;
+    private $numberOftestPass = 4;
+
+    private $testPerfectConfidenceThreshold = .80;
+    private $numberOftestPerfect = 3;
+
 
     /**
      * @var string The database table used by the model.
@@ -242,6 +248,18 @@ class Action extends Model
             return $verifierVotes->first();
         }
 
+        $testPerfectVotes = $this->getTestPerfectVotes();
+        if ($this->getConfidenceAttribute() > $this->testPerfectConfidenceThreshold
+            && $testPerfectVotes->count() >= $this->numberOftestPerfect) {
+            return $testPerfectVotes->first();
+        }
+
+        $testPassVotes = $this->getTestPassVotes();
+        if ($this->getConfidenceAttribute() > $this->testPassConfidenceThreshold
+            && $testPassVotes->count() >= $this->numberOftestPass) {
+            return $testPassVotes->first();
+        }
+
         return false;
     }
 
@@ -253,6 +271,21 @@ class Action extends Model
             ->get();
     }
 
+
+    public function getTestPassVotes()
+    {
+        return $this->votes()
+            ->where('referee_level', 'test-pass')
+            ->get();
+    }
+
+
+    public function getTestPerfectVotes()
+    {
+        return $this->votes()
+            ->where('referee_level', 'test-perfect')
+            ->get();
+    }
 
     public function getFieConsensusVoteAttribute()
     {
@@ -438,8 +471,15 @@ class Action extends Model
         /** @var Vote $verifiedVote */
         $verifiedVote = $this->getVerifiedVote();
         if ($verifiedVote !== false) {
+
+            if (isset($verifiedVote->priority) === true) {
+                $priority = $verifiedVote->priority;
+            } else {
+                $priority = $verifiedVote->card_for;
+            }
+
             return (object) [
-                'priorityId' => $verifiedVote->priority,
+                'priorityId' => $priority,
                 'callId' => $verifiedVote->call_id,
             ];
         }
@@ -849,7 +889,8 @@ class Action extends Model
 
     public function isMediumVerified()
     {
-        if ($this->confidence_cache > 0.7
+        if ($this->confidence_cache > 0.6
+            && $this->confidence_cache < 0.8
             && $this->getIsVerified() === true
             && $this->consensus_cache < 1
         ) {

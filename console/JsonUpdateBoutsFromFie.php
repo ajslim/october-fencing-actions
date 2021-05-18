@@ -144,7 +144,7 @@ class JsonUpdateBoutsFromFie extends Command
 
         $totalFencers = count($fencers);
         foreach ($fencers as $fencerIndex => $fencer) {
-            $json = $this->getBoutsJson($fencer->fie_site_number, 2018);
+            $json = $this->getBoutsJson($fencer->fie_site_number, 2021);
 
             $this->info($fencerIndex . '/' . $totalFencers . ' - ' . $fencer->fie_site_number);
 

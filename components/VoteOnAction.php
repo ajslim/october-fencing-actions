@@ -390,6 +390,7 @@ class VoteOnAction extends ComponentBase
         $this->page['voteForm'] = false;
         $this->page['results'] = true;
         $verifiedCall = $this->action->getVerifiedVoteAttribute();
+
         if ($verifiedCall !== false) {
             $this->page['verified'] = $verifiedCall->call_id;
             $this->page['verifiedString'] = $verifiedCall->toString();

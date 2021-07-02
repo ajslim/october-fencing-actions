@@ -35,8 +35,8 @@ class ActionRepository {
 
     public static function getActionsWithFewVotes()
     {
-        return Action::where('vote_count_cache', '<', 3)
-            ->orWhere('vote_count_cache', '=', null)
+        return Action::where('vote_count_cache', '<', 6)
+            ->where('vote_count_cache', '>', 1)
             ->where('is_verified_cache', '!=', '1')
             ->inRandomOrder();
     }

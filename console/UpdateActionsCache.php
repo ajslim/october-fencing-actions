@@ -4,6 +4,7 @@ use Ajslim\FencingActions\Models\Action;
 use Ajslim\FencingActions\Models\Bout;
 use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\Fencingactions\Models\Tournament;
+use Ajslim\Fencingactions\Models\Vote;
 use DateTime;
 use DOMDocument;
 use DOMXPath;
@@ -32,9 +33,8 @@ class UpdateActionsCache extends Command
      */
     public function handle()
     {
-
         $actions = Action::all();
-        Log::info('Caching random 3000 action details');
+
         foreach ($actions as $action) {
             echo $action->id . ",";
             $action->updateCacheColumns();

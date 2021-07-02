@@ -38,18 +38,22 @@ class TestApi extends Api
         $easyVerifiedActions = ActionRepository::getEasyVerifiedActions()->paginate(self::EASY_COUNT);
         /** @var Action[] $actions */
         $actions = $easyVerifiedActions;
+        $easyIds = $easyVerifiedActions->pluck('id')->toArray();
 
         if (self::MEDIUM_COUNT !== 0) {
             $mediumVerifiedActions = ActionRepository::getMediumVerifiedActions()->paginate(self::MEDIUM_COUNT);
+            $mediumIds = $mediumVerifiedActions->pluck('id')->toArray();
             $actions = $easyVerifiedActions->merge($mediumVerifiedActions);
         }
         if (self::DIFFICULT_COUNT !== 0) {
             $difficultVerifiedActions = ActionRepository::getDifficultVerifiedActions()->paginate(self::DIFFICULT_COUNT);
+            $difficultIds = $difficultVerifiedActions->pluck('id')->toArray();
             $actions = $actions->merge($difficultVerifiedActions);
         }
 
         if (self::NEW_COUNT !== 0) {
             $newActions = ActionRepository::getActionsWithFewVotes()->paginate(self::NEW_COUNT);
+            $newIds = $newActions->pluck('id')->toArray();
             $actions = $actions->merge($newActions);
         }
 
@@ -81,6 +85,10 @@ class TestApi extends Api
 
         $test = Test::create([
             'action_ids' => implode(',', $ids),
+            'easy_ids' => implode(',', $easyIds),
+            'medium_ids' => implode(',', $mediumIds),
+            'difficult_ids' => implode(',', $difficultIds),
+            'new_ids' => implode(',', $newIds),
         ]);
 
         return response(
@@ -128,7 +136,10 @@ class TestApi extends Api
 
             $submittedAction = $submittedActions[$index];
             $submittedVote = $submittedAction->vote;
-            $correctCall = $action->getVerifiedOrTopCall();
+
+            $correctCall = null;
+            $correctCall = $action->getVerifiedCallObject();
+
             $correct = null;
             $callDifficulty = null;
             if ($correctCall !== false) {
@@ -142,19 +153,19 @@ class TestApi extends Api
                     $correct = ($submittedCallString === $correctCallString);
                 }
 
-                if ($action->isEasyVerified()) {
+                if (in_array($action->id, explode(',', $test->easy_ids)) === true) {
                     $callDifficulty = 1;
                     $easyCount += 1;
                     if ($correct) {
                         $easyCorrectCount += 1;
                     }
-                } elseif ($action->isMediumVerified()) {
+                } elseif (in_array($action->id, explode(',', $test->medium_ids)) === true) {
                     $callDifficulty = 2;
                     $mediumCount += 1;
                     if ($correct) {
                         $mediumCorrectCount += 1;
                     }
-                } elseif ($action->isDifficultVerified()) {
+                } elseif (in_array($action->id, explode(',', $test->difficult_ids)) === true) {
                     $callDifficulty = 3;
                     $difficultCount += 1;
                     if ($correct) {
@@ -267,9 +278,16 @@ class TestApi extends Api
         // Log the ip address of the vote, just in case some craziness happens
         $vote->ip_address = $_SERVER['REMOTE_ADDR'];
 
+        // If it's proxied through refereetest
+        if ($vote->ip_address === '104.248.164.27') {
+            $vote->ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+
         $vote->referee_level = $refereeLevel;
 
 
         $vote->save();
+
+        $vote->action->updateCacheColumns();
     }
 }

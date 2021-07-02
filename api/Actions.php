@@ -13,6 +13,7 @@ use Ajslim\FencingActions\Models\Fencer;
 use Ajslim\Fencingactions\Models\Tournament;
 use Backend\Classes\Controller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 /**
@@ -47,6 +48,10 @@ class Actions extends Api
 
         if ($actionId === 'easy') {
             return $this->allEasy();
+        }
+
+        if ($actionId === 'tiedlastactions') {
+            return $this->tiedLastActions();
         }
 
         if ($actionId === 'riposte') {
@@ -98,6 +103,41 @@ class Actions extends Api
      *
      * @return array
      */
+    public function tiedLastActions() {
+
+        $results = DB::select(DB::raw('select action_id from
+        (select *
+         from october_business.ajslim_fencingactions_bouts afb
+                  join (
+             SELECT a.id as action_id, bout_id
+             FROM october_business.ajslim_fencingactions_actions a
+                      INNER JOIN (
+                 SELECT bout_id as bout_idb, MAX(time) timeb
+                 FROM october_business.ajslim_fencingactions_actions
+                 GROUP BY bout_id
+             ) b ON a.bout_id = b.bout_idb AND a.time = b.timeb
+         ) as x
+                       on bout_id = afb.id
+         where left_score = 14
+            or right_score = 14
+        ) as z'));
+
+        $actionIds = collect($results)->pluck('action_id')->toArray();
+
+        // Where the top 2 calls are attack from either side, or simultaneous
+        return $this->makeDataTablesActionResponse(
+            Action::whereIn('id', $actionIds)
+                ->get()
+        );
+    }
+
+
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
     public function separatingAttacks() {
 
         // Where the top 2 calls are attack from either side, or simultaneous
@@ -122,12 +162,9 @@ class Actions extends Api
      * @return array
      */
     public function possibleLine() {
-
         // Where someone has given a point in line
         return $this->makeDataTablesActionResponse(
-            Action::whereRaw(
-                "INSTR(ordered_calls_cache, ':5:') > 0 "
-            )->get()
+            Action::where("ordered_calls_cache", "like", '%:5:%')->get()
         );
     }
 

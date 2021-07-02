@@ -30,11 +30,12 @@ class Action extends Model
     public const LEFT_FENCER_ID = 1;
     public const RIGHT_FENCER_ID = 2;
 
+    // If there is high confidence on an action, then you need only a few verifiers to confirm the call
     private $verifiedConfidenceThreshold = .80;
     private $numberOfVerifiers = 2;
 
     private $testPassConfidenceThreshold = .80;
-    private $numberOftestPass = 4;
+    private $numberOftestPass = 5;
 
     private $testPerfectConfidenceThreshold = .80;
     private $numberOftestPerfect = 3;
@@ -117,8 +118,10 @@ class Action extends Model
         $this->consensus_cache = $this->getConsensus();
         $this->average_difficulty_cache = $this->getAverageDifficultyRating();
         $this->ordered_calls_cache = $this->getOrderedCallsString();
+        $this->top_call_cache = substr($this->ordered_calls_cache, 0, 3);
         $this->is_verified_cache = $this->getIsVerified();
         $this->verified_call_id_cache = $this->getVerifiedCallId();
+        $this->verified_call_cache = $this->getVerifiedCall();
 
         $this->left_fencer_id_cache = $this->bout->left_fencer_id;
         $this->right_fencer_id_cache = $this->bout->right_fencer_id;
@@ -139,6 +142,18 @@ class Action extends Model
         return null;
     }
 
+
+
+    public function getVerifiedCall()
+    {
+        /** @var Vote $verifiedVote */
+        $verifiedVote = $this->getVerifiedVote();
+        if ($verifiedVote !== false) {
+            return $verifiedVote->priority . ':' . $verifiedVote->call_id;
+        }
+
+        return null;
+    }
 
     public function getOrderedCallsString()
     {
@@ -239,24 +254,28 @@ class Action extends Model
     {
         $fieConsensus = $this->getFieConsensusVote();
         if ($fieConsensus !== false) {
+            $this->verified_by = 'fie';
             return $fieConsensus;
         }
 
         $verifierVotes = $this->getVerifierVotes();
         if ($this->getConfidenceAttribute() > $this->verifiedConfidenceThreshold
             && $verifierVotes->count() >= $this->numberOfVerifiers) {
+            $this->verified_by = 'verifiers';
             return $verifierVotes->first();
         }
 
         $testPerfectVotes = $this->getTestPerfectVotes();
         if ($this->getConfidenceAttribute() > $this->testPerfectConfidenceThreshold
             && $testPerfectVotes->count() >= $this->numberOftestPerfect) {
+            $this->verified_by = 'test-perfect';
             return $testPerfectVotes->first();
         }
 
         $testPassVotes = $this->getTestPassVotes();
         if ($this->getConfidenceAttribute() > $this->testPassConfidenceThreshold
             && $testPassVotes->count() >= $this->numberOftestPass) {
+            $this->verified_by = 'test-pass';
             return $testPassVotes->first();
         }
 
@@ -468,10 +487,29 @@ class Action extends Model
      */
     public function getVerifiedOrTopCall()
     {
+        $verifiedCall = $this->getVerifiedCallObject();
+        if ($verifiedCall !== false) {
+            return $verifiedCall;
+        }
+
+        $topVote = $this->getTopVote();
+        if ($topVote !== false) {
+            return $topVote;
+        }
+
+        return false;
+    }
+
+
+
+    /**
+     * Returns the verified vote
+     */
+    public function getVerifiedCallObject()
+    {
         /** @var Vote $verifiedVote */
         $verifiedVote = $this->getVerifiedVote();
         if ($verifiedVote !== false) {
-
             if (isset($verifiedVote->priority) === true) {
                 $priority = $verifiedVote->priority;
             } else {
@@ -482,11 +520,6 @@ class Action extends Model
                 'priorityId' => $priority,
                 'callId' => $verifiedVote->call_id,
             ];
-        }
-
-        $topVote = $this->getTopVote();
-        if ($topVote !== false) {
-            return $topVote;
         }
 
         return false;

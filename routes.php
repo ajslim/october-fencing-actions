@@ -16,6 +16,20 @@ Route::group(
     }
 );
 
+
+Route::group(
+    ['prefix' => 'madlibbouts/'],
+    function () {
+
+        Route::get(
+            '{id}',
+            [
+                'uses' => 'Ajslim\FencingActions\html\MadLibBouts@index',
+            ]
+        );
+    }
+);
+
 Route::group(
     ['prefix' => 'api/'],
     function () {

@@ -56,6 +56,12 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.addcameratoactions', 'Ajslim\FencingActions\Console\AddCameraMovementToActions');
         $this->registerConsoleCommand('ajslim.analyzeaction', 'Ajslim\FencingActions\Console\AnalyzeAction');
         $this->registerConsoleCommand('ajslim.getfencervelocities', 'Ajslim\FencingActions\Console\GetFencerVelocities');
+        $this->registerConsoleCommand('ajslim.createmadlibsclips', 'Ajslim\FencingActions\Console\CreateMadlibsClips');
+        $this->registerConsoleCommand('ajslim.trackfencersonactions', 'Ajslim\FencingActions\Console\TrackFencersOnActions');
+        $this->registerConsoleCommand('ajslim.downloadaudioforbouts', 'Ajslim\FencingActions\Console\DownloadAudioForBouts');
+        $this->registerConsoleCommand('ajslim.createaudioforactions', 'Ajslim\FencingActions\Console\CreateAudioForActions');
+        $this->registerConsoleCommand('ajslim.bladecontactsonactions', 'Ajslim\FencingActions\Console\BladeContactsOnActions');
+        $this->registerConsoleCommand('ajslim.guesscallonaction', 'Ajslim\FencingActions\Console\GuessCallOnAction');
 
         CombineAssets::registerCallback(
             function ($combiner) {

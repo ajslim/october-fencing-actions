@@ -78,6 +78,18 @@ class Actions extends Api
             return $this->withTopVote();
         }
 
+        if ($actionId === 'computerincorrect') {
+            return $this->computerIncorrect();
+        }
+
+        if ($actionId === 'computercorrect') {
+            return $this->computerCorrect();
+        }
+
+        if ($actionId === 'computerguessonly') {
+            return $this->computerGuessOnly();
+        }
+
         if ($actionId !== null) {
             return $this->makeActionResponse(Action::find($actionId));
         }
@@ -293,16 +305,72 @@ class Actions extends Api
 
 
     /**
-     * The verified hard actions
-     *
-     * @return array
-     */
+ * The verified hard actions
+ *
+ * @return array
+ */
     public function withTopVote() {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
             Action::where('top_vote_name_cache', '!=', '')
                 ->where('top_vote_name_cache', '!=', null)
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function computerIncorrect() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('top_call_cache', '!=', '')
+                ->whereNotNull('top_call_cache')
+                ->whereNotNull('computer_guess_call_cache')
+                ->whereRaw('top_call_cache != computer_guess_call_cache')
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function computerCorrect() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where('top_call_cache', '!=', '')
+                ->whereNotNull('top_call_cache')
+                ->whereNotNull('computer_guess_call_cache')
+                ->whereRaw('top_call_cache = computer_guess_call_cache')
+                ->get()
+        );
+    }
+
+
+    /**
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function computerGuessOnly() {
+
+        // Where the top 2 calls are attack from left and riposte from the right, or vice versa
+        return $this->makeDataTablesActionResponse(
+            Action::where(function($query) {
+                $query->whereNull('top_call_cache')
+                    ->orWhere('top_call_cache', '=', '');
+            })
+                ->where('is_not_action_vote_count_cache', '=', 0)
+                ->whereNotNull('computer_guess_call_cache')
                 ->get()
         );
     }

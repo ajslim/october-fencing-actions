@@ -109,6 +109,7 @@ class Action extends Model
 
     public function updateCacheColumns()
     {
+        $this->is_not_action_vote_count_cache = $this->getIsNotActionVoteCountAttribute();
         $this->vote_count_cache = $this->getCallVotes()->count();
         $this->left_vote_count_cache = $this->votes()->where('priority', 1)->count();
         $this->right_vote_count_cache = $this->votes()->where('priority', 2)->count();
@@ -570,6 +571,13 @@ class Action extends Model
         return $highestCountVote;
     }
 
+    public function getIsNotActionVoteCountAttribute()
+    {
+        $votes = $this->votes()->where('vote_comment_id', 2)->get();
+        return count($votes);
+    }
+
+
 
     public function getIsNotActionAttribute()
     {
@@ -724,6 +732,7 @@ class Action extends Model
             return $this->getCallVotes();
         });
     }
+
 
     /**
      * Returns the votes which are part of call

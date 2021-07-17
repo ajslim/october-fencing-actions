@@ -23,7 +23,26 @@
     358,
     326
   ],
+  "leftOffCrop": [
+    15,
+    11,
+    236,
+    337
+  ],
+  "rightOffCrop": [
+    15,
+    11,
+    392,
+    337
+  ],
+    "XrightOffCrop": [
+        640,
+        360,
+        0,
+        0
+    ],
   "redLightThreshold": 0.015,
   "greenLightThreshold": 0.015,
+  "offTargetThreshold": 0.015,
   "overlayThreshold": 0.07
 }

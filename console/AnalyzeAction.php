@@ -29,8 +29,11 @@ class AnalyzeAction extends Command
 
     private $redLightCrop;
     private $greenLightCrop;
+    private $leftOffCrop;
+    private $rightOffCrop;
     private $redLightThreshold;
     private $greenLightThreshold;
+    private $offTargetThreshold;
 
     private $profileType = 1;
 
@@ -39,6 +42,12 @@ class AnalyzeAction extends Command
 
     /* @var Imagick $greenLightImage */
     private $greenLightImage;
+
+    /* @var Imagick $greenLightImage */
+    private $leftOffImage;
+
+    /* @var Imagick $greenLightImage */
+    private $rightOffImage;
 
     // Options
     private $debug = false;
@@ -212,6 +221,47 @@ class AnalyzeAction extends Command
         return $isGreen;
     }
 
+    /**
+     * @param Imagick $image
+     * @return bool
+     * @throws \ImagickException
+     */
+    private function checkIsLeftOff(Imagick $image)
+    {
+        if ($this->profileType === 2 && $this->leftOffImage !== null) {
+            $imageLightSection = clone $image;
+            $imageLightSection->cropImage(...$this->leftOffCrop);
+
+            if ($this->debug === true) {
+                echo "left off:" . $this->leftOffImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . '<' . $this->offTargetThreshold . "\n";
+            }
+
+            return $this->leftOffImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->offTargetThreshold;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Imagick $image
+     * @return bool
+     * @throws \ImagickException
+     */
+    private function checkIsRightOff(Imagick $image)
+    {
+        if ($this->profileType === 2 && $this->rightOffImage !== null) {
+            $imageLightSection = clone $image;
+            $imageLightSection->cropImage(...$this->rightOffCrop);
+
+            if ($this->debug === true) {
+                echo "right off:" . $this->rightOffImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] . '<' . $this->offTargetThreshold . "\n";
+            }
+            return $this->rightOffImage->compareImages($imageLightSection, Imagick::METRIC_MEANSQUAREERROR)[1] < $this->offTargetThreshold;
+        }
+
+        return false;
+    }
+
 
     private function getOverlayProfileWrapper($profileFolder)
     {
@@ -232,6 +282,11 @@ class AnalyzeAction extends Command
         ) {
             $overlayProfileWrapper['redLightImage'] = new Imagick($profileFolder . "/red.png");
             $overlayProfileWrapper['greenLightImage'] = new Imagick($profileFolder . "/green.png");
+
+            if (file_exists($profileFolder . "/leftoff.png") === true) {
+                $overlayProfileWrapper['leftOffImage'] = new Imagick($profileFolder . "/leftoff.png");
+                $overlayProfileWrapper['rightOffImage'] = new Imagick($profileFolder . "/rightoff.png");
+            }
         }
         return $overlayProfileWrapper;
     }
@@ -351,6 +406,15 @@ class AnalyzeAction extends Command
         if ($this->profileType === 2) {
             $this->redLightImage = $profileWrapper['redLightImage'];
             $this->greenLightImage = $profileWrapper['greenLightImage'];
+
+            if (isset($profileWrapper['leftOffImage'])) {
+                $this->leftOffImage = $profileWrapper['leftOffImage'];
+                $this->rightOffImage = $profileWrapper['rightOffImage'];
+
+                $this->leftOffCrop = $profileWrapper['profile']['leftOffCrop'];
+                $this->rightOffCrop = $profileWrapper['profile']['rightOffCrop'];
+                $this->offTargetThreshold = $profileWrapper['profile']['offTargetThreshold'];
+            }
         }
 
     }
@@ -380,6 +444,22 @@ class AnalyzeAction extends Command
                 $greenLightImage->writeImage(getcwd() . $this->actionFolder . "/lights/green-$imageNumber.png");
             }
         }
+    }
+
+    /**
+     * Saves cropped light images if the make light images flag is set. This is useful for converting
+     * profiles to type 2
+     *
+     * @param bool    $isRed
+     * @param bool    $isGreen
+     * @param Imagick $image
+     * @param integer $imageNumber
+     */
+    private function makeOffTargetImage(Imagick $image, $imageNumber)
+    {
+        $redLightImage = clone $image;
+        $redLightImage->cropImage(...$this->rightOffCrop);
+        $redLightImage->writeImage(getcwd() . "leftOff-$imageNumber.png");
     }
 
 
@@ -412,7 +492,11 @@ class AnalyzeAction extends Command
 
             $isLight = $isRed || $isGreen;
             if ($isLight) {
-                return true;
+                $isLeftOff = $this->checkIsLeftOff($image);
+                $isRightOff = $this->checkIsRightOff($image);
+
+                $output = [$isRed, $isGreen, $isLeftOff, $isRightOff];
+                return $output;
             }
         }
         return false;
@@ -437,6 +521,11 @@ class AnalyzeAction extends Command
         $actions = $actionQuery->get();
 
         foreach ($actions as $action) {
+            echo '-------------------------------' . "\n";
+            echo $action->id . "\n";
+            echo '-------------------------------'. "\n";
+
+
             $this->action = $action;
             $this->clearFramesDirectory();
             $this->makeFrameImages();
@@ -453,7 +542,7 @@ class AnalyzeAction extends Command
 
             if ($profileWrapper === false) {
                 echo "Profile not found\n";
-                return;
+                continue;
             }
 
             $this->setProfileValues($profileWrapper);
@@ -467,11 +556,28 @@ class AnalyzeAction extends Command
                     continue;
                 }
 
-                if ($this->isLight($filename, $profileWrapper, $imageNumber)) {
+                $isLight = $this->isLight($filename, $profileWrapper, $imageNumber);
+
+                if ($isLight !== false) {
+
+                    // We want the first frame any light comes on
                     if ($foundLight === false) {
                         echo "light on frame " . ($imageNumber + ($this->sampleRate * $this->sampleStart)) . "\n";
                         $this->action->light_frame_number = $imageNumber + ($this->sampleRate * $this->sampleStart);
-                        $this->action->save();
+                    }
+
+                    // Other lights might come on on later frames
+                    if ((bool) $isLight[0] === true) {
+                        $this->action->left_coloured_light = true;
+                    }
+                    if ((bool) $isLight[1] === true) {
+                        $this->action->right_coloured_light = true;
+                    }
+                    if ((bool) $isLight[2] === true) {
+                        $this->action->left_off_target_light = true;
+                    }
+                    if ((bool) $isLight[3] === true) {
+                        $this->action->right_off_target_light = true;
                     }
 
                     $foundLight = true;
@@ -486,6 +592,7 @@ class AnalyzeAction extends Command
                         unlink($filename); // delete file
                 }
             }
+            $action->save();
 
             // Delete images more than 2 seconds before the light
             $images = array_filter(glob($this->folder . '/*'), 'is_file');

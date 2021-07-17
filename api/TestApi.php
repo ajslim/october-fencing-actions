@@ -71,15 +71,17 @@ class TestApi extends Api
         $questions = [];
         $ids = [];
 
+        $count = 0;
         foreach($shuffledActions as $action) {
             $ids[] = $action->id;
-
+            $count += 1;
             $questions[] = [
                 'video_url' => $action->getVideoAttribute(),
                 'left_fencer_name' => $action->getLeftnameAttribute(),
                 'right_fencer_name' => $action->getRightnameAttribute(),
                 'tournament' => $action->getRightnameAttribute(),
                 'thumb_url' => $action->thumb_url,
+                'number' => $count,
             ];
         }
 

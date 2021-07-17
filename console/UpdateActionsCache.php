@@ -37,6 +37,13 @@ class UpdateActionsCache extends Command
 
         foreach ($actions as $action) {
             echo $action->id . ",";
+
+            $combinedFile = str_replace('clips', 'combined', $action->video_url);
+            if (file_exists(getcwd() . $combinedFile)) {
+                echo 'Combined Audio file exists' . "\n";
+                $action->video_url = $combinedFile;
+            }
+
             $action->updateCacheColumns();
         }
         Log::info('Finished Caching');

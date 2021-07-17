@@ -70,7 +70,7 @@ class CreateActionsForBout extends Command
 
         echo "Updating or creating actions for bout:" . $bout->id . "\n";
         $files = glob(getcwd() . $folder . '/clips/*'); // get all file names
-        foreach($files as $file){ // iterate files
+         foreach($files as $file){ // iterate files
             $pathParts = pathinfo($file);
 
             echo "Creating action for $file \n";

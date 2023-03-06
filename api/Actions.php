@@ -28,7 +28,8 @@ class Actions extends Api
      */
     public function index(
         $actionId = null
-    ) {
+    )
+    {
 
         if ($actionId === 'separatingattacks') {
             return $this->separatingAttacks();
@@ -90,6 +91,10 @@ class Actions extends Api
             return $this->computerGuessOnly();
         }
 
+        if ($actionId === 'possibleattackinprep') {
+            return $this->possibleAttackInPrep();
+        }
+
         if ($actionId !== null) {
             return $this->makeActionResponse(Action::find($actionId));
         }
@@ -104,7 +109,8 @@ class Actions extends Api
      */
     public function userActions(
         $userId
-    ) {
+    )
+    {
         return $this->makeDataTablesActionResponse(Action::whereHas('votes', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->get());
@@ -115,7 +121,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function tiedLastActions() {
+    public function tiedLastActions()
+    {
 
         $results = DB::select(DB::raw('select action_id from
         (select *
@@ -144,19 +151,19 @@ class Actions extends Api
     }
 
 
-
     /**
      * The user actions
      *
      * @return array
      */
-    public function separatingAttacks() {
+    public function separatingAttacks()
+    {
 
         // Where the top 2 calls are attack from either side, or simultaneous
         return $this->makeDataTablesActionResponse(
             Action::whereRaw(
                 "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
-                    . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0"
+                . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '1:1:') > 0"
             )->orWhereRaw(
                 "INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '2:1:') > 0 "
                 . "AND INSTR(SUBSTRING_INDEX(ordered_calls_cache, ',', 2), '0:7:') > 0"
@@ -173,7 +180,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function possibleLine() {
+    public function possibleLine()
+    {
         // Where someone has given a point in line
         return $this->makeDataTablesActionResponse(
             Action::where("ordered_calls_cache", "like", '%:5:%')->get()
@@ -186,7 +194,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function beatVsParry() {
+    public function beatVsParry()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -206,7 +215,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function possibleCard() {
+    public function possibleCard()
+    {
         // Where someone has given a card
         return $this->makeDataTablesActionResponse(
             Action::whereRaw(
@@ -215,12 +225,47 @@ class Actions extends Api
         );
     }
 
+
+    /**
+     * The user actions
+     *
+     * @return array
+     */
+    public function possibleAttackInPrep()
+    {
+        // Where someone has given a card
+        return $this->makeDataTablesActionResponse(
+            Action::where(function ($query) {
+                $query->where(function ($query) {
+                    $query->where('ordered_calls_cache', 'like', '%2:1:%') // Where the fencer on the right might have an attack
+                    ->where('direction_output', 'like', '%}:},}:},}:},}:},}:}%'); // where they went right a lot
+                })
+                    ->orWhere(function ($query) {
+                        $query->where('ordered_calls_cache', 'like', '%1:1:%') // Where the fencer on the left might have an attack
+                        ->where('direction_output', 'like', '%{:{,{:{,{:{,{:{,{:{%'); // where they went left a lot
+                    });
+                })
+                ->where(function ($query) {
+                    $query->where('left_coloured_light', '=', '1')
+                        ->orWhere('left_off_target_light', '=', '1');
+                })
+                ->where(function ($query) {
+                    $query->where('right_coloured_light', 1)
+                        ->orWhere('right_off_target_light', 1);
+                })
+                ->where('ordered_calls_cache', 'not like', '%:3:%') // no riposte calls
+                ->where('vote_count_cache', '>', 2) // 3 votes or more
+                ->get()
+        );
+    }
+
     /**
      * A random riposte
      *
      * @return array
      */
-    public function getAction($actionName) {
+    public function getAction($actionName)
+    {
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '>=', .80)
                 ->where('top_vote_name_cache', '=', $actionName)
@@ -234,13 +279,14 @@ class Actions extends Api
      *
      * @return array
      */
-    public function verifiedEasy() {
+    public function verifiedEasy()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '>=', .80)
-            ->where('is_verified', true)
-            ->get()
+                ->where('is_verified', true)
+                ->get()
         );
     }
 
@@ -249,7 +295,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function unverifiedEasy() {
+    public function unverifiedEasy()
+    {
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '>=', .80)
                 ->where('is_verified', false)
@@ -263,7 +310,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function allEasy() {
+    public function allEasy()
+    {
         return $this->makeDataTablesActionResponse(
             Action::where('confidence_cache', '>=', .80)
                 ->get()
@@ -275,7 +323,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function verifiedMedium() {
+    public function verifiedMedium()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -293,7 +342,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function verifiedHard() {
+    public function verifiedHard()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -305,11 +355,12 @@ class Actions extends Api
 
 
     /**
- * The verified hard actions
- *
- * @return array
- */
-    public function withTopVote() {
+     * The verified hard actions
+     *
+     * @return array
+     */
+    public function withTopVote()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -325,7 +376,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function computerIncorrect() {
+    public function computerIncorrect()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -343,7 +395,8 @@ class Actions extends Api
      *
      * @return array
      */
-    public function computerCorrect() {
+    public function computerCorrect()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
@@ -361,11 +414,12 @@ class Actions extends Api
      *
      * @return array
      */
-    public function computerGuessOnly() {
+    public function computerGuessOnly()
+    {
 
         // Where the top 2 calls are attack from left and riposte from the right, or vice versa
         return $this->makeDataTablesActionResponse(
-            Action::where(function($query) {
+            Action::where(function ($query) {
                 $query->whereNull('top_call_cache')
                     ->orWhere('top_call_cache', '=', '');
             })

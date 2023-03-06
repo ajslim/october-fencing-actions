@@ -62,6 +62,8 @@ class Plugin extends PluginBase
         $this->registerConsoleCommand('ajslim.createaudioforactions', 'Ajslim\FencingActions\Console\CreateAudioForActions');
         $this->registerConsoleCommand('ajslim.bladecontactsonactions', 'Ajslim\FencingActions\Console\BladeContactsOnActions');
         $this->registerConsoleCommand('ajslim.guesscallonaction', 'Ajslim\FencingActions\Console\GuessCallOnAction');
+        $this->registerConsoleCommand('ajslim.gettournamentdata', 'Ajslim\FencingActions\Console\GetTournamentData');
+        $this->registerConsoleCommand('ajslim.calculatetournamentdata', 'Ajslim\FencingActions\Console\CalculateTournamentData');
 
         CombineAssets::registerCallback(
             function ($combiner) {

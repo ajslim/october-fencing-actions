@@ -52,7 +52,7 @@ class TestApi extends Api
         }
 
         if (self::NEW_COUNT !== 0) {
-            $newActions = ActionRepository::getActionsWithFewVotes()->paginate(self::NEW_COUNT);
+            $newActions = ActionRepository::getActionsWithNoVotes()->paginate(self::NEW_COUNT);
             $newIds = $newActions->pluck('id')->toArray();
             $actions = $actions->merge($newActions);
         }
@@ -97,7 +97,7 @@ class TestApi extends Api
             json_encode([
                 'id' => $test->id,
                 'actions' => $questions,
-                'enableFencingDb' => true
+                'enableFencingDb' => false
             ])
         )->withHeaders([
             'Content-Type' => 'text/json; charset=utf-8'
